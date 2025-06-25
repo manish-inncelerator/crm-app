@@ -18,7 +18,7 @@ $config = new SdkConfiguration(
     domain: 'fayyaztravels.us.auth0.com',
     clientId: 'tgqsr8C26IrvLpq7z5h4fKEeVkEEkLGC',
     clientSecret: 'CGN13kuWTHq7YYGUSj6fJkryAfw-FXJGcGDMp-UHejly5tk4KFP9N64PvuWz1MdO',
-    redirectUri: 'http://localhost/crm/callback.php',
+    redirectUri: 'https://crm.fyyz.link/callback.php',
     cookieSecret: 'your-secret-key-here',
     httpClient: $httpClient
 );
@@ -902,9 +902,9 @@ html_start('Tickets');
     .quick-search .dropdown-menu {
         padding: 0.5rem 0;
         margin: 0.125rem 0 0;
-        border: 1px solid rgba(0,0,0,.15);
+        border: 1px solid rgba(0, 0, 0, .15);
         border-radius: 0.25rem;
-        box-shadow: 0 0.5rem 1rem rgba(0,0,0,.175);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, .175);
     }
 
     .quick-search .dropdown-header {
@@ -1908,7 +1908,7 @@ html_start('Tickets');
     document.getElementById('quickTicketSearch').addEventListener('input', function(e) {
         clearTimeout(searchTimeout);
         const searchTerm = e.target.value.trim();
-        
+
         if (searchTerm.length < 1) {
             document.getElementById('quickSearchResults').style.display = 'none';
             return;
@@ -1918,23 +1918,29 @@ html_start('Tickets');
             // Search in all ticket types
             const ticketTypes = ['estimate', 'supplier', 'general'];
             let resultsFound = false;
-            
-            Promise.all(ticketTypes.map(type => 
+
+            Promise.all(ticketTypes.map(type =>
                 fetch(`api/tickets.php?type=${type}&search=${searchTerm}`)
-                    .then(response => response.json())
-                    .then(data => ({ type, data }))
+                .then(response => response.json())
+                .then(data => ({
+                    type,
+                    data
+                }))
             )).then(results => {
                 const resultsDiv = document.getElementById('quickSearchResults');
                 resultsDiv.innerHTML = '';
-                
-                results.forEach(({ type, data }) => {
+
+                results.forEach(({
+                    type,
+                    data
+                }) => {
                     if (data.tickets && data.tickets.length > 0) {
                         resultsFound = true;
                         const typeHeader = document.createElement('div');
                         typeHeader.className = 'dropdown-header';
                         typeHeader.textContent = type.charAt(0).toUpperCase() + type.slice(1) + ' Tickets';
                         resultsDiv.appendChild(typeHeader);
-                        
+
                         data.tickets.forEach(ticket => {
                             const item = document.createElement('a');
                             item.className = 'dropdown-item';
@@ -1952,14 +1958,14 @@ html_start('Tickets');
                         });
                     }
                 });
-                
+
                 if (!resultsFound) {
                     const noResults = document.createElement('div');
                     noResults.className = 'dropdown-item text-muted';
                     noResults.textContent = 'No tickets found';
                     resultsDiv.appendChild(noResults);
                 }
-                
+
                 resultsDiv.style.display = 'block';
             });
         }, 300);

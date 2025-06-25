@@ -10,5 +10,5 @@ define('SSL_CERT_PATH', __DIR__ . '/certs/cacert.pem'); // Path to SSL certifica
 define('AUTH0_DOMAIN', 'fayyaztravels.us.auth0.com');
 define('AUTH0_CLIENT_ID', 'tgqsr8C26IrvLpq7z5h4fKEeVkEEkLGC');
 define('AUTH0_CLIENT_SECRET', 'CGN13kuWTHq7YYGUSj6fJkryAfw-FXJGcGDMp-UHejly5tk4KFP9N64PvuWz1MdO');
-define('AUTH0_REDIRECT_URI', 'http://localhost/crm/callback.php');
+define('AUTH0_REDIRECT_URI', 'https://crm.fyyz.link/callback.php');
 define('AUTH0_COOKIE_SECRET', 'your-secret-key-here');
