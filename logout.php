@@ -36,7 +36,7 @@ session_destroy();
 $auth0->clear();
 
 // Get logout URL from Auth0 with proper returnTo URL
-$logoutUrl = $auth0->logout('http://localhost/crm/login.php');
+$logoutUrl = $auth0->logout('https://crm.fyyz.link/login.php');
 
 // Clear any remaining cookies
 if (isset($_COOKIE[session_name()])) {
