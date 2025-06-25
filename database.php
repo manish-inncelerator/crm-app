@@ -6,13 +6,13 @@ use Medoo\Medoo;
 // Database configuration
 $database = new Medoo([
     'type' => 'mysql',
-    'host' => 'cmcbs4ya7000ipcahiaqe1578',
-    'database' => 'cmcbs4ya00006ahpc21gr6anf',
-    'username' => 'cmcbs4y9w0004ahpc0iirh8kw',
-    'password' => 'hPYekEStT51f57KoXAgErJMD',
-    'port' => 3306,
+    'host' => 'localhost',
+    'database' => 'crm',
+    'username' => 'root',
+    'password' => 'Inncelerator@2025@#',
     'charset' => 'utf8mb4',
     'collation' => 'utf8mb4_unicode_ci',
+    'port' => 3306,
     'prefix' => '',
     'logging' => true,
     'error' => PDO::ERRMODE_EXCEPTION,
