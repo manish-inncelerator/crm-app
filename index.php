@@ -1,1 +1,2 @@
-<?php header('Location: login.php');
+<?php
+echo "Index page is working!";
