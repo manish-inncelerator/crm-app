@@ -23,6 +23,8 @@ function writeLog($message, $type = 'INFO')
  */
 function html_start($title = 'CRM System', $additional_css = [])
 {
+    // Output HTML start tags
+    ob_start(); // Start output buffering
 ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -56,6 +58,7 @@ function html_start($title = 'CRM System', $additional_css = [])
 
     <body>
     <?php
+    ob_end_flush(); // Flush the output buffer
 }
 
 /**
@@ -64,6 +67,8 @@ function html_start($title = 'CRM System', $additional_css = [])
  */
 function html_end($additional_js = [])
 {
+    // Output HTML end tags
+    ob_start(); // Start output buffering
     ?>
         <!-- jQuery -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -86,4 +91,5 @@ function html_end($additional_js = [])
 
     </html>
 <?php
+    ob_end_flush(); // Flush the output buffer
 }
