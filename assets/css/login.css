@@ -1,0 +1,103 @@
+/* Login Page Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+.login-box {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  text-align: center;
+}
+
+.logo-container {
+  margin-bottom: 30px;
+}
+
+.logo {
+  width: 200px;
+  height: auto;
+  object-fit: contain;
+}
+
+h1 {
+  color: #333;
+  margin: 0 0 10px;
+  font-size: 24px;
+}
+
+p {
+  color: #666;
+  margin: 0 0 30px;
+  font-size: 16px;
+}
+
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px 24px;
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.google-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #ccc;
+}
+
+.google-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+  object-fit: contain;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 10px;
+  }
+
+  .login-box {
+    padding: 30px 20px;
+  }
+
+  .logo {
+    width: 160px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  p {
+    font-size: 14px;
+  }
+
+  .google-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
