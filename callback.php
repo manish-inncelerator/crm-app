@@ -31,7 +31,7 @@ $config = new SdkConfiguration(
     domain: 'fayyaztravels.us.auth0.com',
     clientId: 'tgqsr8C26IrvLpq7z5h4fKEeVkEEkLGC',
     clientSecret: 'CGN13kuWTHq7YYGUSj6fJkryAfw-FXJGcGDMp-UHejly5tk4KFP9N64PvuWz1MdO',
-    redirectUri: 'http://localhost/crm/callback.php',
+    redirectUri: 'https://crm.fyyz.link/callback.php',
     cookieSecret: 'your-secret-key-here', // Should be at least 32 chars
     httpClient: $httpClient,
     usePkce: true // Enable PKCE
