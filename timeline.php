@@ -165,8 +165,8 @@ html_start($pageTitle);
                     </div>
                     <div class="timeline-item-connector-wrapper">
                         <div class="timeline-widget">
-                            <div class="d-flex align-items-center mb-2 timeline-badge-row">
-                                <span class="timeline-badge <?= $badgeClass ?> me-2">
+                            <div class="d-flex flex-wrap align-items-center mb-2 timeline-badge-row gap-2">
+                                <span class="timeline-badge <?= $badgeClass ?>">
                                     <i class="bi <?= $icon ?>"></i> <?= htmlspecialchars($comment['user_name']) ?>
                                     <?php if ($comment['is_admin']): ?>
                                         <span class="badge bg-dark ms-1" style="font-size:0.75rem; border-radius:12px;">Admin</span>
@@ -178,11 +178,11 @@ html_start($pageTitle);
                             </div>
                             <div class="timeline-comment"><?= nl2br(htmlspecialchars($comment['comment'])) ?></div>
                             <?php if (isset($isGlobal) && $isGlobal): ?>
-                                <div class="mt-3 pt-2 border-top text-muted d-flex justify-content-between align-items-center" style="font-size:0.8rem;">
-                                    <span>
+                                <div class="mt-3 pt-2 border-top text-muted d-flex flex-wrap justify-content-between align-items-center gap-2" style="font-size:0.8rem;">
+                                    <span class="text-truncate" style="max-width: 100%;">
                                         <i class="bi bi-ticket-detailed"></i> Ticket #<?= htmlspecialchars($comment['ticket_id']) ?> (<?= htmlspecialchars(ucfirst($comment['ticket_type'])) ?>)
                                     </span>
-                                    <a href="timeline.php?id=<?= htmlspecialchars($comment['ticket_id']) ?>&type=<?= htmlspecialchars($comment['ticket_type']) ?>" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size:0.75rem; border-radius:12px;">
+                                    <a href="timeline.php?id=<?= htmlspecialchars($comment['ticket_id']) ?>&type=<?= htmlspecialchars($comment['ticket_type']) ?>" class="btn btn-sm btn-outline-primary py-0 px-2 flex-shrink-0" style="font-size:0.75rem; border-radius:12px;">
                                         View
                                     </a>
                                 </div>
