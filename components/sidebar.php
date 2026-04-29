@@ -69,6 +69,11 @@
             <i class="bi bi-people sidebar-link-icon"></i>
             <span class="sidebar-link-text">Manage Users</span>
         </a>
+        <a href="manage-kb.php"
+            class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'manage-kb.php' ? 'active' : ''; ?>">
+            <i class="bi bi-gear sidebar-link-icon"></i>
+            <span class="sidebar-link-text">Manage KB</span>
+        </a>
         <?php endif; ?>
     </nav>
 
