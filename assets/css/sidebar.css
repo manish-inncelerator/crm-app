@@ -51,7 +51,8 @@ body.dark-mode .sidebar {
     border-bottom: 1px solid rgba(0,0,0,0.05);
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    position: relative;
     background: transparent;
 }
 
@@ -92,6 +93,8 @@ body.dark-mode .sidebar-logo-icon {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: absolute;
+    right: 1.5rem;
     font-size: 1.2rem;
     color: var(--dash-text, #1f2937);
     cursor: pointer;
