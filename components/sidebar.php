@@ -2,12 +2,14 @@
 
 
 <aside class="sidebar" id="sidebar">
-    <button class="sidebar-close" id="sidebar-close" aria-label="Close sidebar"><i class="bi bi-x-lg"></i></button>
 
     <!-- Logo -->
     <div class="sidebar-logo">
-        <span class="sidebar-logo-icon"><i class="bi bi-wallet2"></i></span>
-        <span class="sidebar-logo-text">Accounts<br>Ticketing</span>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span class="sidebar-logo-icon"><i class="bi bi-wallet2"></i></span>
+            <span class="sidebar-logo-text">Accounts<br>Ticketing</span>
+        </div>
+        <button class="sidebar-close d-md-none" id="sidebar-close" aria-label="Close sidebar"><i class="bi bi-x-lg"></i></button>
     </div>
 
     <!-- Navigation -->

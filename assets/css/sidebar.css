@@ -37,22 +37,7 @@ body.dark-mode .sidebar::-webkit-scrollbar-thumb {
     background: rgba(255,255,255,0.1);
 }
 
-/* Close Button (Hidden by default on Desktop) */
-.sidebar-close {
-    display: none;
-    background: transparent;
-    border: none;
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    font-size: 1.5rem;
-    color: var(--dash-text, #1f2937);
-    cursor: pointer;
-    z-index: 10;
-}
-body.dark-mode .sidebar-close {
-    color: #f8f9fa;
-}
+
 
 body.dark-mode .sidebar {
     background: var(--dash-bg-glass, rgba(30, 41, 59, 0.85));
@@ -66,7 +51,7 @@ body.dark-mode .sidebar {
     border-bottom: 1px solid rgba(0,0,0,0.05);
     display: flex;
     align-items: center;
-    gap: 1rem;
+    justify-content: space-between;
     background: transparent;
 }
 
@@ -95,6 +80,37 @@ body.dark-mode .sidebar-logo-icon {
     letter-spacing: 0.5px;
     line-height: 1.2;
     text-transform: uppercase;
+}
+
+/* Close Button (Hidden by default, shown via d-md-none classes on mobile) */
+.sidebar-close {
+    background: rgba(78, 31, 0, 0.05);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--dash-text, #1f2937);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sidebar-close:hover {
+    background: rgba(78, 31, 0, 0.1);
+    color: #4e1f00;
+}
+
+body.dark-mode .sidebar-close {
+    background: rgba(255,255,255,0.05);
+    color: #f8f9fa;
+}
+
+body.dark-mode .sidebar-close:hover {
+    background: rgba(255,255,255,0.1);
+    color: #a97c50;
 }
 
 /* Navigation Section */
@@ -322,8 +338,5 @@ body {
     }
     body {
         padding-left: 0;
-    }
-    .sidebar-close {
-        display: block;
     }
 }
