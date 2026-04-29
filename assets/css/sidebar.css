@@ -317,7 +317,6 @@ body.dark-mode .sidebar-btn:hover {
 
 .sidebar-btn.logout-btn {
     color: #ef4444;
-    flex: 0 0 40px;
 }
 
 .sidebar-btn.logout-btn:hover {

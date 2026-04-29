@@ -35,9 +35,14 @@ try {
         exit;
     }
 
-    // Get POST data
-    $data = json_decode(file_get_contents('php://input'), true);
-    if (!$data) {
+    // Get POST data (handle both multipart/form-data and application/json)
+    if (!empty($_POST)) {
+        $data = $_POST;
+    } else {
+        $data = json_decode(file_get_contents('php://input'), true) ?? [];
+    }
+
+    if (empty($data) && empty($_FILES)) {
         http_response_code(400);
         echo json_encode(['error' => 'Invalid request data']);
         exit;
@@ -53,7 +58,7 @@ try {
     // Common fields for all tickets
     $commonFields = [
         'user_id' => $dbUser['id'],
-        'priority' => $data['priority'],
+        'priority' => $data['priority'] ?? 'MEDIUM',
         'status' => 'OPEN',
         'created_at' => date('Y-m-d H:i:s')
     ];
@@ -108,9 +113,12 @@ try {
             try {
                 $database->query("ALTER TABLE supplier_tickets ADD COLUMN IF NOT EXISTS supplier_name VARCHAR(255) DEFAULT '' AFTER due_date");
                 $database->query("ALTER TABLE supplier_tickets ADD COLUMN IF NOT EXISTS complete_costing TEXT AFTER bank_details");
+                $database->query("ALTER TABLE supplier_tickets ADD COLUMN IF NOT EXISTS supplier_invoice_path VARCHAR(255) AFTER complete_costing");
+                $database->query("ALTER TABLE supplier_tickets ADD COLUMN IF NOT EXISTS customer_invoice_path VARCHAR(255) AFTER supplier_invoice_path");
+                $database->query("ALTER TABLE supplier_tickets ADD COLUMN IF NOT EXISTS payment_proof_path VARCHAR(255) AFTER customer_invoice_path");
             } catch (Exception $e) { }
 
-            // Validate required fields
+            // Validate required text fields
             $requiredFields = [
                 'supplier_name',
                 'travel_date',
@@ -121,27 +129,24 @@ try {
             ];
 
             foreach ($requiredFields as $field) {
-                if (!isset($data[$field]) || empty($data[$field])) {
+                if (empty($data[$field])) {
                     http_response_code(400);
                     echo json_encode(['error' => "Missing required field: $field"]);
                     exit;
                 }
             }
 
-            // Handle file uploads
-            $supplierInvoicePath = null;
-            $customerInvoicePath = null;
-            $paymentProofPath = null;
+            // Validate required files
+            if (empty($_FILES['supplier_invoice']) || empty($_FILES['customer_invoice']) || empty($_FILES['payment_proof'])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Supplier Invoice, Customer Invoice, and Payment Proof are all required.']);
+                exit;
+            }
 
-            if (isset($_FILES['supplier_invoice'])) {
-                $supplierInvoicePath = handleFileUpload($_FILES['supplier_invoice'], 'supplier_invoices');
-            }
-            if (isset($_FILES['customer_invoice'])) {
-                $customerInvoicePath = handleFileUpload($_FILES['customer_invoice'], 'customer_invoices');
-            }
-            if (isset($_FILES['payment_proof'])) {
-                $paymentProofPath = handleFileUpload($_FILES['payment_proof'], 'payment_proofs');
-            }
+            // Handle file uploads
+            $supplierInvoicePath = handleFileUpload($_FILES['supplier_invoice'], 'supplier_invoices');
+            $customerInvoicePath = handleFileUpload($_FILES['customer_invoice'], 'customer_invoices');
+            $paymentProofPath = handleFileUpload($_FILES['payment_proof'], 'payment_proofs');
 
             $ticketData = array_merge($commonFields, [
                 'supplier_name' => $data['supplier_name'],
@@ -162,13 +167,29 @@ try {
             break;
 
         case 'invoice':
+            if (empty($data['client_type'])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Client Type is required']);
+                exit;
+            }
+
             $details = "<h4>Actual Invoice Request</h4>";
-            $details .= "<p><strong>Client Type:</strong> " . htmlspecialchars($data['client_type'] ?? '') . "</p>";
+            $details .= "<p><strong>Client Type:</strong> " . htmlspecialchars($data['client_type']) . "</p>";
             
-            if (($data['client_type'] ?? '') === 'Individual') {
-                $details .= "<p><strong>Boss Confirmation:</strong> " . (!empty($data['boss_confirmation']) && $data['boss_confirmation'] !== 'false' ? 'Yes' : 'No') . "</p>";
-            } elseif (($data['client_type'] ?? '') === 'New Corporate') {
-                $details .= "<p><strong>Boss Approval:</strong> " . (!empty($data['boss_approval']) && $data['boss_approval'] !== 'false' ? 'Yes' : 'No') . "</p>";
+            if ($data['client_type'] === 'Individual') {
+                if (empty($_FILES['payment_proof'])) {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'Payment proof is required for individual clients']);
+                    exit;
+                }
+                $details .= "<p><strong>Boss Confirmation:</strong> " . (!empty($data['boss_confirmation']) ? 'Yes' : 'No') . "</p>";
+            } elseif ($data['client_type'] === 'New Corporate') {
+                if (empty($_FILES['contract_copy'])) {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'Contract copy is required for new corporate clients']);
+                    exit;
+                }
+                $details .= "<p><strong>Boss Approval:</strong> " . (!empty($data['boss_approval']) ? 'Yes' : 'No') . "</p>";
             }
             if (!empty($data['description'])) {
                 $details .= "<h5>Additional Details:</h5><div>" . $data['description'] . "</div>";
@@ -191,13 +212,22 @@ try {
             break;
 
         case 'purchase_order':
+            $requiredFields = ['supplier_name', 'client_name', 'po_date', 'quantity', 'rate', 'description'];
+            foreach ($requiredFields as $field) {
+                if (empty($data[$field])) {
+                    http_response_code(400);
+                    echo json_encode(['error' => "Missing required field: $field"]);
+                    exit;
+                }
+            }
+
             $details = "<h4>Purchase Order Request</h4>";
-            $details .= "<p><strong>Supplier Name:</strong> " . htmlspecialchars($data['supplier_name'] ?? '') . "</p>";
-            $details .= "<p><strong>Client Name:</strong> " . htmlspecialchars($data['client_name'] ?? '') . "</p>";
-            $details .= "<p><strong>PO Date:</strong> " . htmlspecialchars($data['po_date'] ?? '') . "</p>";
-            $details .= "<p><strong>Quantity:</strong> " . htmlspecialchars($data['quantity'] ?? '') . "</p>";
-            $details .= "<p><strong>Rate:</strong> " . htmlspecialchars($data['rate'] ?? '') . "</p>";
-            $details .= "<p><strong>Description:</strong><br>" . nl2br(htmlspecialchars($data['description'] ?? '')) . "</p>";
+            $details .= "<p><strong>Supplier Name:</strong> " . htmlspecialchars($data['supplier_name']) . "</p>";
+            $details .= "<p><strong>Client Name:</strong> " . htmlspecialchars($data['client_name']) . "</p>";
+            $details .= "<p><strong>PO Date:</strong> " . htmlspecialchars($data['po_date']) . "</p>";
+            $details .= "<p><strong>Quantity:</strong> " . htmlspecialchars($data['quantity']) . "</p>";
+            $details .= "<p><strong>Rate:</strong> " . htmlspecialchars($data['rate']) . "</p>";
+            $details .= "<p><strong>Description:</strong><br>" . nl2br(htmlspecialchars($data['description'])) . "</p>";
             if (!empty($data['supplier_instructions'])) {
                 $details .= "<h5>Supplier Instructions:</h5><div>" . $data['supplier_instructions'] . "</div>";
             }
@@ -210,13 +240,22 @@ try {
             break;
 
         case 'payment_link':
+            $requiredFields = ['client_name', 'email', 'phone', 'country', 'amount'];
+            foreach ($requiredFields as $field) {
+                if (empty($data[$field])) {
+                    http_response_code(400);
+                    echo json_encode(['error' => "Missing required field: $field"]);
+                    exit;
+                }
+            }
+
             $details = "<h4>Payment Link Request</h4>";
-            $details .= "<p><strong>Client Name:</strong> " . htmlspecialchars($data['client_name'] ?? '') . "</p>";
-            $details .= "<p><strong>Email Address:</strong> " . htmlspecialchars($data['email'] ?? '') . "</p>";
-            $details .= "<p><strong>Phone Number:</strong> " . htmlspecialchars($data['phone'] ?? '') . "</p>";
-            $details .= "<p><strong>Country:</strong> " . htmlspecialchars($data['country'] ?? '') . "</p>";
-            $details .= "<p><strong>Amount:</strong> " . htmlspecialchars($data['amount'] ?? '') . "</p>";
-            $details .= "<p><strong>Platform Preference:</strong> " . htmlspecialchars($data['platform'] ?? '') . "</p>";
+            $details .= "<p><strong>Client Name:</strong> " . htmlspecialchars($data['client_name']) . "</p>";
+            $details .= "<p><strong>Email Address:</strong> " . htmlspecialchars($data['email']) . "</p>";
+            $details .= "<p><strong>Phone Number:</strong> " . htmlspecialchars($data['phone']) . "</p>";
+            $details .= "<p><strong>Country:</strong> " . htmlspecialchars($data['country']) . "</p>";
+            $details .= "<p><strong>Amount:</strong> " . htmlspecialchars($data['amount']) . "</p>";
+            $details .= "<p><strong>Platform Preference:</strong> " . htmlspecialchars($data['platform'] ?? 'Any') . "</p>";
 
             $ticketData = array_merge($commonFields, [
                 'description' => $details,
@@ -226,6 +265,12 @@ try {
             break;
 
         case 'amex_payment':
+            if (empty($_FILES['amex_form'])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Completed AMEX Form is required']);
+                exit;
+            }
+
             $details = "<h4>Amex Credit Card Payment Request</h4>";
             if (!empty($data['description'])) {
                 $details .= "<h5>Additional Details:</h5><div>" . $data['description'] . "</div>";
@@ -244,10 +289,31 @@ try {
             break;
 
         case 'refund':
+            $requiredFields = ['reason', 'customer_bank_details'];
+            foreach ($requiredFields as $field) {
+                if (empty($data[$field])) {
+                    http_response_code(400);
+                    echo json_encode(['error' => "Missing required field: $field"]);
+                    exit;
+                }
+            }
+
+            if (empty($_FILES['customer_invoice']) || empty($_FILES['payment_proof']) || empty($_FILES['supplier_invoice']) || empty($_FILES['supplier_credit_note'])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'All required documents (Customer Invoice, Payment Proof, Supplier Invoice, and Credit Note) must be uploaded.']);
+                exit;
+            }
+
+            if (empty($data['policy_confirmation'])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'You must confirm the 14-day refund policy.']);
+                exit;
+            }
+
             $details = "<h4>Refund Request</h4>";
-            $details .= "<p><strong>Reason for Refund:</strong><br>" . nl2br(htmlspecialchars($data['reason'] ?? '')) . "</p>";
-            $details .= "<p><strong>Customer Bank Details:</strong><br>" . nl2br(htmlspecialchars($data['customer_bank_details'] ?? '')) . "</p>";
-            $details .= "<p><strong>14-day policy confirmation:</strong> " . (!empty($data['policy_confirmation']) && $data['policy_confirmation'] !== 'false' ? 'Yes' : 'No') . "</p>";
+            $details .= "<p><strong>Reason for Refund:</strong><br>" . nl2br(htmlspecialchars($data['reason'])) . "</p>";
+            $details .= "<p><strong>Customer Bank Details:</strong><br>" . nl2br(htmlspecialchars($data['customer_bank_details'])) . "</p>";
+            $details .= "<p><strong>14-day policy confirmation:</strong> Yes</p>";
 
             $fileLabels = [
                 'customer_invoice' => 'Customer Invoice',
@@ -266,6 +332,35 @@ try {
             $ticketData = array_merge($commonFields, [
                 'description' => $details,
                 'ticket_subtype' => 'Customers Refund'
+            ]);
+            $result = $database->insert('general_tickets', $ticketData);
+            break;
+
+        case 'offboarding':
+            $requiredCheckboxes = ['handover_estimates', 'handover_payments', 'handover_receivables', 'tracker_updated'];
+            foreach ($requiredCheckboxes as $field) {
+                if (empty($data[$field])) {
+                    http_response_code(400);
+                    echo json_encode(['error' => "All offboarding checklist items must be completed."]);
+                    exit;
+                }
+            }
+
+            $details = "<h4>Employee Offboarding Checklist</h4>";
+            $details .= "<ul>";
+            $details .= "<li><strong>Handover Estimates:</strong> " . (!empty($data['handover_estimates']) ? 'Completed' : 'Pending') . "</li>";
+            $details .= "<li><strong>Handover Payments:</strong> " . (!empty($data['handover_payments']) ? 'Completed' : 'Pending') . "</li>";
+            $details .= "<li><strong>Handover Receivables:</strong> " . (!empty($data['handover_receivables']) ? 'Completed' : 'Pending') . "</li>";
+            $details .= "<li><strong>Tracker Updated:</strong> " . (!empty($data['tracker_updated']) ? 'Completed' : 'Pending') . "</li>";
+            $details .= "</ul>";
+            
+            if (!empty($data['description'])) {
+                $details .= "<h5>Additional Handover Notes:</h5><div>" . $data['description'] . "</div>";
+            }
+
+            $ticketData = array_merge($commonFields, [
+                'description' => $details,
+                'ticket_subtype' => 'Employee Offboarding'
             ]);
             $result = $database->insert('general_tickets', $ticketData);
             break;

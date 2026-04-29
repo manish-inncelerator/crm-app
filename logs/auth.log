@@ -46553,3 +46553,31 @@
 
 [2026-02-10 05:53:03][INFO] Login - User data from Auth0: 
 [2026-02-10 05:53:04][INFO] Login - User data from Auth0: 
+[2026-04-29 12:41:18][INFO] Create Ticket - Session data: Array
+(
+)
+
+[2026-04-29 12:41:18][INFO] Create Ticket - Auth0 Configuration: Array
+(
+    [domain] => fayyaztravels.us.auth0.com
+    [clientId] => tgqsr8C26IrvLpq7z5h4fKEeVkEEkLGC
+    [redirectUri] => https://crm.fyyz.link/callback.php
+)
+
+[2026-04-29 12:41:18][INFO] Create Ticket - Raw Auth0 user data: 
+[2026-04-29 12:41:18][ERROR] Create Ticket - No user found in Auth0 session, redirecting to login
+[2026-04-29 12:41:18][INFO] Login - User data from Auth0: 
+[2026-04-29 12:46:43][INFO] Create Ticket - Session data: Array
+(
+)
+
+[2026-04-29 12:46:43][INFO] Create Ticket - Auth0 Configuration: Array
+(
+    [domain] => fayyaztravels.us.auth0.com
+    [clientId] => tgqsr8C26IrvLpq7z5h4fKEeVkEEkLGC
+    [redirectUri] => https://crm.fyyz.link/callback.php
+)
+
+[2026-04-29 12:46:43][INFO] Create Ticket - Raw Auth0 user data: 
+[2026-04-29 12:46:43][ERROR] Create Ticket - No user found in Auth0 session, redirecting to login
+[2026-04-29 12:46:43][INFO] Login - User data from Auth0: 

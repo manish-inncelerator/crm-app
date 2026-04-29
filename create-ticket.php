@@ -169,6 +169,12 @@ html_start('Create Ticket');
                 <p>Process payments for suppliers.</p>
                 <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
             </a>
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#offboardingModal">
+                <div class="bento-icon-wrapper"><i class="bi bi-person-x"></i></div>
+                <h3>Employee Offboarding</h3>
+                <p>Complete requirements for resigning or duty release.</p>
+                <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
+            </a>
             <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="QB Training (Estimates)" data-type="QB Training (Estimates)">
                 <div class="bento-icon-wrapper"><i class="bi bi-easel"></i></div>
                 <h3>Initial QB Training (Estimates)</h3>
@@ -250,7 +256,7 @@ html_start('Create Ticket');
                         <input type="date" name="service_date" class="form-control" required>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Package/Flights/Visa/Insurance</label>
+                        <label class="form-label">Type of Service (Package/Flights/Visa/Insurance)</label>
                         <input type="text" name="package_details" class="form-control" required>
                     </div>
                     <div class="col-md-6">
@@ -340,7 +346,7 @@ html_start('Create Ticket');
                         <input type="text" name="bank_details" class="form-control" required>
                     </div>
                     <div class="col-12">
-                        <label class="form-label">Complete Costing of the Deal (Sales, Cost, and Profit)</label>
+                        <label class="form-label">Complete Costing of the Deal (Sales, Cost, and Profit must be clearly stated)</label>
                         <textarea name="complete_costing" class="form-control" rows="3" required></textarea>
                     </div>
                     <div class="col-md-6">
@@ -397,7 +403,7 @@ html_start('Create Ticket');
                         <div class="form-check mt-4">
                             <input class="form-check-input" type="checkbox" name="boss_confirmation" id="bossConfirmation">
                             <label class="form-check-label" for="bossConfirmation">
-                                Boss confirmed payment credited
+                                Confirmation from the Boss that payment has been credited to Fayyaz’s account
                             </label>
                         </div>
                     </div>
@@ -410,7 +416,7 @@ html_start('Create Ticket');
                         <div class="form-check mt-4">
                             <input class="form-check-input" type="checkbox" name="boss_approval" id="bossApproval">
                             <label class="form-check-label" for="bossApproval">
-                                Boss Approval obtained
+                                Boss approval mandatory for new corporate clients
                             </label>
                         </div>
                     </div>
@@ -584,7 +590,7 @@ html_start('Create Ticket');
                         <input type="file" name="supplier_invoice" class="form-control" required>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Credit Note / Refund Confirmation</label>
+                        <label class="form-label">Credit Note from Supplier or Supplier Refund Confirmation</label>
                         <input type="file" name="supplier_credit_note" class="form-control" required>
                     </div>
                     <div class="col-12">
@@ -603,6 +609,68 @@ html_start('Create Ticket');
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Offboarding Modal -->
+<div class="modal fade" id="offboardingModal" tabindex="-1" aria-labelledby="offboardingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="offboardingModalLabel">Employee Offboarding Requirements</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="alert alert-warning col-12 mb-0">
+                        <strong>Important:</strong> All tasks below must be completed before the last working day.
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="handover_estimates" id="handoverEstimates" required>
+                            <label class="form-check-label" for="handoverEstimates">
+                                Handover all open estimates to the assigned Travel Consultants (TCs)
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="handover_payments" id="handoverPayments" required>
+                            <label class="form-check-label" for="handoverPayments">
+                                Handover pending (ongoing) supplier payments to assigned TCs
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="handover_receivables" id="handoverReceivables" required>
+                            <label class="form-check-label" for="handoverReceivables">
+                                Handover all receivables to assigned TCs
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="tracker_updated" id="trackerUpdated" required>
+                            <label class="form-check-label" for="trackerUpdated">
+                                Ensure Individual Tracker is fully updated
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Priority</label>
+                        <select name="priority" class="form-select" required>
+                            <option value="LOW">LOW</option>
+                            <option value="MEDIUM" selected>MEDIUM</option>
+                            <option value="HIGH">HIGH</option>
+                            <option value="URGENT">URGENT</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Additional Handover Notes (optional)</label>
+                        <textarea name="description" class="form-control rich-editor"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Offboarding Request</button>
                 </div>
             </form>
         </div>
@@ -709,7 +777,6 @@ html_start('Create Ticket');
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const formData = new FormData(this);
             const modalId = this.closest('.modal').id;
             let ticketType = '';
 
@@ -736,32 +803,32 @@ html_start('Create Ticket');
                 case 'refundModal':
                     ticketType = 'refund';
                     break;
+                case 'offboardingModal':
+                    ticketType = 'offboarding';
+                    break;
                 case 'generalModal':
                     ticketType = 'general';
-                    formData.append('ticket_subtype', this.getAttribute('data-ticket-subtype'));
                     break;
             }
 
-            // Convert FormData to JSON object
-            const data = {};
-            formData.forEach((value, key) => {
-                // Get TinyMCE content if it's a rich editor
-                if (key === 'description' || key === 'estimate_message' || key === 'supplier_message' || key === 'supplier_instructions') {
-                    const editor = tinymce.get(key);
-                    data[key] = editor ? editor.getContent() : value;
-                } else {
-                    data[key] = value;
+            // Sync TinyMCE content back to textareas
+            tinymce.get().forEach(editor => {
+                const element = editor.getElement();
+                if (this.contains(element)) {
+                    element.value = editor.getContent();
                 }
             });
-            data.ticket_type = ticketType;
+
+            const formData = new FormData(this);
+            formData.append('ticket_type', ticketType);
+            if (ticketType === 'general') {
+                formData.append('ticket_subtype', this.getAttribute('data-ticket-subtype'));
+            }
 
             try {
                 const response = await fetch('api/create-ticket.php', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
+                    body: formData
                 });
 
                 const result = await response.json();
@@ -774,7 +841,12 @@ html_start('Create Ticket');
                     // Reset form
                     this.reset();
                     // Reset TinyMCE editors
-                    tinymce.get().forEach(editor => editor.setContent(''));
+                    tinymce.get().forEach(editor => {
+                        const element = editor.getElement();
+                        if (this.contains(element)) {
+                            editor.setContent('');
+                        }
+                    });
                 } else {
                     throw new Error(result.error || 'Failed to create ticket');
                 }
