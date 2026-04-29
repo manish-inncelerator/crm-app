@@ -119,16 +119,22 @@ html_start('Create Ticket');
                 <p>Request a new estimate creation in QuickBooks.</p>
                 <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
             </a>
-            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Convert Estimate to Invoice" data-type="Convert Estimate to Invoice">
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#invoiceModal">
                 <div class="bento-icon-wrapper"><i class="bi bi-arrow-left-right"></i></div>
-                <h3>Convert Estimate to Invoice</h3>
-                <p>Convert an estimate into an invoice after payment.</p>
+                <h3>Actual Invoice</h3>
+                <p>Request conversion of estimate into an actual invoice.</p>
                 <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
             </a>
-            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Create Payment Link" data-type="Create Payment Link">
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#poModal">
+                <div class="bento-icon-wrapper"><i class="bi bi-cart-plus"></i></div>
+                <h3>Purchase Order (PO)</h3>
+                <p>Request a new Purchase Order for a supplier.</p>
+                <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
+            </a>
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#paymentLinkModal">
                 <div class="bento-icon-wrapper"><i class="bi bi-link-45deg"></i></div>
                 <h3>Create Payment Link</h3>
-                <p>Generate a payment link in Flywire or Tazapay for customers.</p>
+                <p>Generate a payment link (Flywire/Tazapay/Airwallex).</p>
                 <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
             </a>
             <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Update Payments in QB" data-type="Update Payments in QB">
@@ -151,8 +157,8 @@ html_start('Create Ticket');
             </a>
             <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#supplierModal">
                 <div class="bento-icon-wrapper"><i class="bi bi-truck"></i></div>
-                <h3>Supplier Payment Follow-up</h3>
-                <p>Follow up with suppliers for ticketing and package payments.</p>
+                <h3>Supplier Payment Requests</h3>
+                <p>Process payments for suppliers.</p>
                 <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
             </a>
             <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="QB Training (Estimates)" data-type="QB Training (Estimates)">
@@ -173,13 +179,13 @@ html_start('Create Ticket');
                 <p>Share bank details file for accounts/customer payments.</p>
                 <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
             </a>
-            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Customers Refund" data-type="Customers Refund">
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#refundModal">
                 <div class="bento-icon-wrapper"><i class="bi bi-arrow-counterclockwise"></i></div>
                 <h3>Customers Refund</h3>
                 <p>Request a refund for a customer payment.</p>
                 <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
             </a>
-            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Payment from Amex Card (CC)" data-type="Payment from Amex Card (CC)">
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#amexModal">
                 <div class="bento-icon-wrapper"><i class="bi bi-credit-card"></i></div>
                 <h3>Payment from Amex Card (CC)</h3>
                 <p>Log a payment received via Amex Card (Credit Card).</p>
@@ -291,54 +297,55 @@ html_start('Create Ticket');
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body row g-3">
+                    <div class="alert alert-info col-12 mb-0">
+                        <strong>Important:</strong> All supplier invoices must be issued in their local currency:
+                        <ul>
+                            <li>Singapore suppliers: SGD</li>
+                            <li>India suppliers: INR</li>
+                            <li>Malaysia suppliers: RM</li>
+                        </ul>
+                        If a supplier cannot provide an invoice in their local currency, they must cover related bank charges.
+                        <br><br>
+                        <em>Note: If supplier payment is requested through the company credit card, all requirements below must still be fulfilled before approval.</em>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Supplier Name</label>
+                        <input type="text" name="supplier_name" class="form-control" required>
+                    </div>
                     <div class="col-md-6">
                         <label class="form-label">Travel Date</label>
                         <input type="date" name="travel_date" class="form-control" required>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Due Date</label>
+                        <label class="form-label">Payment Due Date</label>
                         <input type="date" name="due_date" class="form-control" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Supplier Invoice Currency</label>
-                        <input type="text" name="supplier_invoice_currency" class="form-control" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Supplier Local Currency</label>
-                        <input type="text" name="supplier_local_currency" class="form-control" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Payment Type</label>
                         <select name="payment_type" class="form-select" required>
                             <option value="Deposit">Deposit</option>
                             <option value="Full Payment">Full Payment</option>
-                            <option value="Balance Payment">Balance Payment</option>
                         </select>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Priority</label>
-                        <select name="priority" class="form-select" required>
-                            <option value="LOW">LOW</option>
-                            <option value="MEDIUM">MEDIUM</option>
-                            <option value="HIGH">HIGH</option>
-                            <option value="URGENT">URGENT</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Bank Details</label>
+                    <div class="col-md-12">
+                        <label class="form-label">Supplier Bank Details</label>
                         <input type="text" name="bank_details" class="form-control" required>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Supplier Invoice (PDF/Image)</label>
-                        <input type="file" name="supplier_invoice" class="form-control" required>
+                    <div class="col-12">
+                        <label class="form-label">Complete Costing of the Deal (Sales, Cost, and Profit)</label>
+                        <textarea name="complete_costing" class="form-control" rows="3" required></textarea>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Customer Paid Invoice</label>
+                        <label class="form-label">Customer Invoice</label>
                         <input type="file" name="customer_invoice" class="form-control" required>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Customer Payment Proof</label>
+                        <label class="form-label">Payment Proof</label>
                         <input type="file" name="payment_proof" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Supplier Invoice</label>
+                        <input type="file" name="supplier_invoice" class="form-control" required>
                     </div>
                     <div class="col-12">
                         <label class="form-label">Any message/email from supplier</label>
@@ -353,6 +360,247 @@ html_start('Create Ticket');
         </div>
     </div>
 </div>
+
+<!-- Invoice Modal -->
+<div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="invoiceModalLabel">Request Actual Invoice</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-12">
+                        <label class="form-label">Client Type</label>
+                        <select name="client_type" class="form-select" id="invoiceClientType" required>
+                            <option value="">Select...</option>
+                            <option value="Individual">Individual Client</option>
+                            <option value="Corporate">Corporate Client (Existing Credit Terms)</option>
+                            <option value="New Corporate">New Corporate Client</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-6 invoice-individual-field d-none">
+                        <label class="form-label">Payment Proof</label>
+                        <input type="file" name="payment_proof" class="form-control">
+                    </div>
+                    <div class="col-md-6 invoice-individual-field d-none">
+                        <div class="form-check mt-4">
+                            <input class="form-check-input" type="checkbox" name="boss_confirmation" id="bossConfirmation">
+                            <label class="form-check-label" for="bossConfirmation">
+                                Boss confirmed payment credited
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 invoice-new-corporate-field d-none">
+                        <label class="form-label">Contract Copy</label>
+                        <input type="file" name="contract_copy" class="form-control">
+                    </div>
+                    <div class="col-md-6 invoice-new-corporate-field d-none">
+                        <div class="form-check mt-4">
+                            <input class="form-check-input" type="checkbox" name="boss_approval" id="bossApproval">
+                            <label class="form-check-label" for="bossApproval">
+                                Boss Approval obtained
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Additional Information / Description</label>
+                        <textarea name="description" class="form-control rich-editor"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- PO Modal -->
+<div class="modal fade" id="poModal" tabindex="-1" aria-labelledby="poModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="poModalLabel">Request Purchase Order (PO)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Supplier Name</label>
+                        <input type="text" name="supplier_name" class="form-control" placeholder="e.g., Muhibbah, CTM" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Client Name</label>
+                        <input type="text" name="client_name" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">PO Date</label>
+                        <input type="date" name="po_date" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" name="quantity" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Rate</label>
+                        <input type="number" step="0.01" name="rate" class="form-control" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Description of Services/Items</label>
+                        <textarea name="description" class="form-control" required></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Any message or instructions for the supplier</label>
+                        <textarea name="supplier_instructions" class="form-control rich-editor"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Link Modal -->
+<div class="modal fade" id="paymentLinkModal" tabindex="-1" aria-labelledby="paymentLinkModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paymentLinkModalLabel">Request Payment Link</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Client Name</label>
+                        <input type="text" name="client_name" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phone Number</label>
+                        <input type="text" name="phone" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Country</label>
+                        <input type="text" name="country" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Amount (excluding charges)</label>
+                        <input type="number" step="0.01" name="amount" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Platform Preference</label>
+                        <select name="platform" class="form-select" required>
+                            <option value="Any">Any</option>
+                            <option value="Flywire">Flywire</option>
+                            <option value="Tazapay">Tazapay</option>
+                            <option value="Airwallex">Airwallex</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Amex Modal -->
+<div class="modal fade" id="amexModal" tabindex="-1" aria-labelledby="amexModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="amexModalLabel">Amex Credit Card Payment Request</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="alert alert-warning col-12 mb-0">
+                        <strong>Note:</strong> Requests involving American Express credit card payments must be processed through the designated AMEX form. Please ensure the client has completed this form.
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Completed AMEX Form</label>
+                        <input type="file" name="amex_form" class="form-control" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Additional Details / Description</label>
+                        <textarea name="description" class="form-control rich-editor"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Refund Modal -->
+<div class="modal fade" id="refundModal" tabindex="-1" aria-labelledby="refundModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="refundModalLabel">Request Refund</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Reason for Refund</label>
+                        <textarea name="reason" class="form-control" required></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Customer Invoice Copy</label>
+                        <input type="file" name="customer_invoice" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Payment Proof</label>
+                        <input type="file" name="payment_proof" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Supplier Invoice</label>
+                        <input type="file" name="supplier_invoice" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Credit Note / Refund Confirmation</label>
+                        <input type="file" name="supplier_credit_note" class="form-control" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Customer Bank Account Details</label>
+                        <textarea name="customer_bank_details" class="form-control" required></textarea>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" name="policy_confirmation" id="policyConfirmation" required>
+                            <label class="form-check-label" for="policyConfirmation">
+                                I confirm that the customer has been informed of the 14-day refund policy.
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- General Modal -->
 <div class="modal fade" id="generalModal" tabindex="-1" aria-labelledby="generalModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -390,15 +638,40 @@ html_start('Create Ticket');
     </div>
 </div>
 <script>
+    // Form toggle logic for Invoice Modal
+    document.addEventListener('DOMContentLoaded', function() {
+        const invoiceClientType = document.getElementById('invoiceClientType');
+        if (invoiceClientType) {
+            invoiceClientType.addEventListener('change', function() {
+                const isIndividual = this.value === 'Individual';
+                const isNewCorporate = this.value === 'New Corporate';
+                
+                document.querySelectorAll('.invoice-individual-field').forEach(el => {
+                    el.classList.toggle('d-none', !isIndividual);
+                    const input = el.querySelector('input');
+                    if (input && input.type !== 'checkbox') input.required = isIndividual;
+                });
+                
+                document.querySelectorAll('.invoice-new-corporate-field').forEach(el => {
+                    el.classList.toggle('d-none', !isNewCorporate);
+                    const input = el.querySelector('input');
+                    if (input && input.type !== 'checkbox') input.required = isNewCorporate;
+                });
+            });
+        }
+    });
+
     // Set modal title dynamically for general modal
     const generalModal = document.getElementById('generalModal');
-    generalModal.addEventListener('show.bs.modal', function(event) {
-        const button = event.relatedTarget;
-        const title = button.getAttribute('data-title') || 'Create Ticket';
-        const type = button.getAttribute('data-type') || '';
-        generalModal.querySelector('.modal-title').textContent = title;
-        generalModal.querySelector('form').setAttribute('data-ticket-subtype', type);
-    });
+    if (generalModal) {
+        generalModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const title = button.getAttribute('data-title') || 'Create Ticket';
+            const type = button.getAttribute('data-type') || '';
+            generalModal.querySelector('.modal-title').textContent = title;
+            generalModal.querySelector('form').setAttribute('data-ticket-subtype', type);
+        });
+    }
 
     // Toast notification function
     function showToast(title, message, type = 'success') {
@@ -440,6 +713,21 @@ html_start('Create Ticket');
                 case 'supplierModal':
                     ticketType = 'supplier';
                     break;
+                case 'invoiceModal':
+                    ticketType = 'invoice';
+                    break;
+                case 'poModal':
+                    ticketType = 'purchase_order';
+                    break;
+                case 'paymentLinkModal':
+                    ticketType = 'payment_link';
+                    break;
+                case 'amexModal':
+                    ticketType = 'amex_payment';
+                    break;
+                case 'refundModal':
+                    ticketType = 'refund';
+                    break;
                 case 'generalModal':
                     ticketType = 'general';
                     formData.append('ticket_subtype', this.getAttribute('data-ticket-subtype'));
@@ -450,7 +738,7 @@ html_start('Create Ticket');
             const data = {};
             formData.forEach((value, key) => {
                 // Get TinyMCE content if it's a rich editor
-                if (key === 'description' || key === 'estimate_message' || key === 'supplier_message') {
+                if (key === 'description' || key === 'estimate_message' || key === 'supplier_message' || key === 'supplier_instructions') {
                     const editor = tinymce.get(key);
                     data[key] = editor ? editor.getContent() : value;
                 } else {

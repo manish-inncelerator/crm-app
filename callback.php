@@ -69,6 +69,22 @@ try {
 
     writeLog('Callback - User info: ' . print_r($userInfo, true));
 
+    // Email validation check
+    $email = strtolower($userInfo['email'] ?? '');
+    $is_allowed = false;
+
+    if (preg_match('/@(fayyaztravels\.com|inncelerator\.com)$/i', $email)) {
+        $is_allowed = true;
+    } elseif (preg_match('/@gmail\.com$/i', $email)) {
+        if (strpos($email, '.inncelerator') !== false || strpos($email, '.fayyaztravels') !== false) {
+            $is_allowed = true;
+        }
+    }
+
+    if (!$is_allowed) {
+        throw new \Exception('Access Denied: Unauthorized email address. Please use a valid company email.');
+    }
+
     // Save or update user in database
     try {
         writeLog('Callback - Attempting to save user with data: ' . print_r([
