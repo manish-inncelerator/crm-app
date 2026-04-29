@@ -361,7 +361,7 @@
 
     document.addEventListener('DOMContentLoaded', updateNavbarState);
 
-    const origToggleDarkMode = window.toggleDarkMode;
+    var origToggleDarkMode = window.toggleDarkMode;
     window.toggleDarkMode = function () {
         if (origToggleDarkMode) origToggleDarkMode();
         updateNavbarState();

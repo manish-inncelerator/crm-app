@@ -299,9 +299,13 @@ html_start('Manage Knowledge Base');
 </div>
 
 <script>
-const sectionModal = new bootstrap.Modal(document.getElementById('sectionModal'));
-const cardModal = new bootstrap.Modal(document.getElementById('cardModal'));
-const itemModal = new bootstrap.Modal(document.getElementById('itemModal'));
+let sectionModal, cardModal, itemModal;
+
+document.addEventListener('DOMContentLoaded', () => {
+    sectionModal = new bootstrap.Modal(document.getElementById('sectionModal'));
+    cardModal = new bootstrap.Modal(document.getElementById('cardModal'));
+    itemModal = new bootstrap.Modal(document.getElementById('itemModal'));
+});
 
 function openSectionModal(data = null) {
     document.getElementById('sectionForm').reset();

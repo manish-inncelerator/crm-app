@@ -122,7 +122,7 @@
     };
 
     // Patch toggleDarkMode to update icon
-    const origToggleDarkMode = window.toggleDarkMode;
+    var origToggleDarkMode = window.toggleDarkMode;
     window.toggleDarkMode = function () {
         if (origToggleDarkMode) origToggleDarkMode();
         updateModeIcon();
