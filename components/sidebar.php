@@ -58,6 +58,11 @@
             <i class="bi bi-hourglass-split sidebar-link-icon"></i>
             <span class="sidebar-link-text">Timeline</span>
         </a>
+        <a href="knowledgebase.php"
+            class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'knowledgebase.php' ? 'active' : ''; ?>">
+            <i class="bi bi-book sidebar-link-icon"></i>
+            <span class="sidebar-link-text">Knowledge Base</span>
+        </a>
     </nav>
 
     <!-- Footer with User Info and Controls -->

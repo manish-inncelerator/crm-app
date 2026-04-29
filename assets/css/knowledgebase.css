@@ -1,0 +1,208 @@
+/* Knowledge Base Specific Styles */
+.kb-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.kb-section {
+    margin-bottom: 3rem;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--sidebar-active-bg);
+}
+
+.section-header i {
+    font-size: 1.5rem;
+    color: var(--sidebar-accent);
+}
+
+.section-header h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-main);
+}
+
+.kb-card {
+    background: var(--card-bg);
+    border-radius: 1.25rem;
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 2rem;
+}
+
+.kb-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
+}
+
+.kb-card-header {
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(79, 70, 229, 0) 100%);
+    border-bottom: 1px solid var(--card-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.kb-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.kb-card-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: var(--sidebar-active-bg);
+    color: var(--sidebar-accent);
+}
+
+.kb-table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.kb-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.kb-table th {
+    padding: 1rem 1.5rem;
+    background: var(--main-bg);
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.kb-table td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--card-border);
+    color: var(--text-main);
+    font-size: 0.95rem;
+    vertical-align: middle;
+}
+
+.kb-table tr:last-child td {
+    border-bottom: none;
+}
+
+.kb-table tr:hover td {
+    background: rgba(79, 70, 229, 0.02);
+}
+
+.copy-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.copy-btn:hover {
+    color: var(--sidebar-accent);
+    background: var(--sidebar-active-bg);
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    width: 200px;
+}
+
+.detail-value {
+    font-family: 'JetBrains Mono', 'Monaco', 'Consolas', monospace;
+    color: var(--sidebar-accent);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dark Mode Adjustments */
+body.dark-mode .kb-card-header {
+    background: linear-gradient(135deg, rgba(129, 140, 248, 0.1) 0%, rgba(129, 140, 248, 0) 100%);
+}
+
+body.dark-mode .kb-table th {
+    background: rgba(30, 41, 59, 0.5);
+}
+
+body.dark-mode .copy-btn:hover {
+    background: rgba(129, 140, 248, 0.2);
+}
+
+/* Payment Link Cards */
+.payment-links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.payment-card {
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border-radius: 1.25rem;
+    border: 1px solid var(--card-border);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: all 0.3s;
+}
+
+.payment-card:hover {
+    border-color: var(--sidebar-accent);
+    box-shadow: 0 8px 16px rgba(79, 70, 229, 0.1);
+}
+
+.payment-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--sidebar-active-bg);
+    color: var(--sidebar-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.payment-card-info h4 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.payment-card-info p {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.payment-card-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--card-border);
+}
