@@ -84,6 +84,7 @@ html_start('Create Ticket');
         }
     }
 </script>
+<link rel="stylesheet" href="assets/css/dashboard.css">
 <style>
     /* Only override the close icon in dark mode */
     .dark-mode .modal .btn-close {
@@ -93,132 +94,97 @@ html_start('Create Ticket');
     .modal .btn-close:hover {
         opacity: 0.75;
     }
+
+    .dashboard-main-area {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        animation: fadeUp 0.6s ease-out forwards;
+    }
 </style>
 <div class="dashboard-container">
     <?php include 'components/sidebar.php'; ?>
-    <div class="main-content">
-        <h2 class="main-title">Create a Support Ticket</h2>
-        <div class="ticket-widgets">
-            <div class="ticket-link" data-bs-toggle="modal" data-bs-target="#estimateModal">
-                <div class="ticket-widget">
-                    <div class="ticket-main-content">
-                        <div class="ticket-icon"><i class="fas fa-file-invoice-dollar"></i></div>
-                        <div class="ticket-title">Create Estimates in QB</div>
-                        <div class="ticket-desc">Request a new estimate creation in QuickBooks.</div>
-                    </div>
-                    <div class="ticket-chevron"><i class="fas fa-chevron-right"></i></div>
-                </div>
+    <div class="main-content dashboard-main-area">
+        <div class="hero-greeting" style="background: linear-gradient(135deg, #a97c50, #4e1f00); margin-bottom: 2.5rem;">
+            <div class="hero-info">
+                <h1>Create a Support Ticket</h1>
+                <p>Select the type of request below to get started and our team will process it shortly.</p>
             </div>
-            <div class="ticket-link" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Convert Estimate to Invoice" data-type="Convert Estimate to Invoice">
-                <div class="ticket-widget">
-                    <div class="ticket-main-content">
-                        <div class="ticket-icon"><i class="fas fa-exchange-alt"></i></div>
-                        <div class="ticket-title">Convert Estimate to Invoice</div>
-                        <div class="ticket-desc">Convert an estimate into an invoice after payment.</div>
-                    </div>
-                    <div class="ticket-chevron"><i class="fas fa-chevron-right"></i></div>
-                </div>
-            </div>
-            <div class="ticket-link" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Create Payment Link" data-type="Create Payment Link">
-                <div class="ticket-widget">
-                    <div class="ticket-main-content">
-                        <div class="ticket-icon"><i class="fas fa-link"></i></div>
-                        <div class="ticket-title">Create Payment Link</div>
-                        <div class="ticket-desc">Generate a payment link in Flywire or Tazapay for customers.</div>
-                    </div>
-                    <div class="ticket-chevron"><i class="fas fa-chevron-right"></i></div>
-                </div>
-            </div>
-            <div class="ticket-link" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Update Payments in QB" data-type="Update Payments in QB">
-                <div class="ticket-widget">
-                    <div class="ticket-main-content">
-                        <div class="ticket-icon"><i class="fas fa-receipt"></i></div>
-                        <div class="ticket-title">Update Payments in QB</div>
-                        <div class="ticket-desc">Update payments in QuickBooks and provide paid invoice to sales team.</div>
-                    </div>
-                    <div class="ticket-chevron"><i class="fas fa-chevron-right"></i></div>
-                </div>
-            </div>
-            <div class="ticket-link" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Modify Estimates/Invoices" data-type="Modify Estimates/Invoices">
-                <div class="ticket-widget">
-                    <div class="ticket-main-content">
-                        <div class="ticket-icon"><i class="fas fa-edit"></i></div>
-                        <div class="ticket-title">Modify Estimates/Invoices</div>
-                        <div class="ticket-desc">Request modifications to existing estimates or invoices.</div>
-                    </div>
-                    <div class="ticket-chevron"><i class="fas fa-chevron-right"></i></div>
-                </div>
-            </div>
-            <div class="ticket-link" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Customer Payment Follow-up" data-type="Customer Payment Follow-up">
-                <div class="ticket-widget">
-                    <div class="ticket-main-content">
-                        <div class="ticket-icon"><i class="fas fa-user-clock"></i></div>
-                        <div class="ticket-title">Customer Payment Follow-up</div>
-                        <div class="ticket-desc">Follow up with normal or corporate customers for payments.</div>
-                    </div>
-                    <div class="ticket-chevron"><i class="fas fa-chevron-right"></i></div>
-                </div>
-            </div>
-            <div class="ticket-link" data-bs-toggle="modal" data-bs-target="#supplierModal">
-                <div class="ticket-widget">
-                    <div class="ticket-main-content">
-                        <div class="ticket-icon"><i class="fas fa-people-carry"></i></div>
-                        <div class="ticket-title">Supplier Payment Follow-up</div>
-                        <div class="ticket-desc">Follow up with suppliers for ticketing and package payments.</div>
-                    </div>
-                    <div class="ticket-chevron"><i class="fas fa-chevron-right"></i></div>
-                </div>
-            </div>
-            <div class="ticket-link" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="QB Training (Estimates)" data-type="QB Training (Estimates)">
-                <div class="ticket-widget">
-                    <div class="ticket-main-content">
-                        <div class="ticket-icon"><i class="fas fa-chalkboard-teacher"></i></div>
-                        <div class="ticket-title">Initial QB Training (Estimates)</div>
-                        <div class="ticket-desc">Request initial training on QuickBooks for estimate creation.</div>
-                    </div>
-                    <div class="ticket-chevron"><i class="fas fa-chevron-right"></i></div>
-                </div>
-            </div>
-            <div class="ticket-link" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Separate Payment Receipts" data-type="Separate Payment Receipts">
-                <div class="ticket-widget">
-                    <div class="ticket-main-content">
-                        <div class="ticket-icon"><i class="fas fa-file-invoice"></i></div>
-                        <div class="ticket-title">Separate Payment Receipts</div>
-                        <div class="ticket-desc">Request separate payment receipts for customers.</div>
-                    </div>
-                    <div class="ticket-chevron"><i class="fas fa-chevron-right"></i></div>
-                </div>
-            </div>
-            <div class="ticket-link" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Share Bank Details" data-type="Share Bank Details">
-                <div class="ticket-widget">
-                    <div class="ticket-main-content">
-                        <div class="ticket-icon"><i class="fas fa-university"></i></div>
-                        <div class="ticket-title">Share Bank Details</div>
-                        <div class="ticket-desc">Share bank details file for accounts/customer payments.</div>
-                    </div>
-                    <div class="ticket-chevron"><i class="fas fa-chevron-right"></i></div>
-                </div>
-            </div>
-            <div class="ticket-link" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Customers Refund" data-type="Customers Refund">
-                <div class="ticket-widget">
-                    <div class="ticket-main-content">
-                        <div class="ticket-icon"><i class="fas fa-undo-alt"></i></div>
-                        <div class="ticket-title">Customers Refund</div>
-                        <div class="ticket-desc">Request a refund for a customer payment.</div>
-                    </div>
-                    <div class="ticket-chevron"><i class="fas fa-chevron-right"></i></div>
-                </div>
-            </div>
-            <div class="ticket-link" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Payment from Amex Card (CC)" data-type="Payment from Amex Card (CC)">
-                <div class="ticket-widget">
-                    <div class="ticket-main-content">
-                        <div class="ticket-icon"><i class="fas fa-credit-card"></i></div>
-                        <div class="ticket-title">Payment from Amex Card (CC)</div>
-                        <div class="ticket-desc">Log a payment received via Amex Card (Credit Card).</div>
-                    </div>
-                    <div class="ticket-chevron"><i class="fas fa-chevron-right"></i></div>
-                </div>
-            </div>
+        </div>
+
+        <div class="bento-grid">
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#estimateModal">
+                <div class="bento-icon-wrapper"><i class="bi bi-file-earmark-spreadsheet"></i></div>
+                <h3>Create Estimates in QB</h3>
+                <p>Request a new estimate creation in QuickBooks.</p>
+                <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
+            </a>
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Convert Estimate to Invoice" data-type="Convert Estimate to Invoice">
+                <div class="bento-icon-wrapper"><i class="bi bi-arrow-left-right"></i></div>
+                <h3>Convert Estimate to Invoice</h3>
+                <p>Convert an estimate into an invoice after payment.</p>
+                <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
+            </a>
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Create Payment Link" data-type="Create Payment Link">
+                <div class="bento-icon-wrapper"><i class="bi bi-link-45deg"></i></div>
+                <h3>Create Payment Link</h3>
+                <p>Generate a payment link in Flywire or Tazapay for customers.</p>
+                <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
+            </a>
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Update Payments in QB" data-type="Update Payments in QB">
+                <div class="bento-icon-wrapper"><i class="bi bi-receipt"></i></div>
+                <h3>Update Payments in QB</h3>
+                <p>Update payments in QuickBooks and provide paid invoice to sales team.</p>
+                <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
+            </a>
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Modify Estimates/Invoices" data-type="Modify Estimates/Invoices">
+                <div class="bento-icon-wrapper"><i class="bi bi-pencil-square"></i></div>
+                <h3>Modify Estimates/Invoices</h3>
+                <p>Request modifications to existing estimates or invoices.</p>
+                <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
+            </a>
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Customer Payment Follow-up" data-type="Customer Payment Follow-up">
+                <div class="bento-icon-wrapper"><i class="bi bi-person-lines-fill"></i></div>
+                <h3>Customer Payment Follow-up</h3>
+                <p>Follow up with normal or corporate customers for payments.</p>
+                <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
+            </a>
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#supplierModal">
+                <div class="bento-icon-wrapper"><i class="bi bi-truck"></i></div>
+                <h3>Supplier Payment Follow-up</h3>
+                <p>Follow up with suppliers for ticketing and package payments.</p>
+                <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
+            </a>
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="QB Training (Estimates)" data-type="QB Training (Estimates)">
+                <div class="bento-icon-wrapper"><i class="bi bi-easel"></i></div>
+                <h3>Initial QB Training (Estimates)</h3>
+                <p>Request initial training on QuickBooks for estimate creation.</p>
+                <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
+            </a>
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Separate Payment Receipts" data-type="Separate Payment Receipts">
+                <div class="bento-icon-wrapper"><i class="bi bi-receipt-cutoff"></i></div>
+                <h3>Separate Payment Receipts</h3>
+                <p>Request separate payment receipts for customers.</p>
+                <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
+            </a>
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Share Bank Details" data-type="Share Bank Details">
+                <div class="bento-icon-wrapper"><i class="bi bi-bank"></i></div>
+                <h3>Share Bank Details</h3>
+                <p>Share bank details file for accounts/customer payments.</p>
+                <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
+            </a>
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Customers Refund" data-type="Customers Refund">
+                <div class="bento-icon-wrapper"><i class="bi bi-arrow-counterclockwise"></i></div>
+                <h3>Customers Refund</h3>
+                <p>Request a refund for a customer payment.</p>
+                <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
+            </a>
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Payment from Amex Card (CC)" data-type="Payment from Amex Card (CC)">
+                <div class="bento-icon-wrapper"><i class="bi bi-credit-card"></i></div>
+                <h3>Payment from Amex Card (CC)</h3>
+                <p>Log a payment received via Amex Card (Credit Card).</p>
+                <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
+            </a>
         </div>
     </div>
 </div>

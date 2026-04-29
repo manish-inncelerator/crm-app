@@ -227,6 +227,7 @@ $database->update('messages', [
 
 html_start('Messages');
 ?>
+<link rel="stylesheet" href="assets/css/messages.css">
 <script>
     function toggleSidebar() {
         var sidebar = document.getElementById('sidebar');
@@ -318,11 +319,11 @@ html_start('Messages');
                 <!-- Status will be filled by JS -->
             </div>
         </div>
-        <div class="chat-admin-wrapper" style="display:flex;gap:32px;">
+        <div class="chat-admin-wrapper">
             <?php if ($is_admin): ?>
-                <div class="admin-user-list" id="admin-user-list" style="width:320px;min-width:220px;max-width:340px;background:var(--card-bg);border-radius:18px;padding:18px 0;box-shadow:0 2px 8px rgba(78,31,0,0.08);overflow-y:auto;">
-                    <h4 style="text-align:center;margin-bottom:18px;">Users</h4>
-                    <ul style="list-style:none;padding:0;margin:0;" id="user-list-ul"></ul>
+                <div class="admin-user-list" id="admin-user-list">
+                    <h4>Users</h4>
+                    <ul id="user-list-ul"></ul>
                 </div>
             <?php endif; ?>
             <div style="flex:1;min-width:0;">
@@ -334,7 +335,7 @@ html_start('Messages');
                         </div>
                     </div>
                     <form class="chat-input-form" id="message-form" autocomplete="off" enctype="multipart/form-data">
-                        <div class="input-group" style="align-items: stretch; display: flex; gap: 0;">
+                        <div class="input-group">
                             <label for="chat-attachment" class="chat-attach-label" title="Attach file">
                                 <i class="fas fa-paperclip"></i>
                                 <input type="file" id="chat-attachment" name="attachment" class="chat-attach-input" style="display:none;" accept="image/*,audio/*,video/*">
@@ -420,13 +421,18 @@ html_start('Messages');
             if (user.id == selectedUserId) user.unread_count = 0;
             const li = document.createElement('li');
             li.className = 'user-list-item';
-            li.style = 'display:flex;align-items:center;gap:12px;padding:10px 18px;cursor:pointer;border-bottom:1px solid #eee;';
+            li.style.display = 'flex';
+            li.style.alignItems = 'center';
+            li.style.gap = '12px';
+            li.style.padding = '10px 18px';
+            li.style.cursor = 'pointer';
+            li.style.borderBottom = '1px solid var(--dash-border-glass, rgba(0,0,0,0.05))';
             li.innerHTML = `
                 <span class="status-indicator" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${isOnline(user.last_activity) ? '#4caf50' : '#aaa'};margin-right:8px;"></span>
                 <img src="${user.picture || 'assets/images/default-avatar.png'}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
                 <div style="flex:1;">
                     <div style="font-weight:600;">${escapeHtml(user.name)}</div>
-                    <div style="font-size:0.95em;color:#a98b6d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">${escapeHtml(user.last_message || '')}</div>
+                    <div style="font-size:0.95em;color:var(--dash-text-muted, #6c757d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">${escapeHtml(user.last_message || '')}</div>
                 </div>
                 ${showCounter ? `<span style='background:#ff5252;color:#fff;border-radius:10px;padding:2px 8px;font-size:0.9em;'>${user.unread_count}</span>` : ''}
             `;

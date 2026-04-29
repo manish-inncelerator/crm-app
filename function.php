@@ -45,6 +45,7 @@ function html_start($title = 'CRM System', $additional_css = [])
 
         <!-- Custom CSS -->
         <link href="assets/css/style.css" rel="stylesheet">
+        <link href="assets/css/sidebar.css" rel="stylesheet">
 
         <?php
         // Add any additional CSS files

@@ -128,6 +128,13 @@ try {
         }
     }
 
+    // Get recent activity
+    $recentActivity = $database->select('notifications', '*', [
+        'user_id' => $dbUser['id'],
+        'ORDER' => ['created_at' => 'DESC'],
+        'LIMIT' => 5
+    ]);
+
     // Update last_activity for current user
     $database->update('users', [
         'last_activity' => date('Y-m-d H:i:s')
@@ -141,7 +148,7 @@ try {
 }
 
 // Print HTML start
-html_start('Dashboard - Fayyaz Travels CRM');
+html_start('Dashboard - Fayyaz Travels CRM', ['assets/css/dashboard.css']);
 ?>
 <script>
     function toggleSidebar() {
@@ -230,85 +237,104 @@ html_start('Dashboard - Fayyaz Travels CRM');
 </?php include 'components/navbar.php' ; ?>
 <div class="dashboard-container">
     <?php include 'components/sidebar.php'; ?>
-    <div class="main-content">
-        <div class="greeting-section">
+    <div class="main-content dashboard-main-area">
+        <div class="hero-greeting">
             <img src="<?php echo htmlspecialchars($user['picture'] ?? 'assets/images/default-avatar.png'); ?>"
-                alt="Profile" class="greeting-avatar">
-            <div class="greeting-info">
-                <h2>Welcome, <?php echo htmlspecialchars($user['name'] ?? 'User'); ?>!</h2>
-                <p><?php echo htmlspecialchars($user['email'] ?? ''); ?></p>
+                alt="Profile" class="greeting-avatar-large">
+            <div class="hero-info">
+                <h1>Welcome back, <?php echo htmlspecialchars($user['name'] ?? 'User'); ?>!</h1>
+                <p><?php echo htmlspecialchars($user['email'] ?? ''); ?> • Ready to manage your CRM?</p>
             </div>
         </div>
-        <div class="content-header">
-            <h1>Welcome, <?php echo htmlspecialchars($user['name'] ?? 'User'); ?></h1>
-            <div class="header-actions">
-                <button class="btn-primary" onclick="window.location.href='create-ticket.php'">
+
+        <div class="dashboard-actions-header">
+            <h2>Overview</h2>
+            <div class="action-buttons-group">
+                <a href="create-ticket.php" class="btn-premium">
                     <i class="fas fa-plus"></i> New Ticket
-                </button>
-                <button class="btn-primary" onclick="window.location.href='messages.php'">
+                </a>
+                <a href="messages.php" class="btn-premium">
                     <i class="fas fa-envelope"></i> New Message
-                </button>
+                </a>
             </div>
         </div>
-        <div class="dashboard-widgets">
-            <a href="dashboard.php" class="widget-link" title="Go to Dashboard">
-                <div class="widget">
-                    <div class="widget-main-content">
-                        <div class="widget-icon"><i class="fas fa-home"></i></div>
-                        <h3>Dashboard</h3>
-                        <div class="widget-content">
-                            <p>Overview and quick stats</p>
-                        </div>
-                    </div>
-                    <div class="widget-chevron"><i class="fas fa-chevron-right"></i></div>
+
+        <div class="bento-grid">
+            <a href="dashboard.php" class="bento-card" title="Go to Dashboard">
+                <div class="bento-icon-wrapper"><i class="fas fa-home"></i></div>
+                <h3>Dashboard</h3>
+                <p>Overview and quick stats</p>
+                <div class="bento-badges">
+                    <span class="bento-badge">Active</span>
                 </div>
             </a>
-            <a href="tickets.php" class="widget-link" title="Go to Tickets">
-                <div class="widget">
-                    <div class="widget-main-content">
-                        <div class="widget-icon"><i class="fas fa-ticket-alt"></i></div>
-                        <h3>Tickets</h3>
-                        <div class="widget-content">
-                            <p>View and manage your tickets</p>
-                        </div>
-                        <div>
-                            <span class="widget-badge"><?php echo $openTickets; ?> Open</span>
-                            <span class="widget-badge secondary"><?php echo $closedTickets; ?> Closed</span>
-                        </div>
-                    </div>
-                    <div class="widget-chevron"><i class="fas fa-chevron-right"></i></div>
+            
+            <a href="tickets.php" class="bento-card" title="Go to Tickets">
+                <div class="bento-icon-wrapper"><i class="fas fa-ticket-alt"></i></div>
+                <h3>Tickets</h3>
+                <p>View and manage your tickets</p>
+                <div class="bento-badges">
+                    <span class="bento-badge"><?php echo $openTickets; ?> Open</span>
+                    <span class="bento-badge secondary"><?php echo $closedTickets; ?> Closed</span>
                 </div>
             </a>
-            <a href="messages.php" class="widget-link" title="Go to Messages">
-                <div class="widget">
-                    <div class="widget-main-content">
-                        <div class="widget-icon"><i class="fas fa-envelope"></i></div>
-                        <h3>Messages</h3>
-                        <div class="widget-content">
-                            <p>Check your recent messages</p>
-                        </div>
-                        <div>
-                            <span class="widget-badge info"><?php echo $newMessages; ?> New</span>
-                        </div>
-                    </div>
-                    <div class="widget-chevron"><i class="fas fa-chevron-right"></i></div>
+            
+            <a href="messages.php" class="bento-card" title="Go to Messages">
+                <div class="bento-icon-wrapper"><i class="fas fa-envelope"></i></div>
+                <h3>Messages</h3>
+                <p>Check your recent messages</p>
+                <div class="bento-badges">
+                    <span class="bento-badge <?php echo $newMessages > 0 ? 'alert' : 'secondary'; ?>">
+                        <?php echo $newMessages; ?> New
+                    </span>
                 </div>
             </a>
-            <a href="notifications.php" class="widget-link" title="Go to Notifications">
-                <div class="widget">
-                    <div class="widget-main-content">
-                        <div class="widget-icon"><i class="fas fa-bell"></i></div>
-                        <h3>Notifications</h3>
-                        <div class="widget-content">
-                            <p>See your latest notifications</p>
-                        </div>
-                        <div>
-                            <span class="widget-badge alert"><?php echo $unreadNotifications; ?> New</span>
-                        </div>
-                    </div>
-                    <div class="widget-chevron"><i class="fas fa-chevron-right"></i></div>
+            
+            <a href="notifications.php" class="bento-card" title="Go to Notifications">
+                <div class="bento-icon-wrapper"><i class="fas fa-bell"></i></div>
+                <h3>Notifications</h3>
+                <p>See your latest notifications</p>
+                <div class="bento-badges">
+                    <span class="bento-badge <?php echo $unreadNotifications > 0 ? 'alert' : 'secondary'; ?>">
+                        <?php echo $unreadNotifications; ?> Unread
+                    </span>
                 </div>
             </a>
+        </div>
+
+        <!-- Recent Activity Timeline -->
+        <div class="recent-activity-section">
+            <h3><i class="fas fa-history"></i> Recent Activity</h3>
+            <?php if (empty($recentActivity)): ?>
+                <div class="empty-activity">
+                    <i class="fas fa-inbox"></i>
+                    <p>No recent activity found.</p>
+                </div>
+            <?php else: ?>
+                <div class="timeline">
+                    <?php foreach ($recentActivity as $activity): 
+                        // Determine icon and color based on notification type
+                        $iconClass = 'fas fa-info';
+                        if ($activity['type'] === 'success') $iconClass = 'fas fa-check';
+                        if ($activity['type'] === 'warning') $iconClass = 'fas fa-exclamation-triangle';
+                        if ($activity['type'] === 'error') $iconClass = 'fas fa-times';
+                    ?>
+                        <div class="timeline-item">
+                            <div class="timeline-dot"><i class="<?php echo $iconClass; ?>"></i></div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h4 class="timeline-title"><?php echo htmlspecialchars($activity['title'] ?? 'Notification'); ?></h4>
+                                    <span class="timeline-date"><?php echo date('M d, Y h:i A', strtotime($activity['created_at'])); ?></span>
+                                </div>
+                                <p class="timeline-text"><?php echo htmlspecialchars($activity['message'] ?? ''); ?></p>
+                                <?php if (!empty($activity['link'])): ?>
+                                    <a href="<?php echo htmlspecialchars($activity['link']); ?>" class="timeline-link">View Details &rarr;</a>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
