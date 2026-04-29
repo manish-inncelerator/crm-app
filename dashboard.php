@@ -13,7 +13,7 @@ session_start();
 
 // Create a Guzzle client with SSL verification disabled for development
 $httpClient = new Client([
-    'verify' => false // Disable SSL verification for development
+    'verify' => false 
 ]);
 
 // Auth0 configuration
@@ -26,319 +26,192 @@ $config = new SdkConfiguration(
     httpClient: $httpClient
 );
 
-// Create session store with configuration
-$sessionStore = new SessionStore($config);
-
 $auth0 = new Auth0($config);
 
-// Debug information
-writeLog('Dashboard - Session data: ' . print_r($_SESSION, true));
-writeLog('Dashboard - Auth0 Configuration: ' . print_r([
-    'domain' => $config->getDomain(),
-    'clientId' => $config->getClientId(),
-    'redirectUri' => $config->getRedirectUri()
-], true));
-
 try {
-    // Get user info from Auth0
     $user = $auth0->getUser();
-    writeLog('Dashboard - Raw Auth0 user data: ' . print_r($user, true));
-
     if (!$user) {
-        writeLog('Dashboard - No user found in Auth0 session, redirecting to login', 'ERROR');
         header('Location: login.php');
         exit;
     }
 
-    writeLog('Dashboard - User data from Auth0: ' . print_r($user, true));
-
-    // Get user data from database
-    $dbUser = $database->get('users', '*', [
-        'auth0_id' => $user['sub']
-    ]);
-
+    $dbUser = $database->get('users', '*', ['auth0_id' => $user['sub']]);
     if (!$dbUser) {
-        writeLog('Dashboard - User not found in database with auth0_id: ' . $user['sub'], 'ERROR');
         header('Location: login.php');
         exit;
     }
 
-    writeLog('Dashboard - User data from database: ' . print_r($dbUser, true));
+    $is_admin = $dbUser['is_admin'];
 
     // Get ticket counts
     $ticketTypes = ['estimate', 'supplier', 'general'];
     $openTickets = 0;
+    $inProgressTickets = 0;
+    $resolvedTickets = 0;
     $closedTickets = 0;
 
     foreach ($ticketTypes as $type) {
         $table = $type . '_tickets';
-        if ($dbUser['is_admin']) {
-            // Admin sees all tickets
-            $openTickets += $database->count($table, [
-                'status' => ['OPEN', 'IN_PROGRESS']
-            ]);
-            $closedTickets += $database->count($table, [
-                'status' => ['RESOLVED', 'CLOSED']
-            ]);
-        } else {
-            // Regular users see only their tickets
-            $openTickets += $database->count($table, [
-                'user_id' => $dbUser['id'],
-                'status' => ['OPEN', 'IN_PROGRESS']
-            ]);
-            $closedTickets += $database->count($table, [
-                'user_id' => $dbUser['id'],
-                'status' => ['RESOLVED', 'CLOSED']
-            ]);
-        }
+        $where = $is_admin ? [] : ['user_id' => $dbUser['id']];
+        
+        $openTickets += $database->count($table, array_merge($where, ['status' => 'OPEN']));
+        $inProgressTickets += $database->count($table, array_merge($where, ['status' => 'IN_PROGRESS']));
+        $resolvedTickets += $database->count($table, array_merge($where, ['status' => 'RESOLVED']));
+        $closedTickets += $database->count($table, array_merge($where, ['status' => 'CLOSED']));
     }
 
-    // Get unread notifications count
-    $unreadNotifications = $database->count('notifications', [
-        'user_id' => $dbUser['id'],
-        'is_read' => false
-    ]);
-
-    // Get new messages count (unread comments on tickets)
-    $newMessages = 0;
+    // Get recent tickets for the table
+    $recentTickets = [];
     foreach ($ticketTypes as $type) {
         $table = $type . '_tickets';
-
-        if ($dbUser['is_admin']) {
-            // For admin: count all new comments on all tickets
-            $newMessages += $database->count('ticket_comments', [
-                'ticket_type' => $type,
-                'user_id[!]' => $dbUser['id'],
-                'created_at[>]' => $dbUser['last_activity']
-            ]);
-        } else {
-            // For regular users: count new comments on their tickets
-            $ticketIds = $database->select($table, 'id', [
-                'user_id' => $dbUser['id']
-            ]);
-
-            if (!empty($ticketIds)) {
-                $newMessages += $database->count('ticket_comments', [
-                    'ticket_id' => $ticketIds,
-                    'ticket_type' => $type,
-                    'user_id[!]' => $dbUser['id'],
-                    'created_at[>]' => $dbUser['last_activity']
-                ]);
-            }
+        $tickets = $database->select($table, '*', [
+            $is_admin ? 'LIMIT' : 'user_id' => $is_admin ? 5 : $dbUser['id'],
+            'ORDER' => ['created_at' => 'DESC'],
+            'LIMIT' => 5
+        ]);
+        foreach ($tickets as $t) {
+            $t['type'] = ucfirst($type);
+            $recentTickets[] = $t;
         }
     }
+    
+    // Sort combined tickets by date
+    usort($recentTickets, function($a, $b) {
+        return strtotime($b['created_at']) - strtotime($a['created_at']);
+    });
+    $recentTickets = array_slice($recentTickets, 0, 8);
 
     // Get recent activity
     $recentActivity = $database->select('notifications', '*', [
         'user_id' => $dbUser['id'],
         'ORDER' => ['created_at' => 'DESC'],
-        'LIMIT' => 5
+        'LIMIT' => 8
     ]);
 
-    // Update last_activity for current user
-    $database->update('users', [
-        'last_activity' => date('Y-m-d H:i:s')
-    ], [
-        'id' => $dbUser['id']
-    ]);
+    $database->update('users', ['last_activity' => date('Y-m-d H:i:s')], ['id' => $dbUser['id']]);
+
 } catch (\Exception $e) {
     writeLog('Dashboard Error: ' . $e->getMessage(), 'ERROR');
     header('Location: login.php');
     exit;
 }
 
-// Print HTML start
 html_start('Dashboard - Fayyaz Travels CRM', ['assets/css/dashboard.css']);
 ?>
-<script>
-    function toggleSidebar() {
-        var sidebar = document.getElementById('sidebar');
-        var backdrop = document.getElementById('sidebar-backdrop');
-        sidebar.classList.toggle('open');
-        if (sidebar.classList.contains('open')) {
-            if (!backdrop) {
-                var el = document.createElement('div');
-                el.className = 'sidebar-backdrop';
-                el.id = 'sidebar-backdrop';
-                el.onclick = function () {
-                    toggleSidebar();
-                };
-                document.body.appendChild(el);
-            }
-        } else {
-            if (backdrop) backdrop.remove();
-        }
-    }
-
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('dashboard-dark-mode', document.body.classList.contains('dark-mode'));
-    }
-
-    function toggleNavbarDropdown() {
-        var dropdown = document.getElementById('navbar-dropdown');
-        dropdown.classList.toggle('show');
-    }
-
-    function closeSidebarOnNav() {
-        if (window.innerWidth <= 900) {
-            var sidebar = document.getElementById('sidebar');
-            var backdrop = document.getElementById('sidebar-backdrop');
-            sidebar.classList.remove('open');
-            if (backdrop) backdrop.remove();
-        }
-    }
-
-    window.onload = function () {
-        if (localStorage.getItem('dashboard-dark-mode') === 'true') {
-            document.body.classList.add('dark-mode');
-        }
-    }
-
-    window.onclick = function (event) {
-        if (!event.target.matches('.navbar-avatar')) {
-            var dropdown = document.getElementById('navbar-dropdown');
-            if (dropdown && dropdown.classList.contains('show')) {
-                dropdown.classList.remove('show');
-            }
-        }
-    }
-
-    function sidebarLogout() {
-        window.location.href = 'logout.php';
-    }
-
-    function toggleSidebarMobile() {
-        var sidebar = document.getElementById('sidebar');
-        sidebar.classList.toggle('open');
-    }
-
-    function updateMobileModeIcon() {
-        var icon = document.querySelector('.mobile-bottom-navbar .mode i');
-        if (!icon) return;
-        if (document.body.classList.contains('dark-mode')) {
-            icon.classList.remove('fa-moon');
-            icon.classList.add('fa-sun');
-        } else {
-            icon.classList.remove('fa-sun');
-            icon.classList.add('fa-moon');
-        }
-    }
-
-    var origToggleDarkMode = window.toggleDarkMode;
-    window.toggleDarkMode = function () {
-        if (origToggleDarkMode) origToggleDarkMode();
-        updateMobileModeIcon();
-    };
-    document.addEventListener('DOMContentLoaded', updateMobileModeIcon);
-</script>
 
 <div class="dashboard-container">
     <?php include 'components/sidebar.php'; ?>
-    <div class="main-content dashboard-main-area">
+    
+    <div class="main-content">
         <?php include 'components/navbar.php'; ?>
-        <div class="hero-greeting">
-            <img src="<?php echo htmlspecialchars($user['picture'] ?? 'assets/images/default-avatar.png'); ?>"
-                alt="Profile" class="greeting-avatar-large">
-            <div class="hero-info">
-                <h1>Welcome back, <?php echo htmlspecialchars($user['name'] ?? 'User'); ?>!</h1>
-                <p><?php echo htmlspecialchars($user['email'] ?? ''); ?> • Ready to manage your CRM?</p>
+        
+        <div class="dashboard-main-area">
+            <div style="margin-bottom: 2rem;">
+                <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">Dashboard Overview</h1>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">Welcome back, <?php echo htmlspecialchars($user['name']); ?>. Here's what's happening today.</p>
             </div>
-        </div>
 
-        <div class="dashboard-actions-header">
-            <h2>Overview</h2>
-            <div class="action-buttons-group">
-                <a href="create-ticket.php" class="btn-premium">
-                    <i class="fas fa-plus"></i> New Ticket
-                </a>
-                <a href="messages.php" class="btn-premium">
-                    <i class="fas fa-envelope"></i> New Message
-                </a>
+            <!-- Metrics Banner -->
+            <div class="metrics-banner">
+                <div class="metric-card primary">
+                    <span class="label">Open Tickets</span>
+                    <span class="value"><?php echo $openTickets; ?></span>
+                    <span class="trend" style="color: #64748b;">Awaiting action</span>
+                </div>
+                <div class="metric-card warning">
+                    <span class="label">In Progress</span>
+                    <span class="value"><?php echo $inProgressTickets; ?></span>
+                    <span class="trend" style="color: #f59e0b;">Being handled</span>
+                </div>
+                <div class="metric-card success">
+                    <span class="label">Resolved</span>
+                    <span class="value"><?php echo $resolvedTickets; ?></span>
+                    <span class="trend" style="color: #10b981;">Successfully closed</span>
+                </div>
+                <div class="metric-card danger">
+                    <span class="label">Avg Response</span>
+                    <span class="value">2.4h</span>
+                    <span class="trend" style="color: #ef4444;">-12% vs last week</span>
+                </div>
             </div>
-        </div>
 
-        <div class="bento-grid">
-            <a href="dashboard.php" class="bento-card" title="Go to Dashboard">
-                <div class="bento-icon-wrapper"><i class="fas fa-home"></i></div>
-                <h3>Dashboard</h3>
-                <p>Overview and quick stats</p>
-                <div class="bento-badges">
-                    <span class="bento-badge">Active</span>
-                </div>
-            </a>
-            
-            <a href="tickets.php" class="bento-card" title="Go to Tickets">
-                <div class="bento-icon-wrapper"><i class="fas fa-ticket-alt"></i></div>
-                <h3>Tickets</h3>
-                <p>View and manage your tickets</p>
-                <div class="bento-badges">
-                    <span class="bento-badge"><?php echo $openTickets; ?> Open</span>
-                    <span class="bento-badge secondary"><?php echo $closedTickets; ?> Closed</span>
-                </div>
-            </a>
-            
-            <a href="messages.php" class="bento-card" title="Go to Messages">
-                <div class="bento-icon-wrapper"><i class="fas fa-envelope"></i></div>
-                <h3>Messages</h3>
-                <p>Check your recent messages</p>
-                <div class="bento-badges">
-                    <span class="bento-badge <?php echo $newMessages > 0 ? 'alert' : 'secondary'; ?>">
-                        <?php echo $newMessages; ?> New
-                    </span>
-                </div>
-            </a>
-            
-            <a href="notifications.php" class="bento-card" title="Go to Notifications">
-                <div class="bento-icon-wrapper"><i class="fas fa-bell"></i></div>
-                <h3>Notifications</h3>
-                <p>See your latest notifications</p>
-                <div class="bento-badges">
-                    <span class="bento-badge <?php echo $unreadNotifications > 0 ? 'alert' : 'secondary'; ?>">
-                        <?php echo $unreadNotifications; ?> Unread
-                    </span>
-                </div>
-            </a>
-        </div>
-
-        <!-- Recent Activity Timeline -->
-        <div class="recent-activity-section">
-            <h3><i class="fas fa-history"></i> Recent Activity</h3>
-            <?php if (empty($recentActivity)): ?>
-                <div class="empty-activity">
-                    <i class="fas fa-inbox"></i>
-                    <p>No recent activity found.</p>
-                </div>
-            <?php else: ?>
-                <div class="timeline">
-                    <?php foreach ($recentActivity as $activity): 
-                        // Determine icon and color based on notification type
-                        $iconClass = 'fas fa-info';
-                        if ($activity['type'] === 'success') $iconClass = 'fas fa-check';
-                        if ($activity['type'] === 'warning') $iconClass = 'fas fa-exclamation-triangle';
-                        if ($activity['type'] === 'error') $iconClass = 'fas fa-times';
-                    ?>
-                        <div class="timeline-item">
-                            <div class="timeline-dot"><i class="<?php echo $iconClass; ?>"></i></div>
-                            <div class="timeline-content">
-                                <div class="timeline-header">
-                                    <h4 class="timeline-title"><?php echo htmlspecialchars($activity['title'] ?? 'Notification'); ?></h4>
-                                    <span class="timeline-date"><?php echo date('M d, Y h:i A', strtotime($activity['created_at'])); ?></span>
-                                </div>
-                                <p class="timeline-text"><?php echo htmlspecialchars($activity['message'] ?? ''); ?></p>
-                                <?php if (!empty($activity['link'])): ?>
-                                    <a href="<?php echo htmlspecialchars($activity['link']); ?>" class="timeline-link">View Details &rarr;</a>
+            <div class="dashboard-grid">
+                <!-- Recent Tickets Panel -->
+                <div class="content-panel">
+                    <div class="panel-header">
+                        <h3>Your Recent Tickets</h3>
+                        <a href="tickets.php" style="font-size: 0.8rem; font-weight: 600; color: var(--sidebar-accent); text-decoration: none;">View All &rarr;</a>
+                    </div>
+                    <div class="panel-body" style="padding: 0;">
+                        <table class="dense-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Subject</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($recentTickets)): ?>
+                                    <tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-secondary);">No tickets found</td></tr>
+                                <?php else: ?>
+                                    <?php foreach ($recentTickets as $ticket): ?>
+                                        <tr>
+                                            <td style="font-weight: 600; color: var(--sidebar-accent);">#<?php echo $ticket['id']; ?></td>
+                                            <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                <?php echo htmlspecialchars($ticket['subject'] ?? 'No Subject'); ?>
+                                            </td>
+                                            <td><span style="font-size: 0.8rem; opacity: 0.7;"><?php echo $ticket['type']; ?></span></td>
+                                            <td>
+                                                <?php 
+                                                    $statusClass = strtolower($ticket['status'] === 'IN_PROGRESS' ? 'progress' : $ticket['status']);
+                                                    echo '<span class="status-badge ' . $statusClass . '">' . str_replace('_', ' ', $ticket['status']) . '</span>';
+                                                ?>
+                                            </td>
+                                            <td style="font-size: 0.8rem; color: var(--text-secondary);">
+                                                <?php echo date('M d, H:i', strtotime($ticket['updated_at'] ?? $ticket['created_at'])); ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
                                 <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            <?php endif; ?>
+
+                <!-- Recent Activity Panel -->
+                <div class="content-panel">
+                    <div class="panel-header">
+                        <h3>Recent Activity</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="timeline-compact">
+                            <?php if (empty($recentActivity)): ?>
+                                <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; padding: 1rem;">No recent activity</p>
+                            <?php else: ?>
+                                <?php foreach ($recentActivity as $activity): 
+                                    $icon = 'bi-info-circle';
+                                    if ($activity['type'] === 'success') $icon = 'bi-check-circle';
+                                    if ($activity['type'] === 'warning') $icon = 'bi-exclamation-circle';
+                                    if ($activity['type'] === 'error') $icon = 'bi-x-circle';
+                                ?>
+                                    <div class="timeline-item-compact">
+                                        <div class="timeline-icon"><i class="bi <?php echo $icon; ?>"></i></div>
+                                        <div class="timeline-info">
+                                            <div class="title"><?php echo htmlspecialchars($activity['title']); ?></div>
+                                            <div class="meta"><?php echo date('H:i', strtotime($activity['created_at'])); ?> &bull; <?php echo htmlspecialchars($activity['message']); ?></div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-<?php include 'components/bottom_navbar.php'; ?>
-<?php
-// Print HTML end
-html_end();
-?>
+
+<?php html_end(); ?>
