@@ -6,8 +6,8 @@
 
     <!-- Logo -->
     <div class="sidebar-logo">
-        <span class="sidebar-logo-icon">✈️</span>
-        <span class="sidebar-logo-text">Fayyaz<br>CRM</span>
+        <span class="sidebar-logo-icon"><i class="bi bi-wallet2"></i></span>
+        <span class="sidebar-logo-text">Accounts<br>Ticketing</span>
     </div>
 
     <!-- Navigation -->

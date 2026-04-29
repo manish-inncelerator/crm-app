@@ -22,6 +22,38 @@
     flex-direction: column;
 }
 
+/* Hide scrollbar for a cleaner look */
+.sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+body.dark-mode .sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+}
+
+/* Close Button (Hidden by default on Desktop) */
+.sidebar-close {
+    display: none;
+    background: transparent;
+    border: none;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 1.5rem;
+    color: var(--dash-text, #1f2937);
+    cursor: pointer;
+    z-index: 10;
+}
+body.dark-mode .sidebar-close {
+    color: #f8f9fa;
+}
+
 body.dark-mode .sidebar {
     background: var(--dash-bg-glass, rgba(30, 41, 59, 0.85));
     border-right-color: var(--dash-border-glass, rgba(255, 255, 255, 0.05));
@@ -290,5 +322,8 @@ body {
     }
     body {
         padding-left: 0;
+    }
+    .sidebar-close {
+        display: block;
     }
 }
