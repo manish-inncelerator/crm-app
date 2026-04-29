@@ -321,8 +321,11 @@ html_start('Manage Knowledge Base');
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <input type="text" id="iconSearch" class="form-control" placeholder="Search icons...">
+                    <input type="text" id="iconSearch" class="form-control" placeholder="Search icons across all categories...">
                 </div>
+                <ul class="nav nav-pills mb-3" id="iconTabs" role="tablist">
+                    <!-- Tab headers will be injected here -->
+                </ul>
                 <div class="row g-2 text-center" id="iconGrid">
                     <!-- Icons will be injected here -->
                 </div>
@@ -332,17 +335,16 @@ html_start('Manage Knowledge Base');
 </div>
 
 <script>
-const iconList = [
-    'bi-bank', 'bi-cash', 'bi-cash-stack', 'bi-credit-card', 'bi-credit-card-2-front', 'bi-currency-dollar', 'bi-currency-exchange', 'bi-wallet2', 'bi-piggy-bank', 'bi-calculator',
-    'bi-chat', 'bi-chat-dots', 'bi-envelope', 'bi-telephone', 'bi-headset', 'bi-megaphone', 'bi-broadcast',
-    'bi-person', 'bi-people', 'bi-person-badge', 'bi-person-check', 'bi-person-vcard',
-    'bi-file-earmark', 'bi-file-earmark-text', 'bi-file-earmark-pdf', 'bi-files', 'bi-journal-text', 'bi-book', 'bi-clipboard-data',
-    'bi-cpu', 'bi-laptop', 'bi-phone', 'bi-server', 'bi-shield-lock', 'bi-unlock', 'bi-key',
-    'bi-geo-alt', 'bi-map', 'bi-compass', 'bi-globe', 'bi-pin-map',
-    'bi-info-circle', 'bi-question-circle', 'bi-exclamation-circle', 'bi-check-circle', 'bi-gear', 'bi-tools', 'bi-lightning', 'bi-star', 'bi-heart', 'bi-house', 'bi-search', 'bi-link-45deg',
-    'bi-briefcase', 'bi-buildings', 'bi-calendar-event', 'bi-cart', 'bi-cloud', 'bi-download', 'bi-eye', 'bi-flag', 'bi-graph-up', 'bi-image', 'bi-layers', 'bi-list-ul', 'bi-lock', 'bi-magic'
-];
+const categorizedIcons = {
+    'Finance': ['bi-bank', 'bi-cash', 'bi-cash-stack', 'bi-credit-card', 'bi-credit-card-2-front', 'bi-currency-dollar', 'bi-currency-exchange', 'bi-wallet2', 'bi-piggy-bank', 'bi-calculator'],
+    'Comm': ['bi-chat', 'bi-chat-dots', 'bi-envelope', 'bi-telephone', 'bi-headset', 'bi-megaphone', 'bi-broadcast'],
+    'People': ['bi-person', 'bi-people', 'bi-person-badge', 'bi-person-check', 'bi-person-vcard'],
+    'Files': ['bi-file-earmark', 'bi-file-earmark-text', 'bi-file-earmark-pdf', 'bi-files', 'bi-journal-text', 'bi-book', 'bi-clipboard-data'],
+    'Tech': ['bi-cpu', 'bi-laptop', 'bi-phone', 'bi-server', 'bi-shield-lock', 'bi-unlock', 'bi-key'],
+    'General': ['bi-info-circle', 'bi-question-circle', 'bi-exclamation-circle', 'bi-check-circle', 'bi-gear', 'bi-tools', 'bi-lightning', 'bi-star', 'bi-heart', 'bi-house', 'bi-search', 'bi-link-45deg', 'bi-briefcase', 'bi-buildings', 'bi-calendar-event', 'bi-cart', 'bi-cloud', 'bi-download', 'bi-eye', 'bi-flag', 'bi-graph-up', 'bi-image', 'bi-layers', 'bi-list-ul', 'bi-lock', 'bi-magic', 'bi-puzzle', 'bi-rocket', 'bi-tag', 'bi-trash', 'bi-trophy', 'bi-umbrella', 'bi-alarm', 'bi-archive', 'bi-attachment', 'bi-bell', 'bi-bookmark', 'bi-camera', 'bi-clock', 'bi-collection', 'bi-cup-hot', 'bi-folder', 'bi-gift', 'bi-grid', 'bi-hash', 'bi-inboxes', 'bi-infinity', 'bi-kanban', 'bi-layers-half', 'bi-mortarboard', 'bi-newspaper', 'bi-palette', 'bi-paperclip', 'bi-patch-check', 'bi-plug', 'bi-printer', 'bi-qr-code-scan', 'bi-receipt', 'bi-rulers', 'bi-safe', 'bi-send', 'bi-signpost', 'bi-speaker', 'bi-speedometer', 'bi-stickies', 'bi-suit-spade', 'bi-terminal', 'bi-ticket-detailed', 'bi-translate', 'bi-truck', 'bi-tv', 'bi-usb', 'bi-vector-pen', 'bi-window']
+};
 
+let currentCategory = 'Finance';
 let sectionModal, cardModal, itemModal, iconPickerModal;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -351,14 +353,59 @@ document.addEventListener('DOMContentLoaded', () => {
     itemModal = new bootstrap.Modal(document.getElementById('itemModal'));
     iconPickerModal = new bootstrap.Modal(document.getElementById('iconPickerModal'));
 
-    renderIcons();
+    initIconPicker();
     document.getElementById('iconSearch').addEventListener('input', (e) => renderIcons(e.target.value));
 });
+
+function initIconPicker() {
+    const tabs = document.getElementById('iconTabs');
+    
+    // Add "All" tab first
+    const allLi = document.createElement('li');
+    allLi.className = 'nav-item';
+    allLi.innerHTML = `
+        <button class="nav-link active py-1 px-3 small" data-bs-toggle="pill" type="button" onclick="setCategory('All')">
+            All
+        </button>
+    `;
+    tabs.appendChild(allLi);
+
+    Object.keys(categorizedIcons).forEach((cat) => {
+        const li = document.createElement('li');
+        li.className = 'nav-item';
+        li.innerHTML = `
+            <button class="nav-link py-1 px-3 small" data-bs-toggle="pill" type="button" onclick="setCategory('${cat}')">
+                ${cat}
+            </button>
+        `;
+        tabs.appendChild(li);
+    });
+    currentCategory = 'All';
+    renderIcons();
+}
+
+function setCategory(cat) {
+    currentCategory = cat;
+    document.getElementById('iconSearch').value = '';
+    renderIcons();
+}
 
 function renderIcons(filter = '') {
     const grid = document.getElementById('iconGrid');
     grid.innerHTML = '';
-    iconList.filter(icon => icon.includes(filter.toLowerCase())).forEach(icon => {
+    
+    let iconsToRender = [];
+    if (filter || currentCategory === 'All') {
+        // Show all or filtered
+        Object.values(categorizedIcons).forEach(icons => {
+            iconsToRender = iconsToRender.concat(icons.filter(icon => icon.includes(filter.toLowerCase())));
+        });
+        iconsToRender = [...new Set(iconsToRender)];
+    } else {
+        iconsToRender = categorizedIcons[currentCategory];
+    }
+
+    iconsToRender.forEach(icon => {
         const col = document.createElement('div');
         col.className = 'col-2';
         col.innerHTML = `
