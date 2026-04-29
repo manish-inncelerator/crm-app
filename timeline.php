@@ -28,27 +28,46 @@ if (!$dbUser) {
 // Get ticket id and type from GET
 $ticketId = $_GET['id'] ?? null;
 $ticketType = $_GET['type'] ?? null;
-if (!$ticketId || !$ticketType) {
-    die('Ticket ID and type required.');
+
+$isGlobal = (!$ticketId || !$ticketType);
+
+if ($isGlobal) {
+    // Fetch all comments across all tickets, newest first
+    $comments = $database->select('ticket_comments', [
+        '[>]users' => ['user_id' => 'id']
+    ], [
+        'ticket_comments.comment',
+        'ticket_comments.created_at',
+        'ticket_comments.ticket_id',
+        'ticket_comments.ticket_type',
+        'users.name(user_name)',
+        'users.is_admin'
+    ], [
+        'ORDER' => ['ticket_comments.created_at' => 'DESC'],
+        'LIMIT' => 50
+    ]);
+    $ticket = null;
+    $pageTitle = 'Recent Activity';
+} else {
+    // Fetch all comments for this ticket, oldest first
+    $comments = $database->select('ticket_comments', [
+        '[>]users' => ['user_id' => 'id']
+    ], [
+        'ticket_comments.comment',
+        'ticket_comments.created_at',
+        'users.name(user_name)',
+        'users.is_admin'
+    ], [
+        'ticket_comments.ticket_id' => $ticketId,
+        'ticket_comments.ticket_type' => $ticketType,
+        'ORDER' => ['ticket_comments.created_at' => 'ASC']
+    ]);
+
+    // Get ticket details for the header
+    $ticketTable = $ticketType . '_tickets';
+    $ticket = $database->get($ticketTable, '*', ['id' => $ticketId]);
+    $pageTitle = 'Ticket Timeline';
 }
-
-// Fetch all comments for this ticket, oldest first
-$comments = $database->select('ticket_comments', [
-    '[>]users' => ['user_id' => 'id']
-], [
-    'ticket_comments.comment',
-    'ticket_comments.created_at',
-    'users.name(user_name)',
-    'users.is_admin'
-], [
-    'ticket_comments.ticket_id' => $ticketId,
-    'ticket_comments.ticket_type' => $ticketType,
-    'ORDER' => ['ticket_comments.created_at' => 'ASC']
-]);
-
-// Get ticket details for the header
-$ticketTable = $ticketType . '_tickets';
-$ticket = $database->get($ticketTable, '*', ['id' => $ticketId]);
 
 if (!$comments) $comments = [];
 
@@ -66,7 +85,7 @@ function getBadgeAndIcon($comment)
     return ['bg-primary', 'bi-chat'];
 }
 
-html_start('Ticket Timeline');
+html_start($pageTitle);
 ?>
 <script>
     function toggleSidebar() {
@@ -123,7 +142,7 @@ html_start('Ticket Timeline');
     <?php include 'components/sidebar.php'; ?>
     <div class="main-content">
         <div class="content-header">
-            <h2 class="main-title mb-0" style="margin-bottom:0;"><i class="bi bi-clock-history"></i> Ticket Timeline</h2>
+            <h2 class="main-title mb-0" style="margin-bottom:0;"><i class="bi bi-clock-history"></i> <?php echo htmlspecialchars($pageTitle); ?></h2>
         </div>
         <?php if ($ticket): ?>
             <div class="text-muted mb-4" style="text-align:center;">
@@ -158,6 +177,16 @@ html_start('Ticket Timeline');
                                 <?= date('F j, Y g:i A', strtotime($comment['created_at'])) ?>
                             </div>
                             <div class="timeline-comment"><?= nl2br(htmlspecialchars($comment['comment'])) ?></div>
+                            <?php if (isset($isGlobal) && $isGlobal): ?>
+                                <div class="mt-3 pt-2 border-top text-muted d-flex justify-content-between align-items-center" style="font-size:0.8rem;">
+                                    <span>
+                                        <i class="bi bi-ticket-detailed"></i> Ticket #<?= htmlspecialchars($comment['ticket_id']) ?> (<?= htmlspecialchars(ucfirst($comment['ticket_type'])) ?>)
+                                    </span>
+                                    <a href="timeline.php?id=<?= htmlspecialchars($comment['ticket_id']) ?>&type=<?= htmlspecialchars($comment['ticket_type']) ?>" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size:0.75rem; border-radius:12px;">
+                                        View
+                                    </a>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
