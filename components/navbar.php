@@ -8,7 +8,7 @@
         padding: 0;
         position: sticky;
         top: 0;
-        z-index: 1001;
+        z-index: 1000;
         transition: all 0.3s ease;
         box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         margin: -2rem -2rem 2rem -2rem;
