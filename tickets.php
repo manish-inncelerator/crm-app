@@ -169,7 +169,8 @@ try {
     }
 
     // Fetch tickets based on user role
-    $isAdmin = isset($dbUser['is_admin']) && $dbUser['is_admin'] == 1;
+    $is_admin = isset($dbUser['is_admin']) && $dbUser['is_admin'] == 1;
+    $isAdmin = $is_admin;
 
     // Base conditions for tickets
     $conditions = [];

@@ -24,6 +24,7 @@ if (!$dbUser) {
     header('Location: login.php');
     exit;
 }
+$is_admin = (bool)($dbUser['is_admin'] ?? false);
 
 // Get ticket id and type from GET
 $ticketId = $_GET['id'] ?? null;

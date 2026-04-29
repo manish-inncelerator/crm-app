@@ -51,7 +51,8 @@ try {
     }
 
     $user_id = $dbUser['id'];
-    $isAdmin = isset($dbUser['is_admin']) && $dbUser['is_admin'] == 1;
+    $is_admin = isset($dbUser['is_admin']) && $dbUser['is_admin'] == 1;
+    $isAdmin = $is_admin;
 
     // Handle marking notification as read
     if (isset($_POST['mark_read']) && isset($_POST['notification_id'])) {

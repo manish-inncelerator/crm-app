@@ -64,6 +64,7 @@ try {
     }
 
     writeLog('Dashboard - User data from database: ' . print_r($dbUser, true));
+    $is_admin = (bool)($dbUser['is_admin'] ?? false);
 
     // Get ticket counts
     $ticketTypes = ['estimate', 'supplier', 'general'];

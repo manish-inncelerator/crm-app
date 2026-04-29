@@ -63,7 +63,7 @@ try {
         exit;
     }
 
-    $is_admin = ($dbUser['role'] === 'admin');
+    $is_admin = (bool)($dbUser['is_admin'] ?? false);
     if ($is_admin) {
         writeLog('Create Ticket - Admin attempted to access create-ticket.php, redirecting to tickets.php');
         header('Location: tickets.php');
@@ -157,7 +157,7 @@ html_start('Create Ticket');
                 <p>Request modifications to existing estimates or invoices.</p>
                 <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
             </a>
-            <?php if ($dbUser['role'] === 'admin'): ?>
+            <?php if ($is_admin): ?>
             <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Customer Payment Follow-up" data-type="Customer Payment Follow-up">
                 <div class="bento-icon-wrapper"><i class="bi bi-person-lines-fill"></i></div>
                 <h3>Customer Payment Follow-up</h3>

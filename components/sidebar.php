@@ -30,7 +30,7 @@
             <i class="bi bi-ticket sidebar-link-icon"></i>
             <span class="sidebar-link-text">Tickets</span>
         </a>
-        <?php if (!($is_admin ?? false)): ?>
+        <?php if (!($is_admin ?? $dbUser['is_admin'] ?? false)): ?>
         <a href="create-ticket.php"
             class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'create-ticket.php' ? 'active' : ''; ?>">
             <i class="bi bi-plus-circle sidebar-link-icon"></i>
@@ -63,7 +63,7 @@
             <i class="bi bi-book sidebar-link-icon"></i>
             <span class="sidebar-link-text">Knowledge Base</span>
         </a>
-        <?php if ($is_admin ?? false): ?>
+        <?php if ($is_admin ?? $dbUser['is_admin'] ?? false): ?>
         <a href="users.php"
             class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'users.php' ? 'active' : ''; ?>">
             <i class="bi bi-people sidebar-link-icon"></i>
@@ -89,7 +89,7 @@
                     <span class="user-email"><?php echo htmlspecialchars($user['email'] ?? 'user@example.com'); ?></span>
                 </div>
             </div>
-            <?php if (!($is_admin ?? false)): ?>
+            <?php if (!($is_admin ?? $dbUser['is_admin'] ?? false)): ?>
                 <span class="user-role">Employee</span>
             <?php else: ?>
                 <span class="user-role">Admin</span>

@@ -27,10 +27,11 @@ if (!$user) {
 }
 
 $dbUser = $database->get('users', '*', ['auth0_id' => $user['sub']]);
-if (!$dbUser || $dbUser['role'] !== 'admin') {
+if (!$dbUser || !($dbUser['is_admin'] ?? false)) {
     header('Location: dashboard.php');
     exit;
 }
+$is_admin = true;
 
 // Fetch all data for management
 $sections = $database->select('kb_sections', '*', ['ORDER' => ['display_order' => 'ASC']]);

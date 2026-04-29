@@ -31,7 +31,7 @@ try {
         header('Location: login.php');
         exit;
     }
-    $is_admin = (bool)($dbUser['role'] === 'admin');
+    $is_admin = (bool)($dbUser['is_admin'] ?? false);
 } catch (\Exception $e) {
     header('Location: login.php');
     exit;

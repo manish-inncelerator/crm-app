@@ -27,7 +27,7 @@ if (!$user) {
 }
 
 $dbUser = $database->get('users', '*', ['auth0_id' => $user['sub']]);
-if (!$dbUser || $dbUser['role'] !== 'admin') {
+if (!$dbUser || !($dbUser['is_admin'] ?? false)) {
     header('Location: dashboard.php');
     exit;
 }
@@ -99,7 +99,7 @@ html_start('Manage Users');
                             <img src="<?php echo htmlspecialchars($u['picture'] ?: 'https://via.placeholder.com/80'); ?>" alt="" class="user-avatar">
                             <h5 class="mb-1"><?php echo htmlspecialchars($u['name']); ?></h5>
                             <p class="text-muted small mb-2"><?php echo htmlspecialchars($u['email']); ?></p>
-                            <p class="small mb-3">Role: <span class="badge bg-secondary"><?php echo htmlspecialchars($u['role'] ?: 'User'); ?></span></p>
+                            <p class="small mb-3">Role: <span class="badge bg-secondary"><?php echo ($u['is_admin'] ? 'Admin' : 'User'); ?></span></p>
                             
                             <?php if ($u['is_ex_employee']): ?>
                                 <span class="status-badge status-ex">Ex-Employee</span>
