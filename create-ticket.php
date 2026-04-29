@@ -145,24 +145,26 @@ html_start('Create Ticket');
                 <p>Generate a payment link (Flywire/Tazapay/Airwallex).</p>
                 <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
             </a>
-            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Update Payments in QB" data-type="Update Payments in QB">
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#paymentUpdateModal">
                 <div class="bento-icon-wrapper"><i class="bi bi-receipt"></i></div>
                 <h3>Update Payments in QB</h3>
                 <p>Update payments in QuickBooks and provide paid invoice to sales team.</p>
                 <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
             </a>
-            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Modify Estimates/Invoices" data-type="Modify Estimates/Invoices">
+            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#modifyTicketModal">
                 <div class="bento-icon-wrapper"><i class="bi bi-pencil-square"></i></div>
                 <h3>Modify Estimates/Invoices</h3>
                 <p>Request modifications to existing estimates or invoices.</p>
                 <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
             </a>
+            <?php if ($dbUser['role'] === 'admin'): ?>
             <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Customer Payment Follow-up" data-type="Customer Payment Follow-up">
                 <div class="bento-icon-wrapper"><i class="bi bi-person-lines-fill"></i></div>
                 <h3>Customer Payment Follow-up</h3>
                 <p>Follow up with normal or corporate customers for payments.</p>
                 <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
             </a>
+            <?php endif; ?>
             <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#supplierModal">
                 <div class="bento-icon-wrapper"><i class="bi bi-truck"></i></div>
                 <h3>Supplier Payment Requests</h3>
@@ -173,18 +175,6 @@ html_start('Create Ticket');
                 <div class="bento-icon-wrapper"><i class="bi bi-person-x"></i></div>
                 <h3>Employee Offboarding</h3>
                 <p>Complete requirements for resigning or duty release.</p>
-                <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
-            </a>
-            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="QB Training (Estimates)" data-type="QB Training (Estimates)">
-                <div class="bento-icon-wrapper"><i class="bi bi-easel"></i></div>
-                <h3>Initial QB Training (Estimates)</h3>
-                <p>Request initial training on QuickBooks for estimate creation.</p>
-                <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
-            </a>
-            <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Separate Payment Receipts" data-type="Separate Payment Receipts">
-                <div class="bento-icon-wrapper"><i class="bi bi-receipt-cutoff"></i></div>
-                <h3>Separate Payment Receipts</h3>
-                <p>Request separate payment receipts for customers.</p>
                 <div class="bento-badges mt-auto"><span class="bento-badge">Select &rarr;</span></div>
             </a>
             <a href="#" class="bento-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#generalModal" data-title="Share Bank Details" data-type="Share Bank Details">
@@ -454,6 +444,14 @@ html_start('Create Ticket');
                         <input type="text" name="client_name" class="form-control" required>
                     </div>
                     <div class="col-md-6">
+                        <label class="form-label">From (Destination)</label>
+                        <input type="text" name="from_destination" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">To (Destination)</label>
+                        <input type="text" name="to_destination" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
                         <label class="form-label">PO Date</label>
                         <input type="date" name="po_date" class="form-control" required>
                     </div>
@@ -512,6 +510,10 @@ html_start('Create Ticket');
                     <div class="col-md-6">
                         <label class="form-label">Amount (excluding charges)</label>
                         <input type="number" step="0.01" name="amount" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Inclusive Charges</label>
+                        <input type="number" step="0.01" name="inclusive_charges" class="form-control" placeholder="0.00">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Platform Preference</label>
@@ -676,6 +678,95 @@ html_start('Create Ticket');
         </div>
     </div>
 </div>
+<!-- Payment Update Modal -->
+<div class="modal fade" id="paymentUpdateModal" tabindex="-1" aria-labelledby="paymentUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paymentUpdateModalLabel">Update Payments in QB</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Estimate No</label>
+                        <input type="text" name="estimate_no" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Invoice No</label>
+                        <input type="text" name="invoice_no" class="form-control">
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Payment Proof</label>
+                        <input type="file" name="payment_proof" class="form-control" required>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Priority</label>
+                        <select name="priority" class="form-select" required>
+                            <option value="LOW">LOW</option>
+                            <option value="MEDIUM" selected>MEDIUM</option>
+                            <option value="HIGH">HIGH</option>
+                            <option value="URGENT">URGENT</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Additional Information / Description</label>
+                        <textarea name="description" class="form-control rich-editor"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modify Estimates/Invoices Modal -->
+<div class="modal fade" id="modifyTicketModal" tabindex="-1" aria-labelledby="modifyTicketModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modifyTicketModalLabel">Modify Estimates/Invoices</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Estimate No</label>
+                        <input type="text" name="estimate_no" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Invoice No</label>
+                        <input type="text" name="invoice_no" class="form-control">
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Reason for Modification</label>
+                        <textarea name="modification_reason" class="form-control" required></textarea>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Priority</label>
+                        <select name="priority" class="form-select" required>
+                            <option value="LOW">LOW</option>
+                            <option value="MEDIUM" selected>MEDIUM</option>
+                            <option value="HIGH">HIGH</option>
+                            <option value="URGENT">URGENT</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Upload Supporting Image (optional)</label>
+                        <input type="file" name="supporting_image" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <!-- General Modal -->
 <div class="modal fade" id="generalModal" tabindex="-1" aria-labelledby="generalModalLabel" aria-hidden="true">
@@ -796,6 +887,12 @@ html_start('Create Ticket');
                     break;
                 case 'paymentLinkModal':
                     ticketType = 'payment_link';
+                    break;
+                case 'paymentUpdateModal':
+                    ticketType = 'payment_update';
+                    break;
+                case 'modifyTicketModal':
+                    ticketType = 'modify_ticket';
                     break;
                 case 'amexModal':
                     ticketType = 'amex_payment';

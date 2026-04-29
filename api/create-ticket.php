@@ -212,7 +212,7 @@ try {
             break;
 
         case 'purchase_order':
-            $requiredFields = ['supplier_name', 'client_name', 'po_date', 'quantity', 'rate', 'description'];
+            $requiredFields = ['supplier_name', 'client_name', 'from_destination', 'to_destination', 'po_date', 'quantity', 'rate', 'description'];
             foreach ($requiredFields as $field) {
                 if (empty($data[$field])) {
                     http_response_code(400);
@@ -224,6 +224,8 @@ try {
             $details = "<h4>Purchase Order Request</h4>";
             $details .= "<p><strong>Supplier Name:</strong> " . htmlspecialchars($data['supplier_name']) . "</p>";
             $details .= "<p><strong>Client Name:</strong> " . htmlspecialchars($data['client_name']) . "</p>";
+            $details .= "<p><strong>From (Destination):</strong> " . htmlspecialchars($data['from_destination']) . "</p>";
+            $details .= "<p><strong>To (Destination):</strong> " . htmlspecialchars($data['to_destination']) . "</p>";
             $details .= "<p><strong>PO Date:</strong> " . htmlspecialchars($data['po_date']) . "</p>";
             $details .= "<p><strong>Quantity:</strong> " . htmlspecialchars($data['quantity']) . "</p>";
             $details .= "<p><strong>Rate:</strong> " . htmlspecialchars($data['rate']) . "</p>";
@@ -255,6 +257,9 @@ try {
             $details .= "<p><strong>Phone Number:</strong> " . htmlspecialchars($data['phone']) . "</p>";
             $details .= "<p><strong>Country:</strong> " . htmlspecialchars($data['country']) . "</p>";
             $details .= "<p><strong>Amount:</strong> " . htmlspecialchars($data['amount']) . "</p>";
+            if (!empty($data['inclusive_charges'])) {
+                $details .= "<p><strong>Inclusive Charges:</strong> " . htmlspecialchars($data['inclusive_charges']) . "</p>";
+            }
             $details .= "<p><strong>Platform Preference:</strong> " . htmlspecialchars($data['platform'] ?? 'Any') . "</p>";
 
             $ticketData = array_merge($commonFields, [
@@ -361,6 +366,55 @@ try {
             $ticketData = array_merge($commonFields, [
                 'description' => $details,
                 'ticket_subtype' => 'Employee Offboarding'
+            ]);
+            $result = $database->insert('general_tickets', $ticketData);
+            break;
+
+        case 'payment_update':
+            if (empty($_FILES['payment_proof'])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Payment proof is required']);
+                exit;
+            }
+
+            $details = "<h4>Update Payments in QB</h4>";
+            if (!empty($data['estimate_no'])) $details .= "<p><strong>Estimate No:</strong> " . htmlspecialchars($data['estimate_no']) . "</p>";
+            if (!empty($data['invoice_no'])) $details .= "<p><strong>Invoice No:</strong> " . htmlspecialchars($data['invoice_no']) . "</p>";
+            
+            $path = handleFileUpload($_FILES['payment_proof'], 'payment_proofs');
+            if ($path) $details .= "<p><strong>Payment Proof:</strong> <a href='uploads/payment_proofs/{$path}' target='_blank'>View File</a></p>";
+            
+            if (!empty($data['description'])) {
+                $details .= "<h5>Additional Details:</h5><div>" . $data['description'] . "</div>";
+            }
+
+            $ticketData = array_merge($commonFields, [
+                'description' => $details,
+                'ticket_subtype' => 'Updating Payments in QB and giving paid invoice to sales team'
+            ]);
+            $result = $database->insert('general_tickets', $ticketData);
+            break;
+
+        case 'modify_ticket':
+            if (empty($data['modification_reason'])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Reason for modification is required']);
+                exit;
+            }
+
+            $details = "<h4>Modify Estimates/Invoices</h4>";
+            if (!empty($data['estimate_no'])) $details .= "<p><strong>Estimate No:</strong> " . htmlspecialchars($data['estimate_no']) . "</p>";
+            if (!empty($data['invoice_no'])) $details .= "<p><strong>Invoice No:</strong> " . htmlspecialchars($data['invoice_no']) . "</p>";
+            $details .= "<p><strong>Reason for Modification:</strong><br>" . nl2br(htmlspecialchars($data['modification_reason'])) . "</p>";
+
+            if (isset($_FILES['supporting_image'])) {
+                $path = handleFileUpload($_FILES['supporting_image'], 'supporting_images');
+                if ($path) $details .= "<p><strong>Supporting Image:</strong> <a href='uploads/supporting_images/{$path}' target='_blank'>View File</a></p>";
+            }
+
+            $ticketData = array_merge($commonFields, [
+                'description' => $details,
+                'ticket_subtype' => 'Modification in the estimates/invoices if any new changes coming from customer'
             ]);
             $result = $database->insert('general_tickets', $ticketData);
             break;

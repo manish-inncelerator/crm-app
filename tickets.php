@@ -67,8 +67,6 @@ function getEstimatedTime($ticket)
         'modification in the estimates/invoices if any new changes coming from customer but that are sometime' => '10 Minutes',
         'normal customers / corporate customer  payments follow up' => '5 Minutes',
         'suppliers payment follow up for containing ticketing and packages' => '5 Minutes',
-        'initial training on qb for estimate creations' => '30 Minutes',
-        'sometime requests for separate payment receipts for the customers' => '10 Minutes',
         'customers refund' => '30 to 45 Days',
         'payment from amex card (cc)' => '10 Minutes',
     ];
@@ -124,8 +122,6 @@ function getDefaultEstimatedTime($subject)
         'modification in the estimates/invoices if any new changes coming from customer but that are sometime' => '10 Minutes',
         'normal customers / corporate customer  payments follow up' => '5 Minutes',
         'suppliers payment follow up for containing ticketing and packages' => '5 Minutes',
-        'initial training on qb for estimate creations' => '30 Minutes',
-        'sometime requests for separate payment receipts for the customers' => '10 Minutes',
         'sharing bank details file for the accounts for customer payments' => 'Already discussed and file shared with Jeth',
         'customers refund' => '30 to 45 Days',
         'payment from amex card (cc)' => '10 Minutes'

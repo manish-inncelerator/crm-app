@@ -100,6 +100,10 @@ try {
         ]);
 
         if ($existingUser) {
+            if (isset($existingUser['is_ex_employee']) && $existingUser['is_ex_employee']) {
+                writeLog('Callback - Ex-employee attempted access: ' . $existingUser['email'], 'WARNING');
+                throw new \Exception('Access Denied: Your account has been deactivated.');
+            }
             // Update existing user
             $result = $database->update('users', [
                 'email' => $userInfo['email'] ?? null,

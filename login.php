@@ -43,6 +43,12 @@ try {
         ]);
 
         if ($dbUser) {
+            if (isset($dbUser['is_ex_employee']) && $dbUser['is_ex_employee']) {
+                writeLog('Login - Ex-employee attempted login: ' . $dbUser['email'], 'WARNING');
+                session_destroy();
+                header('Location: login.php?error=' . urlencode('Access Denied: Your account has been deactivated.'));
+                exit;
+            }
             writeLog('Login - User is authenticated and exists in database, redirecting to dashboard');
             header('Location: dashboard.php');
             exit;

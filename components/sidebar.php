@@ -63,6 +63,13 @@
             <i class="bi bi-book sidebar-link-icon"></i>
             <span class="sidebar-link-text">Knowledge Base</span>
         </a>
+        <?php if ($is_admin ?? false): ?>
+        <a href="users.php"
+            class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'users.php' ? 'active' : ''; ?>">
+            <i class="bi bi-people sidebar-link-icon"></i>
+            <span class="sidebar-link-text">Manage Users</span>
+        </a>
+        <?php endif; ?>
     </nav>
 
     <!-- Footer with User Info and Controls -->
