@@ -84,6 +84,15 @@ html_start('Manage Knowledge Base');
         cursor: move;
         color: #666;
     }
+    .icon-item:hover {
+        background: rgba(79, 70, 229, 0.1);
+        border-color: #4f46e5 !important;
+        transform: translateY(-2px);
+        transition: all 0.2s ease;
+    }
+    .cursor-pointer {
+        cursor: pointer;
+    }
 </style>
 
 <div class="dashboard-container">
@@ -193,8 +202,12 @@ html_start('Manage Knowledge Base');
                         <input type="text" name="title" id="sec_title" class="form-control" required>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Icon (Bootstrap Icon Class)</label>
-                        <input type="text" name="icon" id="sec_icon" class="form-control" placeholder="bi-info-circle">
+                        <label class="form-label">Icon</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i id="icon-preview" class="bi bi-info-circle"></i></span>
+                            <input type="text" name="icon" id="sec_icon" class="form-control" placeholder="bi-info-circle" readonly>
+                            <button class="btn btn-outline-secondary" type="button" onclick="openIconPicker()">Browse</button>
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Display Order</label>
@@ -298,14 +311,75 @@ html_start('Manage Knowledge Base');
     </div>
 </div>
 
+<!-- Icon Picker Modal -->
+<div class="modal fade" id="iconPickerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select an Icon</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <input type="text" id="iconSearch" class="form-control" placeholder="Search icons...">
+                </div>
+                <div class="row g-2 text-center" id="iconGrid">
+                    <!-- Icons will be injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-let sectionModal, cardModal, itemModal;
+const iconList = [
+    'bi-bank', 'bi-cash', 'bi-cash-stack', 'bi-credit-card', 'bi-credit-card-2-front', 'bi-currency-dollar', 'bi-currency-exchange', 'bi-wallet2', 'bi-piggy-bank', 'bi-calculator',
+    'bi-chat', 'bi-chat-dots', 'bi-envelope', 'bi-telephone', 'bi-headset', 'bi-megaphone', 'bi-broadcast',
+    'bi-person', 'bi-people', 'bi-person-badge', 'bi-person-check', 'bi-person-vcard',
+    'bi-file-earmark', 'bi-file-earmark-text', 'bi-file-earmark-pdf', 'bi-files', 'bi-journal-text', 'bi-book', 'bi-clipboard-data',
+    'bi-cpu', 'bi-laptop', 'bi-phone', 'bi-server', 'bi-shield-lock', 'bi-unlock', 'bi-key',
+    'bi-geo-alt', 'bi-map', 'bi-compass', 'bi-globe', 'bi-pin-map',
+    'bi-info-circle', 'bi-question-circle', 'bi-exclamation-circle', 'bi-check-circle', 'bi-gear', 'bi-tools', 'bi-lightning', 'bi-star', 'bi-heart', 'bi-house', 'bi-search', 'bi-link-45deg',
+    'bi-briefcase', 'bi-buildings', 'bi-calendar-event', 'bi-cart', 'bi-cloud', 'bi-download', 'bi-eye', 'bi-flag', 'bi-graph-up', 'bi-image', 'bi-layers', 'bi-list-ul', 'bi-lock', 'bi-magic'
+];
+
+let sectionModal, cardModal, itemModal, iconPickerModal;
 
 document.addEventListener('DOMContentLoaded', () => {
     sectionModal = new bootstrap.Modal(document.getElementById('sectionModal'));
     cardModal = new bootstrap.Modal(document.getElementById('cardModal'));
     itemModal = new bootstrap.Modal(document.getElementById('itemModal'));
+    iconPickerModal = new bootstrap.Modal(document.getElementById('iconPickerModal'));
+
+    renderIcons();
+    document.getElementById('iconSearch').addEventListener('input', (e) => renderIcons(e.target.value));
 });
+
+function renderIcons(filter = '') {
+    const grid = document.getElementById('iconGrid');
+    grid.innerHTML = '';
+    iconList.filter(icon => icon.includes(filter.toLowerCase())).forEach(icon => {
+        const col = document.createElement('div');
+        col.className = 'col-2';
+        col.innerHTML = `
+            <div class="p-3 border rounded cursor-pointer icon-item" onclick="selectIcon('${icon}')" style="cursor: pointer;">
+                <i class="bi ${icon} fs-4"></i>
+                <div class="small text-truncate mt-1">${icon.replace('bi-', '')}</div>
+            </div>
+        `;
+        grid.appendChild(col);
+    });
+}
+
+function openIconPicker() {
+    iconPickerModal.show();
+}
+
+function selectIcon(icon) {
+    document.getElementById('sec_icon').value = icon;
+    document.getElementById('icon-preview').className = `bi ${icon}`;
+    iconPickerModal.hide();
+}
 
 function openSectionModal(data = null) {
     document.getElementById('sectionForm').reset();
@@ -313,9 +387,11 @@ function openSectionModal(data = null) {
         document.getElementById('sec_id').value = data.id;
         document.getElementById('sec_title').value = data.title;
         document.getElementById('sec_icon').value = data.icon;
+        document.getElementById('icon-preview').className = `bi ${data.icon || 'bi-info-circle'}`;
         document.getElementById('sec_order').value = data.display_order;
         document.getElementById('sec_action').value = 'edit_section';
     } else {
+        document.getElementById('icon-preview').className = 'bi bi-info-circle';
         document.getElementById('sec_action').value = 'add_section';
     }
     sectionModal.show();
