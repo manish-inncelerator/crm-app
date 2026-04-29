@@ -122,18 +122,20 @@ html_start('Knowledge Base - Fayyaz Travels CRM', ['assets/css/knowledgebase.css
                                             </table>
                                         </div>
                                     <?php else: ?>
-                                        <div class="payment-links-grid p-3">
+                                        <div class="p-3">
                                             <?php foreach ($card['items'] as $item): ?>
-                                                <div class="payment-card mb-0">
+                                                <div class="payment-card mb-3">
                                                     <div class="payment-card-icon">
                                                         <i class="bi bi-lightning-fill"></i>
                                                     </div>
                                                     <div class="payment-card-info">
-                                                        <h4><?php echo htmlspecialchars($item['label']); ?></h4>
-                                                        <p><?php echo htmlspecialchars($item['description']); ?></p>
-                                                    </div>
-                                                    <div class="payment-card-footer mt-auto">
-                                                        <span class="badge bg-primary"><?php echo htmlspecialchars($item['value']); ?></span>
+                                                        <h4 class="mb-1"><?php echo htmlspecialchars($item['label']); ?></h4>
+                                                        <p class="mb-2 text-secondary small"><?php echo htmlspecialchars($item['description']); ?></p>
+                                                        <div class="mt-2">
+                                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">
+                                                                <?php echo htmlspecialchars($item['value']); ?>
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             <?php endforeach; ?>

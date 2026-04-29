@@ -121,24 +121,27 @@ try {
 
     $database->insert('kb_cards', [
         'section_id' => $sec3_id,
-        'title' => 'Flywire',
+        'title' => 'Payment Platforms',
         'type' => 'grid',
         'display_order' => 1
     ]);
     $card7_id = $database->id();
-    $database->insert('kb_items', [
-        ['card_id' => $card7_id, 'label' => 'Flywire', 'value' => '2.5% flat fee', 'description' => 'Global payment solution for international transfers.', 'display_order' => 1]
-    ]);
 
-    $database->insert('kb_cards', [
-        'section_id' => $sec3_id,
-        'title' => 'Taza Pay',
-        'type' => 'grid',
-        'display_order' => 2
-    ]);
-    $card8_id = $database->id();
     $database->insert('kb_items', [
-        ['card_id' => $card8_id, 'label' => 'Taza Pay', 'value' => '2.5% fee inside, 3.5% fee outside', 'description' => 'Cross-border payments for businesses.', 'display_order' => 1]
+        [
+            'card_id' => $card7_id, 
+            'label' => 'Flywire', 
+            'value' => '2.5% flat on total amount whether inside country or outside.', 
+            'description' => 'Global payment solution for international transfers.', 
+            'display_order' => 1
+        ],
+        [
+            'card_id' => $card7_id, 
+            'label' => 'Taza Pay', 
+            'value' => '2.5% flat on total amount if inside country and 3.5% if outside Singapore', 
+            'description' => 'Cross-border payments for businesses.', 
+            'display_order' => 2
+        ]
     ]);
 
     echo json_encode(['success' => true, 'message' => 'Database tables created and seeded successfully']);
