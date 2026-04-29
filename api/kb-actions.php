@@ -25,7 +25,7 @@ if (!$user) {
 }
 
 $dbUser = $database->get('users', '*', ['auth0_id' => $user['sub']]);
-if (!$dbUser || $dbUser['role'] !== 'admin') {
+if (!$dbUser || !($dbUser['is_admin'] ?? false)) {
     http_response_code(403);
     echo json_encode(['error' => 'Forbidden']);
     exit;
