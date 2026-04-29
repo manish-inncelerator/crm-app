@@ -1,31 +1,33 @@
 <style>
-    /* Corporate Professional Navbar */
+    /* Premium Professional Navbar */
     .navbar {
-        background: #ffffff;
-        border-bottom: 1px solid #e0e0e0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid #e2e8f0;
         padding: 0;
-        position: fixed;
+        position: sticky;
         top: 0;
-        left: 0;
-        right: 0;
         z-index: 1001;
         transition: all 0.3s ease;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        margin: -2rem -2rem 2rem -2rem;
     }
 
     body.dark-mode .navbar {
-        background: #1f2937;
-        border-bottom-color: #374151;
+        background: rgba(15, 23, 42, 0.95);
+        border-bottom-color: #1e293b;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
     }
 
     .navbar-content {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 1rem 2rem;
+        padding: 0.8rem 2rem;
         max-width: none;
         gap: 2rem;
-        height: 70px;
+        height: 64px;
     }
 
     .navbar-left {
@@ -39,29 +41,30 @@
         background: none;
         border: none;
         font-size: 1.25rem;
-        color: #1f2937;
+        color: #475569;
         cursor: pointer;
         padding: 0.5rem;
-        border-radius: 6px;
-        transition: all 0.3s ease;
+        border-radius: 8px;
+        transition: all 0.2s ease;
         display: none;
         width: 40px;
         height: 40px;
-        display: flex;
         align-items: center;
         justify-content: center;
     }
 
     .sidebar-hamburger:hover {
-        background: #f3f4f6;
+        background: #f1f5f9;
+        color: #0f172a;
     }
 
     body.dark-mode .sidebar-hamburger {
-        color: #e5e7eb;
+        color: #94a3b8;
     }
 
     body.dark-mode .sidebar-hamburger:hover {
-        background: #374151;
+        background: #1e293b;
+        color: #f8fafc;
     }
 
     .navbar-brand {
@@ -69,26 +72,26 @@
         align-items: center;
         gap: 0.75rem;
         font-weight: 700;
-        color: #1f2937;
+        color: #0f172a;
         text-decoration: none;
-        font-size: 1.1rem;
-        letter-spacing: 0.5px;
+        font-size: 1.15rem;
+        letter-spacing: -0.01em;
     }
 
     .navbar-brand:hover {
-        color: #374151;
+        color: #4f46e5;
     }
 
     .navbar-brand-icon {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
     }
 
     body.dark-mode .navbar-brand {
-        color: #e5e7eb;
+        color: #f8fafc;
     }
 
     body.dark-mode .navbar-brand:hover {
-        color: #f3f4f6;
+        color: #818cf8;
     }
 
     .navbar-center {
@@ -101,31 +104,32 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        font-size: 0.9rem;
-        color: #6b7280;
-    }
-
-    .navbar-breadcrumb a {
-        color: #2d3748;
-        text-decoration: none;
-        transition: color 0.2s ease;
+        font-size: 0.95rem;
+        color: #64748b;
         font-weight: 500;
     }
 
+    .navbar-breadcrumb a {
+        color: #0f172a;
+        text-decoration: none;
+        transition: color 0.2s ease;
+        font-weight: 600;
+    }
+
     .navbar-breadcrumb a:hover {
-        color: #1f2937;
+        color: #4f46e5;
     }
 
     body.dark-mode .navbar-breadcrumb {
-        color: #9ca3af;
+        color: #94a3b8;
     }
 
     body.dark-mode .navbar-breadcrumb a {
-        color: #e5e7eb;
+        color: #f8fafc;
     }
 
     body.dark-mode .navbar-breadcrumb a:hover {
-        color: #f3f4f6;
+        color: #818cf8;
     }
 
     .navbar-actions {
@@ -140,61 +144,70 @@
     }
 
     .navbar-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 6px;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
         cursor: pointer;
-        border: 2px solid #e0e0e0;
+        border: 2px solid #e2e8f0;
         object-fit: cover;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
     }
 
     .navbar-avatar:hover {
-        border-color: #d1d5db;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-color: #cbd5e1;
+        box-shadow: 0 0 0 4px rgba(241, 245, 249, 1);
     }
 
     body.dark-mode .navbar-avatar {
-        border-color: #4b5563;
+        border-color: #334155;
     }
 
     body.dark-mode .navbar-avatar:hover {
-        border-color: #6b7280;
+        border-color: #475569;
+        box-shadow: 0 0 0 4px rgba(30, 41, 59, 1);
     }
 
     .dropdown {
         position: absolute;
-        top: 100%;
+        top: calc(100% + 0.5rem);
         right: 0;
         background: #ffffff;
-        border: 1px solid #e0e0e0;
-        border-radius: 6px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         display: none;
-        margin-top: 0.5rem;
-        min-width: 180px;
+        min-width: 200px;
         z-index: 1000;
+        overflow: hidden;
     }
 
     .dropdown.show {
         display: block;
+        animation: dropFade 0.2s ease;
+    }
+
+    @keyframes dropFade {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     body.dark-mode .dropdown {
-        background: #2d3748;
-        border-color: #4b5563;
+        background: #0f172a;
+        border-color: #1e293b;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
     }
 
     .dropdown a {
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        padding: 0.75rem 1rem;
-        color: #1f2937;
+        padding: 0.8rem 1.2rem;
+        color: #334155;
         text-decoration: none;
         transition: all 0.2s ease;
-        border-bottom: 1px solid #f3f4f6;
-        font-size: 0.9rem;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.95rem;
+        font-weight: 500;
     }
 
     .dropdown a:last-child {
@@ -202,30 +215,64 @@
     }
 
     .dropdown a:hover {
-        background: #f9fafb;
-        color: #1f2937;
+        background: #f8fafc;
+        color: #0f172a;
     }
 
     body.dark-mode .dropdown a {
-        color: #e5e7eb;
-        border-bottom-color: #374151;
+        color: #cbd5e1;
+        border-bottom-color: #1e293b;
     }
 
     body.dark-mode .dropdown a:hover {
-        background: #374151;
-        color: #f3f4f6;
+        background: #1e293b;
+        color: #f8fafc;
     }
 
     .logout-btn {
-        color: #dc2626 !important;
+        color: #ef4444 !important;
     }
 
     .logout-btn:hover {
-        background: rgba(220, 38, 38, 0.1) !important;
+        background: #fef2f2 !important;
+        color: #dc2626 !important;
     }
 
     body.dark-mode .logout-btn {
         color: #f87171 !important;
+    }
+
+    body.dark-mode .logout-btn:hover {
+        background: rgba(239, 68, 68, 0.1) !important;
+        color: #fca5a5 !important;
+    }
+
+    .logout-btn-direct {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        color: #ef4444;
+        background: transparent;
+        border: 1px solid #ef4444;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+    .logout-btn-direct:hover {
+        background: #ef4444;
+        color: #ffffff !important;
+        box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+    }
+    body.dark-mode .logout-btn-direct {
+        color: #f87171;
+        border-color: #f87171;
+    }
+    body.dark-mode .logout-btn-direct:hover {
+        background: #f87171;
+        color: #0f172a !important;
     }
 
     @media (max-width: 900px) {
@@ -265,6 +312,9 @@
         </div>
 
         <div class="navbar-actions">
+            <a href="logout.php" class="logout-btn-direct">
+                <i class="bi bi-power"></i> Logout
+            </a>
             <div class="navbar-user">
                 <img src="<?php echo htmlspecialchars($user['picture'] ?? 'assets/images/default-avatar.png'); ?>"
                     alt="Profile" class="navbar-avatar" onclick="toggleNavbarDropdown()"
@@ -320,4 +370,67 @@
     if (mobileHamburger) {
         mobileHamburger.addEventListener('click', toggleSidebar);
     }
+
+    // ----------------------------------------------------------------------
+    // Browser Notifications Polling Logic
+    // ----------------------------------------------------------------------
+    let lastNotifiedId = parseInt(localStorage.getItem('crm_last_notified_id') || '0', 10);
+
+    function requestNotificationPermission() {
+        if (!("Notification" in window)) {
+            console.log("This browser does not support desktop notification");
+        } else if (Notification.permission !== "denied" && Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+    }
+
+    function spawnNotification(title, body, icon) {
+        if (Notification.permission === "granted") {
+            const options = {
+                body: body,
+                icon: icon || 'assets/images/main-logo.png' // Use your CRM logo if available
+            };
+            const n = new Notification(title, options);
+            n.onclick = function() {
+                window.focus();
+                this.close();
+            };
+        }
+    }
+
+    async function checkNewNotifications() {
+        if (Notification.permission !== "granted") return;
+
+        try {
+            const response = await fetch(`api/check_new_notifications.php?last_id=${lastNotifiedId}`);
+            if (!response.ok) return;
+
+            const data = await response.json();
+            if (data.success && data.notifications && data.notifications.length > 0) {
+                let maxId = lastNotifiedId;
+                
+                data.notifications.forEach(notification => {
+                    spawnNotification(notification.title || "New Notification", notification.message || "You have a new update.");
+                    if (parseInt(notification.id) > maxId) {
+                        maxId = parseInt(notification.id);
+                    }
+                });
+
+                // Update the last notified ID to avoid duplicate alerts
+                lastNotifiedId = maxId;
+                localStorage.setItem('crm_last_notified_id', maxId.toString());
+            }
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+        }
+    }
+
+    // Run permission request and set up polling on load
+    document.addEventListener('DOMContentLoaded', () => {
+        requestNotificationPermission();
+        
+        // Initial check and then poll every 30 seconds
+        setTimeout(checkNewNotifications, 2000); // 2 second delay to let page load completely
+        setInterval(checkNewNotifications, 30000); 
+    });
 </script>

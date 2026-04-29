@@ -1416,6 +1416,7 @@ html_start('Tickets');
 <div class="dashboard-container">
     <?php include 'components/sidebar.php'; ?>
     <div class="main-content">
+        <?php include 'components/navbar.php'; ?>
         <div class="content-header">
             <div class="d-flex justify-content-between align-items-center">
                 <h2 class="main-title">Tickets</h2>

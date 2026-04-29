@@ -243,6 +243,7 @@ html_start('Notifications');
 <div class="dashboard-container">
     <?php include 'components/sidebar.php'; ?>
     <div class="main-content">
+        <?php include 'components/navbar.php'; ?>
         <!-- Header -->
         <div class="notifications-header">
             <nav aria-label="breadcrumb" style="margin-bottom: 1rem;">

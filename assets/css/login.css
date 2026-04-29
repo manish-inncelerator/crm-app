@@ -1,103 +1,170 @@
-/* Login Page Styles */
+/* ====================================
+   PREMIUM LOGIN PAGE STYLES
+   ==================================== */
+
 body {
-  margin: 0;
-  padding: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f5f7fa;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f8fafc;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Background Pattern/Gradient */
+body::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(79, 70, 229, 0.05) 0%, transparent 50%);
+    z-index: 0;
+}
+
+body.dark-mode {
+    background: #020617;
+}
+body.dark-mode::before {
+    background: radial-gradient(circle at center, rgba(129, 140, 248, 0.08) 0%, transparent 50%);
 }
 
 .login-container {
-  width: 100%;
-  max-width: 400px;
-  padding: 20px;
+    width: 100%;
+    max-width: 440px;
+    padding: 2rem;
+    z-index: 1;
+    position: relative;
 }
 
 .login-box {
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 40px;
-  text-align: center;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    border: 1px solid #f1f5f9;
+    padding: 3.5rem 3rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .login-box {
+    background: #0f172a;
+    border-color: #1e293b;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
 }
 
 .logo-container {
-  margin-bottom: 30px;
+    margin-bottom: 2rem;
 }
 
 .logo {
-  width: 200px;
-  height: auto;
-  object-fit: contain;
+    height: 48px;
+    width: auto;
+    object-fit: contain;
 }
 
 h1 {
-  color: #333;
-  margin: 0 0 10px;
-  font-size: 24px;
+    color: #0f172a;
+    margin: 0 0 0.5rem;
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+body.dark-mode h1 {
+    color: #f8fafc;
 }
 
 p {
-  color: #666;
-  margin: 0 0 30px;
-  font-size: 16px;
+    color: #64748b;
+    margin: 0 0 2.5rem;
+    font-size: 1rem;
+    font-weight: 500;
 }
 
+body.dark-mode p {
+    color: #94a3b8;
+}
+
+/* Auth Provider Button */
 .google-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 12px 24px;
-  text-decoration: none;
-  color: #333;
-  font-size: 16px;
-  transition: all 0.3s ease;
-  width: 100%;
-  box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.875rem 1.5rem;
+    text-decoration: none;
+    color: #334155;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .google-btn:hover {
-  background-color: #f8f9fa;
-  border-color: #ccc;
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+}
+
+.google-btn:active {
+    transform: translateY(0);
+}
+
+body.dark-mode .google-btn {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .google-btn:hover {
+    background-color: #334155;
+    border-color: #475569;
 }
 
 .google-icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 12px;
-  object-fit: contain;
+    width: 20px;
+    height: 20px;
+    margin-right: 0.75rem;
+    object-fit: contain;
 }
 
 /* Responsive Design */
 @media (max-width: 480px) {
-  .login-container {
-    padding: 10px;
-  }
+    .login-container {
+        padding: 1rem;
+    }
 
-  .login-box {
-    padding: 30px 20px;
-  }
+    .login-box {
+        padding: 2.5rem 1.5rem;
+        border-radius: 20px;
+    }
 
-  .logo {
-    width: 160px;
-  }
+    .logo {
+        height: 40px;
+    }
 
-  h1 {
-    font-size: 20px;
-  }
+    h1 {
+        font-size: 1.5rem;
+    }
 
-  p {
-    font-size: 14px;
-  }
+    p {
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+    }
 
-  .google-btn {
-    padding: 10px 20px;
-    font-size: 14px;
-  }
+    .google-btn {
+        padding: 0.75rem 1.25rem;
+    }
 }

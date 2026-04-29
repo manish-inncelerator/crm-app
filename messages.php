@@ -313,6 +313,7 @@ html_start('Messages');
 <div class="dashboard-container">
     <?php include 'components/sidebar.php'; ?>
     <div class="main-content">
+        <?php include 'components/navbar.php'; ?>
         <div class="content-header">
             <h2 class="main-title">Messages<?php if ($is_admin) echo ' (Admin)'; ?> </h2>
             <div class="message-status" id="chat-status-bar">

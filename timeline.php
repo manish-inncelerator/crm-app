@@ -141,6 +141,7 @@ html_start($pageTitle);
 <div class="dashboard-container">
     <?php include 'components/sidebar.php'; ?>
     <div class="main-content">
+        <?php include 'components/navbar.php'; ?>
         <div class="content-header">
             <h2 class="main-title mb-0" style="margin-bottom:0;"><i class="bi bi-clock-history"></i> <?php echo htmlspecialchars($pageTitle); ?></h2>
         </div>

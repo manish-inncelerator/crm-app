@@ -44,7 +44,7 @@ body.dark-mode .timeline-container::before {
 .timeline-step-circle {
     width: 50px;
     height: 50px;
-    background: linear-gradient(135deg, var(--dash-primary, #4e1f00) 0%, var(--dash-gradient-end, #8b4513) 100%);
+    background: linear-gradient(135deg, var(--dash-primary, #0f172a) 0%, var(--dash-gradient-end, #1e3a8a) 100%);
     color: #fff;
     border-radius: 50%;
     display: flex;
@@ -52,7 +52,7 @@ body.dark-mode .timeline-container::before {
     justify-content: center;
     font-size: 1.2rem;
     font-weight: 700;
-    box-shadow: 0 4px 15px rgba(78, 31, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.3);
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -61,8 +61,8 @@ body.dark-mode .timeline-container::before {
 }
 
 body.dark-mode .timeline-step-circle {
-    background: linear-gradient(135deg, var(--dash-primary, #a97c50) 0%, var(--dash-gradient-end, #c99c70) 100%);
-    color: #1a1a1a;
+    background: linear-gradient(135deg, var(--dash-primary, #1e3a8a) 0%, var(--dash-gradient-end, #3b82f6) 100%);
+    color: #fff;
     border-color: #1e293b;
     box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
@@ -82,7 +82,7 @@ body.dark-mode .timeline-step-circle {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-radius: var(--dash-radius, 16px) !important;
-    box-shadow: var(--dash-shadow, 0 8px 32px rgba(78, 31, 0, 0.05));
+    box-shadow: var(--dash-shadow, 0 8px 32px rgba(15, 23, 42, 0.05));
     padding: 1.5rem;
     transition: all 0.3s ease;
     position: relative;
@@ -95,7 +95,7 @@ body.dark-mode .timeline-widget {
 
 .timeline-widget:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(78, 31, 0, 0.1);
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.1);
 }
 
 /* Arrow pointer */

@@ -3,10 +3,16 @@
         <i class="fas fa-home"></i>
         <span>Dashboard</span>
     </button>
-    <button class="mobile-nav-btn<?php if (basename($_SERVER['PHP_SELF']) == 'create-ticket.php') echo ' active'; ?>" onclick="window.location.href='create-ticket.php'">
+    <button class="mobile-nav-btn<?php if (basename($_SERVER['PHP_SELF']) == 'tickets.php') echo ' active'; ?>" onclick="window.location.href='tickets.php'">
         <i class="fas fa-ticket-alt"></i>
         <span>Tickets</span>
     </button>
+    <?php if (!($is_admin ?? false)): ?>
+    <button class="mobile-nav-btn<?php if (basename($_SERVER['PHP_SELF']) == 'create-ticket.php') echo ' active'; ?>" onclick="window.location.href='create-ticket.php'">
+        <i class="fas fa-plus-circle"></i>
+        <span>New</span>
+    </button>
+    <?php endif; ?>
     <button class="mobile-nav-btn<?php if (basename($_SERVER['PHP_SELF']) == 'messages.php') echo ' active'; ?>" onclick="window.location.href='messages.php'">
         <i class="fas fa-envelope"></i>
         <span>Messages</span>

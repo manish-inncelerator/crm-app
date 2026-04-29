@@ -2,14 +2,15 @@
 
 
 <aside class="sidebar" id="sidebar">
-
     <!-- Logo -->
     <div class="sidebar-logo">
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <span class="sidebar-logo-icon"><i class="bi bi-wallet2"></i></span>
-            <span class="sidebar-logo-text">Accounts<br>Ticketing</span>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span class="sidebar-logo-icon"><i class="bi bi-layers-fill"></i></span>
+            <span class="sidebar-logo-text">Fayyaz CRM</span>
         </div>
-        <button class="sidebar-close d-md-none" id="sidebar-close" aria-label="Close sidebar"><i class="bi bi-x-lg"></i></button>
+        <button class="sidebar-close d-md-none" id="sidebar-close" aria-label="Close sidebar">
+            <i class="bi bi-x-lg"></i>
+        </button>
     </div>
 
     <!-- Navigation -->
@@ -29,11 +30,13 @@
             <i class="bi bi-ticket sidebar-link-icon"></i>
             <span class="sidebar-link-text">Tickets</span>
         </a>
+        <?php if (!($is_admin ?? false)): ?>
         <a href="create-ticket.php"
             class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'create-ticket.php' ? 'active' : ''; ?>">
             <i class="bi bi-plus-circle sidebar-link-icon"></i>
             <span class="sidebar-link-text">New Ticket</span>
         </a>
+        <?php endif; ?>
 
         <!-- Communication -->
         <div class="sidebar-nav-label">Communication</div>
@@ -61,10 +64,14 @@
     <div class="sidebar-footer">
         <!-- User Card -->
         <div class="user-card">
-            <img src="<?php echo htmlspecialchars($user['picture'] ?? 'assets/images/default-avatar.png'); ?>"
-                alt="<?php echo htmlspecialchars($user['name'] ?? 'User'); ?>" class="user-avatar">
-            <div class="user-name"><?php echo htmlspecialchars($user['name'] ?? 'Guest User'); ?></div>
-            <div class="user-email"><?php echo htmlspecialchars($user['email'] ?? 'user@example.com'); ?></div>
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                <img src="<?php echo htmlspecialchars($user['picture'] ?? 'assets/images/default-avatar.png'); ?>"
+                    alt="<?php echo htmlspecialchars($user['name'] ?? 'User'); ?>" class="user-avatar" style="margin-bottom: 0;">
+                <div style="display: flex; flex-direction: column;">
+                    <span class="user-name"><?php echo htmlspecialchars($user['name'] ?? 'Guest User'); ?></span>
+                    <span class="user-email"><?php echo htmlspecialchars($user['email'] ?? 'user@example.com'); ?></span>
+                </div>
+            </div>
             <?php if (!($is_admin ?? false)): ?>
                 <span class="user-role">Employee</span>
             <?php else: ?>

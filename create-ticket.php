@@ -63,6 +63,13 @@ try {
         exit;
     }
 
+    $is_admin = ($dbUser['role'] === 'admin');
+    if ($is_admin) {
+        writeLog('Create Ticket - Admin attempted to access create-ticket.php, redirecting to tickets.php');
+        header('Location: tickets.php');
+        exit;
+    }
+
     writeLog('Create Ticket - User data from database: ' . print_r($dbUser, true));
 } catch (\Exception $e) {
     writeLog('Create Ticket Error: ' . $e->getMessage(), 'ERROR');
@@ -105,6 +112,7 @@ html_start('Create Ticket');
 <div class="dashboard-container">
     <?php include 'components/sidebar.php'; ?>
     <div class="main-content dashboard-main-area">
+        <?php include 'components/navbar.php'; ?>
         <div class="hero-greeting" style="background: linear-gradient(135deg, #a97c50, #4e1f00); margin-bottom: 2.5rem;">
             <div class="hero-info">
                 <h1>Create a Support Ticket</h1>

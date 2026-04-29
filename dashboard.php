@@ -232,12 +232,11 @@ html_start('Dashboard - Fayyaz Travels CRM', ['assets/css/dashboard.css']);
     };
     document.addEventListener('DOMContentLoaded', updateMobileModeIcon);
 </script>
-<?php
-?>
-</?php include 'components/navbar.php' ; ?>
+
 <div class="dashboard-container">
     <?php include 'components/sidebar.php'; ?>
     <div class="main-content dashboard-main-area">
+        <?php include 'components/navbar.php'; ?>
         <div class="hero-greeting">
             <img src="<?php echo htmlspecialchars($user['picture'] ?? 'assets/images/default-avatar.png'); ?>"
                 alt="Profile" class="greeting-avatar-large">

@@ -1,103 +1,77 @@
 :root {
-  --sidebar-width: 210px;
-  --sidebar-width-expanded: 180px;
-  --sidebar-bg: rgba(255, 255, 255, 0.85);
-  --sidebar-blur: blur(18px);
-  --sidebar-border: 1.5px solid rgba(78, 31, 0, 0.1);
-  --sidebar-shadow: 0 8px 32px rgba(78, 31, 0, 0.13);
-  --sidebar-accent: #4e1f00;
-  --sidebar-hover: #f3e7db;
-  --sidebar-active-bg: #f3e7db;
-  --sidebar-icon: #4e1f00;
-  --sidebar-icon-active: #fff;
-  --sidebar-icon-bg-active: #4e1f00;
-  --sidebar-avatar-bg: #fff;
-  --sidebar-divider: 1.5px solid #e7d7c3;
-  --sidebar-text: #4e1f00;
-  --sidebar-text-active: #4e1f00;
-  --sidebar-logout-bg: #ff5252;
-  --sidebar-logout-hover: #d32f2f;
-  --main-bg: #f7f6f3;
-  --card-bg: linear-gradient(135deg, #fff 60%, #f3e7db 100%);
-  --card-shadow: 0 8px 32px rgba(78, 31, 0, 0.1),
-    0 1.5px 8px rgba(0, 0, 0, 0.04);
-  --card-border: 1.5px solid rgba(78, 31, 0, 0.08);
-  --widget-title: #4e1f00;
-  --widget-icon-bg: #f3e7db;
-  --widget-icon: #4e1f00;
-  --text-main: #232526;
-  --text-secondary: #6b6b6b;
-  --logout-bg: #ff5252;
-  --logout-bg-hover: #d32f2f;
-  --greeting-bg: linear-gradient(90deg, #fff 60%, #f3e7db 100%);
-  --navbar-bg: #fff;
-  --navbar-title: #4e1f00;
-  --navbar-text: #232526;
-  --sidebar-bg-glass: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.85) 60%,
-    #f3e7db 100%
-  );
-  --sidebar-accent-light: #a97c50;
-  --sidebar-pill-bg: rgba(78, 31, 0, 0.85);
-  --sidebar-pill-shadow: 0 4px 16px rgba(78, 31, 0, 0.1);
-  --sidebar-icon-inactive: #a97c50;
-  --sidebar-text-inactive: #7a5a3a;
-  --sidebar-user-card-bg: rgba(255, 255, 255, 0.75);
-  --sidebar-user-card-shadow: 0 2px 8px rgba(78, 31, 0, 0.07);
-  --sidebar-btn-bg: rgba(255, 255, 255, 0.85);
-  --sidebar-btn-shadow: 0 2px 8px rgba(78, 31, 0, 0.1);
-  --sidebar-btn-hover: #4e1f00;
-  --sidebar-btn-hover-text: #fff;
-  --sidebar-font: "Inter", "Segoe UI", "Roboto", Arial, sans-serif;
+  --sidebar-width: 260px;
+  --sidebar-width-expanded: 260px;
+  --sidebar-bg: #ffffff;
+  --sidebar-border: 1px solid #e2e8f0;
+  --sidebar-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --sidebar-accent: #4f46e5;
+  --sidebar-hover: #f8fafc;
+  --sidebar-active-bg: #eef2ff;
+  --sidebar-icon: #64748b;
+  --sidebar-icon-active: #4f46e5;
+  --sidebar-icon-bg-active: #eef2ff;
+  --sidebar-avatar-bg: #f1f5f9;
+  --sidebar-divider: 1px solid #f1f5f9;
+  --sidebar-text: #475569;
+  --sidebar-text-active: #4f46e5;
+  --sidebar-logout-bg: #fee2e2;
+  --sidebar-logout-hover: #fca5a5;
+  --main-bg: #f8fafc;
+  --card-bg: #ffffff;
+  --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --card-border: 1px solid #e2e8f0;
+  --widget-title: #1e293b;
+  --widget-icon-bg: #eef2ff;
+  --widget-icon: #4f46e5;
+  --text-main: #0f172a;
+  --text-secondary: #64748b;
+  --logout-bg: #ef4444;
+  --logout-bg-hover: #dc2626;
+  --greeting-bg: #ffffff;
+  --navbar-bg: #ffffff;
+  --navbar-title: #0f172a;
+  --navbar-text: #1e293b;
+  --sidebar-bg-glass: rgba(255, 255, 255, 0.95);
+  --sidebar-accent-light: #6366f1;
+  --sidebar-pill-bg: #4f46e5;
+  --sidebar-pill-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+  --sidebar-icon-inactive: #64748b;
+  --sidebar-text-inactive: #475569;
+  --sidebar-user-card-bg: #f8fafc;
+  --sidebar-user-card-shadow: none;
+  --sidebar-btn-bg: #ffffff;
+  --sidebar-btn-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --sidebar-btn-hover: #f1f5f9;
+  --sidebar-btn-hover-text: #0f172a;
+  --sidebar-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 body.dark-mode {
-  --sidebar-bg-glass: linear-gradient(
-    135deg,
-    rgba(34, 37, 38, 0.98) 60%,
-    #2d1a0d 100%
-  );
-  --sidebar-accent: #fff;
-  --sidebar-accent-light: #a97c50;
-  --sidebar-pill-bg: rgba(78, 31, 0, 0.92);
-  --sidebar-pill-shadow: 0 4px 16px rgba(78, 31, 0, 0.18);
-  --sidebar-icon-inactive: #e7d7c3;
-  --sidebar-icon-active: #fff;
-  --sidebar-text-inactive: #e7d7c3;
-  --sidebar-text-active: #fff;
-  --sidebar-user-card-bg: rgba(34, 37, 38, 0.92);
-  --sidebar-user-card-shadow: 0 2px 8px rgba(78, 31, 0, 0.18);
-  --sidebar-btn-bg: rgba(34, 37, 38, 0.98);
-  --sidebar-btn-shadow: 0 2px 8px rgba(78, 31, 0, 0.18);
-  --sidebar-btn-hover: #fff;
-  --sidebar-btn-hover-text: #4e1f00;
-  --sidebar-divider: 1.5px solid #4e1f00;
-  --sidebar-font: "Inter", "Segoe UI", "Roboto", Arial, sans-serif;
-  --sidebar-bg: rgba(34, 37, 38, 0.98);
-  --sidebar-blur: blur(10px);
-  --sidebar-border: 1.5px solid rgba(78, 31, 0, 0.18);
-  --sidebar-shadow: 0 8px 32px rgba(78, 31, 0, 0.18);
-  --sidebar-hover: #3a2412;
-  --sidebar-active-bg: #4e1f00;
-  --sidebar-icon: #fff;
-  --sidebar-avatar-bg: #232526;
-  --sidebar-text: #fff;
-  --main-bg: #181a1b;
-  --card-bg: linear-gradient(135deg, #232526 60%, #4e1f00 100%);
-  --card-shadow: 0 8px 32px rgba(78, 31, 0, 0.1), 0 1.5px 8px rgba(0, 0, 0, 0.1);
-  --card-border: 1.5px solid rgba(78, 31, 0, 0.18);
-  --widget-title: #fff;
-  --widget-icon-bg: #4e1f00;
-  --widget-icon: #fff;
-  --text-main: #e0e0e0;
-  --text-secondary: #b0b0b0;
-  --logout-bg: #ff5252;
-  --logout-bg-hover: #d32f2f;
-  --greeting-bg: linear-gradient(90deg, #232526 60%, #4e1f00 100%);
-  --navbar-bg: #232526;
-  --navbar-title: #fff;
-  --navbar-text: #fff;
+  --sidebar-bg: #0f172a;
+  --sidebar-border: 1px solid #1e293b;
+  --sidebar-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --sidebar-accent: #818cf8;
+  --sidebar-hover: #1e293b;
+  --sidebar-active-bg: rgba(79, 70, 229, 0.1);
+  --sidebar-icon: #94a3b8;
+  --sidebar-icon-active: #818cf8;
+  --sidebar-avatar-bg: #1e293b;
+  --sidebar-divider: 1px solid #1e293b;
+  --sidebar-text: #e2e8f0;
+  --sidebar-text-active: #818cf8;
+  --main-bg: #020617;
+  --card-bg: #0f172a;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --card-border: 1px solid #1e293b;
+  --widget-title: #f8fafc;
+  --widget-icon-bg: rgba(79, 70, 229, 0.1);
+  --widget-icon: #818cf8;
+  --text-main: #f8fafc;
+  --text-secondary: #94a3b8;
+  --navbar-bg: #0f172a;
+  --navbar-title: #f8fafc;
+  --navbar-text: #f8fafc;
+  --sidebar-bg-glass: rgba(15, 23, 42, 0.95);
 }
 
 body {
@@ -739,16 +713,15 @@ body {
   width: calc(100vw - 32px);
   max-width: 480px;
   height: 72px;
-  background: var(--sidebar-bg-glass);
-  box-shadow: 0 4px 32px rgba(78, 31, 0, 0.18), 0 1.5px 8px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
   z-index: 2002;
   justify-content: space-around;
   align-items: center;
-  border-top: none;
+  border: 1px solid #e2e8f0;
   border-radius: 24px;
   padding: 0 16px;
   margin: 0;
-  backdrop-filter: blur(12px);
   transition: background 0.3s, box-shadow 0.3s;
 }
 
@@ -758,8 +731,8 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #4e1f00;
-  font-size: 1.4rem;
+  color: #64748b;
+  font-size: 1.25rem;
   background: none;
   border: none;
   outline: none;
@@ -768,39 +741,41 @@ body {
   height: 56px;
   border-radius: 16px;
   margin: 0 6px;
-  transition: color 0.18s, background 0.18s, box-shadow 0.18s;
+  transition: all 0.2s ease;
   position: relative;
   min-width: 56px;
   box-shadow: none;
 }
 
 .mobile-bottom-navbar .mobile-nav-btn span {
-  font-size: 0.72rem;
-  margin-top: 2px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
+  font-size: 0.7rem;
+  margin-top: 4px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .mobile-bottom-navbar .mobile-nav-btn.active,
-.mobile-bottom-navbar .mobile-nav-btn:focus {
-  color: #fff;
-  background: #4e1f00;
-  box-shadow: 0 2px 12px rgba(78, 31, 0, 0.13);
+.mobile-bottom-navbar .mobile-nav-btn:focus,
+.mobile-bottom-navbar .mobile-nav-btn:hover {
+  color: #4f46e5;
+  background: #eef2ff;
 }
 
 body.dark-mode .mobile-bottom-navbar {
-  background: var(--sidebar-bg-glass);
-  border-top: none;
+  background: #0f172a;
+  border-color: #1e293b;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
 }
 
 body.dark-mode .mobile-bottom-navbar .mobile-nav-btn {
-  color: #fff;
+  color: #94a3b8;
 }
 
 body.dark-mode .mobile-bottom-navbar .mobile-nav-btn.active,
-body.dark-mode .mobile-bottom-navbar .mobile-nav-btn:focus {
-  background: #fff;
-  color: #4e1f00;
+body.dark-mode .mobile-bottom-navbar .mobile-nav-btn:focus,
+body.dark-mode .mobile-bottom-navbar .mobile-nav-btn:hover {
+  background: rgba(129, 140, 248, 0.1);
+  color: #818cf8;
 }
 
 /* Add badge styles for stats */
