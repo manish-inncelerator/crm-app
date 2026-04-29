@@ -227,7 +227,7 @@ $database->update('messages', [
 
 html_start('Messages');
 ?>
-<link rel="stylesheet" href="assets/css/messages.css">
+<link rel="stylesheet" href="assets/css/messages.css?v=<?= time() ?>">
 <script>
     function toggleSidebar() {
         var sidebar = document.getElementById('sidebar');
@@ -520,7 +520,7 @@ html_start('Messages');
                 } else if (msg.attachment.match(/\.(mp4|webm|ogg|mov|avi)$/i)) {
                     attachmentHtml = `<video controls src="${msg.attachment}" style="max-width:180px;max-height:100px;border-radius:8px;display:block;margin-bottom:6px;"></video>`;
                 } else {
-                    attachmentHtml = `<a href="${msg.attachment}" target="_blank" style="color:#a97c50;">Download attachment</a>`;
+                    attachmentHtml = `<a href="${msg.attachment}" target="_blank" style="color:var(--dash-primary, #4f46e5);">Download attachment</a>`;
                 }
             }
         }
@@ -734,7 +734,7 @@ html_start('Messages');
             } else if (file.type.startsWith('video/')) {
                 attachmentPreview.innerHTML = `<video controls src="${url}" style="max-width:180px;max-height:100px;border-radius:8px;"></video>`;
             } else {
-                attachmentPreview.innerHTML = `<span style='color:#a97c50;'>Unsupported file type</span>`;
+                attachmentPreview.innerHTML = `<span style='color:var(--dash-primary, #4f46e5);'>Unsupported file type</span>`;
             }
         }
     });

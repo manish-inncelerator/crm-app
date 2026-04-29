@@ -348,7 +348,7 @@ html_start('Tickets');
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
-<link rel="stylesheet" href="assets/css/tickets.css">
+<link rel="stylesheet" href="assets/css/tickets.css?v=<?= time() ?>">
 
 <!-- Add this right after the opening body tag -->
 <div class="toast-container">

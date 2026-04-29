@@ -80,6 +80,7 @@ body {
   margin: 0;
   color: var(--text-main);
   transition: background 0.3s, color 0.3s;
+  overflow-x: hidden;
 }
 
 .navbar {

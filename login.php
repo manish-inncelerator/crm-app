@@ -59,13 +59,11 @@ try {
 }
 
 // Print HTML start
-html_start('Login - Fayyaz Travels CRM');
-
-// Add login CSS
-echo '<link rel="stylesheet" href="assets/css/login.css">';
+html_start('Login - Fayyaz Travels CRM', ['assets/css/login.css']);
 ?>
 
-<div class="login-container">
+<div class="d-flex align-items-center justify-content-center min-vh-100 w-100">
+    <div class="login-container">
     <div class="login-box">
         <div class="logo-container">
             <img src="https://fayyaztravels.com/visa/assets/images/main-logo.png" alt="Fayyaz Travels" class="logo">
@@ -78,6 +76,7 @@ echo '<link rel="stylesheet" href="assets/css/login.css">';
                 class="google-icon">
             Sign in with Google
         </a>
+    </div>
     </div>
 </div>
 

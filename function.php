@@ -44,14 +44,14 @@ function html_start($title = 'CRM System', $additional_css = [])
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
         <!-- Custom CSS -->
-        <link href="assets/css/style.css" rel="stylesheet">
-        <link href="assets/css/sidebar.css" rel="stylesheet">
+        <link href="assets/css/style.css?v=<?= time() ?>" rel="stylesheet">
+        <link href="assets/css/sidebar.css?v=<?= time() ?>" rel="stylesheet">
 
         <?php
         // Add any additional CSS files
         if (!empty($additional_css)) {
             foreach ($additional_css as $css) {
-                echo '<link href="' . htmlspecialchars($css) . '" rel="stylesheet">' . "\n";
+                echo '<link href="' . htmlspecialchars($css) . '?v=' . time() . '" rel="stylesheet">' . "\n";
             }
         }
         ?>

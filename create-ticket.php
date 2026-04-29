@@ -113,7 +113,7 @@ html_start('Create Ticket');
     <?php include 'components/sidebar.php'; ?>
     <div class="main-content dashboard-main-area">
         <?php include 'components/navbar.php'; ?>
-        <div class="hero-greeting" style="background: linear-gradient(135deg, #a97c50, #4e1f00); margin-bottom: 2.5rem;">
+        <div class="hero-greeting" style="margin-bottom: 2.5rem;">
             <div class="hero-info">
                 <h1>Create a Support Ticket</h1>
                 <p>Select the type of request below to get started and our team will process it shortly.</p>
