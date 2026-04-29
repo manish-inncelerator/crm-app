@@ -21,7 +21,7 @@ $config = new SdkConfiguration(
     domain: 'fayyaztravels.us.auth0.com',
     clientId: 'tgqsr8C26IrvLpq7z5h4fKEeVkEEkLGC',
     clientSecret: 'CGN13kuWTHq7YYGUSj6fJkryAfw-FXJGcGDMp-UHejly5tk4KFP9N64PvuWz1MdO',
-    redirectUri: 'https://crm.fyyz.link/callback.php',
+    redirectUri: 'https://crm.fayyaz.travel/callback.php',
     cookieSecret: 'your-secret-key-here',
     httpClient: $httpClient
 );
@@ -153,7 +153,7 @@ html_start('Dashboard - Fayyaz Travels CRM');
                 var el = document.createElement('div');
                 el.className = 'sidebar-backdrop';
                 el.id = 'sidebar-backdrop';
-                el.onclick = function() {
+                el.onclick = function () {
                     toggleSidebar();
                 };
                 document.body.appendChild(el);
@@ -182,13 +182,13 @@ html_start('Dashboard - Fayyaz Travels CRM');
         }
     }
 
-    window.onload = function() {
+    window.onload = function () {
         if (localStorage.getItem('dashboard-dark-mode') === 'true') {
             document.body.classList.add('dark-mode');
         }
     }
 
-    window.onclick = function(event) {
+    window.onclick = function (event) {
         if (!event.target.matches('.navbar-avatar')) {
             var dropdown = document.getElementById('navbar-dropdown');
             if (dropdown && dropdown.classList.contains('show')) {
@@ -219,7 +219,7 @@ html_start('Dashboard - Fayyaz Travels CRM');
     }
 
     var origToggleDarkMode = window.toggleDarkMode;
-    window.toggleDarkMode = function() {
+    window.toggleDarkMode = function () {
         if (origToggleDarkMode) origToggleDarkMode();
         updateMobileModeIcon();
     };
@@ -232,7 +232,8 @@ html_start('Dashboard - Fayyaz Travels CRM');
     <?php include 'components/sidebar.php'; ?>
     <div class="main-content">
         <div class="greeting-section">
-            <img src="<?php echo htmlspecialchars($user['picture'] ?? 'assets/images/default-avatar.png'); ?>" alt="Profile" class="greeting-avatar">
+            <img src="<?php echo htmlspecialchars($user['picture'] ?? 'assets/images/default-avatar.png'); ?>"
+                alt="Profile" class="greeting-avatar">
             <div class="greeting-info">
                 <h2>Welcome, <?php echo htmlspecialchars($user['name'] ?? 'User'); ?>!</h2>
                 <p><?php echo htmlspecialchars($user['email'] ?? ''); ?></p>
@@ -241,10 +242,10 @@ html_start('Dashboard - Fayyaz Travels CRM');
         <div class="content-header">
             <h1>Welcome, <?php echo htmlspecialchars($user['name'] ?? 'User'); ?></h1>
             <div class="header-actions">
-                <button class="btn-primary">
+                <button class="btn-primary" onclick="window.location.href='create-ticket.php'">
                     <i class="fas fa-plus"></i> New Ticket
                 </button>
-                <button class="btn-primary">
+                <button class="btn-primary" onclick="window.location.href='messages.php'">
                     <i class="fas fa-envelope"></i> New Message
                 </button>
             </div>

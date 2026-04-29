@@ -1,40 +1,42 @@
-<?php /* Corporate Professional Sidebar Component */ ?>
+<?php /* Professional Sidebar Component */ ?>
 <style>
-    /* Corporate Sidebar Styles */
+    /* ===== PROFESSIONAL SIDEBAR STYLES ===== */
     .sidebar {
         position: fixed;
         left: 0;
-        top: 0;
-        height: 100vh;
-        width: 280px;
-        background: #ffffff;
-        border-right: 1px solid #e5e7eb;
+        top: 70px;
+        height: calc(100vh - 70px);
+        width: 260px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 247, 244, 0.95) 100%);
+        border-right: 1px solid rgba(78, 31, 0, 0.1);
         padding: 0;
         overflow-y: auto;
         overflow-x: hidden;
         z-index: 1000;
         transition: all 0.3s ease;
-        box-shadow: 1px 0 3px rgba(0, 0, 0, 0.05);
+        box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
     }
 
+    /* Dark Mode */
     body.dark-mode .sidebar {
-        background: #111827;
-        border-right-color: #374151;
+        background: linear-gradient(135deg, rgba(45, 52, 54, 0.98) 0%, rgba(58, 63, 68, 0.98) 100%);
+        border-right-color: rgba(169, 124, 80, 0.15);
     }
 
     /* Sidebar Logo Section */
     .sidebar-logo {
         padding: 1.5rem;
-        border-bottom: 1px solid #f3f4f6;
+        border-bottom: 2px solid rgba(78, 31, 0, 0.08);
         display: flex;
         align-items: center;
-        gap: 1rem;
-        background: #fafbfc;
+        gap: 0.75rem;
+        background: rgba(78, 31, 0, 0.02);
+        margin-top: 70px;
     }
 
     body.dark-mode .sidebar-logo {
-        border-bottom-color: #1f2937;
-        background: #1f2937;
+        border-bottom-color: rgba(169, 124, 80, 0.15);
+        background: rgba(169, 124, 80, 0.05);
     }
 
     .sidebar-logo-icon {
@@ -44,35 +46,35 @@
 
     .sidebar-logo-text {
         font-weight: 700;
-        color: #1f2937;
-        font-size: 0.85rem;
+        color: #4e1f00;
+        font-size: 0.9rem;
         letter-spacing: 0.5px;
-        line-height: 1.3;
+        line-height: 1.2;
     }
 
     body.dark-mode .sidebar-logo-text {
-        color: #f3f4f6;
+        color: #a97c50;
     }
 
     /* Navigation Section */
     .sidebar-nav {
         padding: 1.5rem 0;
-        padding-bottom: 1.5rem;
+        padding-bottom: 200px;
     }
 
     .sidebar-nav-label {
-        padding: 0.75rem 1.5rem;
-        font-size: 0.7rem;
+        padding: 0.5rem 1.5rem;
+        font-size: 0.75rem;
         font-weight: 700;
-        color: #9ca3af;
+        color: #999;
         text-transform: uppercase;
-        letter-spacing: 1.2px;
-        margin-top: 1.5rem;
-        margin-bottom: 0.75rem;
+        letter-spacing: 1px;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
     }
 
     body.dark-mode .sidebar-nav-label {
-        color: #6b7280;
+        color: #888;
     }
 
     .sidebar-nav-label:first-child {
@@ -84,10 +86,10 @@
         display: flex;
         align-items: center;
         gap: 1rem;
-        padding: 0.75rem 1.5rem;
-        color: #6b7280;
+        padding: 0.85rem 1.5rem;
+        color: #495057;
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
         border-left: 3px solid transparent;
         font-size: 0.95rem;
         font-weight: 500;
@@ -95,36 +97,46 @@
     }
 
     .sidebar-link:hover {
-        background: #f9fafb;
-        color: #1f2937;
-        border-left-color: #d1d5db;
+        background: rgba(78, 31, 0, 0.08);
+        color: #4e1f00;
+        border-left-color: #4e1f00;
     }
 
     .sidebar-link.active {
-        background: #f0f4f8;
-        color: #2563eb;
-        border-left-color: #2563eb;
+        background: linear-gradient(to right, rgba(78, 31, 0, 0.12) 0%, rgba(78, 31, 0, 0.04) 100%);
+        color: #4e1f00;
+        border-left-color: #4e1f00;
         font-weight: 600;
     }
 
+    .sidebar-link.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: #4e1f00;
+    }
+
     body.dark-mode .sidebar-link {
-        color: #9ca3af;
+        color: #bbb;
     }
 
     body.dark-mode .sidebar-link:hover {
-        background: #1f2937;
-        color: #f3f4f6;
-        border-left-color: #4b5563;
+        background: rgba(169, 124, 80, 0.15);
+        color: #a97c50;
+        border-left-color: #a97c50;
     }
 
     body.dark-mode .sidebar-link.active {
-        background: #1e3a8a;
-        color: #60a5fa;
-        border-left-color: #60a5fa;
+        background: linear-gradient(to right, rgba(169, 124, 80, 0.2) 0%, rgba(169, 124, 80, 0.08) 100%);
+        color: #a97c50;
+        border-left-color: #a97c50;
     }
 
     .sidebar-link-icon {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
         width: 24px;
         text-align: center;
         flex-shrink: 0;
@@ -135,11 +147,11 @@
     }
 
     .sidebar-link-badge {
-        background: #ef4444;
+        background: #ff5252;
         color: white;
-        border-radius: 10px;
-        padding: 0.2rem 0.6rem;
-        font-size: 0.7rem;
+        border-radius: 12px;
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
         font-weight: 700;
         flex-shrink: 0;
     }
@@ -151,86 +163,87 @@
         left: 0;
         right: 0;
         padding: 1.5rem;
-        border-top: 1px solid #f3f4f6;
-        background: #fafbfc;
+        border-top: 2px solid rgba(78, 31, 0, 0.08);
+        background: rgba(78, 31, 0, 0.02);
     }
 
     body.dark-mode .sidebar-footer {
-        border-top-color: #1f2937;
-        background: #1f2937;
+        border-top-color: rgba(169, 124, 80, 0.15);
+        background: rgba(169, 124, 80, 0.05);
     }
 
     /* User Card */
     .user-card {
         margin-bottom: 1rem;
         padding: 1rem;
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        transition: all 0.2s ease;
+        background: #fff;
+        border: 1px solid rgba(78, 31, 0, 0.08);
+        border-radius: 10px;
+        transition: all 0.3s ease;
     }
 
     .user-card:hover {
-        border-color: #d1d5db;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border-color: #4e1f00;
+        box-shadow: 0 3px 12px rgba(78, 31, 0, 0.1);
     }
 
     body.dark-mode .user-card {
-        background: #111827;
-        border-color: #374151;
+        background: #3a3f44;
+        border-color: rgba(169, 124, 80, 0.15);
     }
 
     body.dark-mode .user-card:hover {
-        border-color: #4b5563;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        border-color: #a97c50;
+        box-shadow: 0 3px 12px rgba(169, 124, 80, 0.15);
     }
 
     .user-avatar {
-        width: 48px;
-        height: 48px;
-        border-radius: 6px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
         object-fit: cover;
-        border: 1px solid #e5e7eb;
+        border: 2px solid #4e1f00;
         margin-bottom: 0.75rem;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
     }
 
     .user-card:hover .user-avatar {
-        border-color: #d1d5db;
+        border-color: #a97c50;
+        box-shadow: 0 2px 8px rgba(78, 31, 0, 0.15);
     }
 
     body.dark-mode .user-avatar {
-        border-color: #374151;
+        border-color: #a97c50;
     }
 
     .user-name {
         font-weight: 700;
-        color: #1f2937;
+        color: #2d3436;
         font-size: 0.9rem;
         margin-bottom: 0.25rem;
     }
 
     body.dark-mode .user-name {
-        color: #f3f4f6;
+        color: #fff;
     }
 
     .user-email {
         font-size: 0.75rem;
-        color: #9ca3af;
+        color: #999;
         word-break: break-word;
     }
 
     body.dark-mode .user-email {
-        color: #9ca3af;
+        color: #a0a0a0;
     }
 
     .user-role {
         display: inline-block;
         margin-top: 0.5rem;
-        padding: 0.3rem 0.75rem;
-        background: #dbeafe;
-        color: #1e40af;
-        border-radius: 6px;
+        padding: 0.25rem 0.75rem;
+        background: #4e1f00;
+        color: white;
+        border-radius: 20px;
         font-size: 0.7rem;
         font-weight: 700;
         text-transform: uppercase;
@@ -238,8 +251,7 @@
     }
 
     body.dark-mode .user-role {
-        background: #1e3a8a;
-        color: #93c5fd;
+        background: #a97c50;
     }
 
     /* Mode Toggle & Logout Buttons */
@@ -250,14 +262,14 @@
 
     .sidebar-btn {
         flex: 1;
-        padding: 0.65rem;
-        border: 1px solid #e5e7eb;
-        background: #ffffff;
-        color: #1f2937;
-        border-radius: 6px;
+        padding: 0.7rem;
+        border: 1px solid rgba(78, 31, 0, 0.15);
+        background: #fff;
+        color: #4e1f00;
+        border-radius: 8px;
         cursor: pointer;
-        font-weight: 500;
-        transition: all 0.2s ease;
+        font-weight: 600;
+        transition: all 0.3s ease;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -266,32 +278,31 @@
     }
 
     .sidebar-btn:hover {
-        background: #f3f4f6;
-        border-color: #d1d5db;
-        color: #1f2937;
+        background: #4e1f00;
+        color: white;
+        border-color: #4e1f00;
     }
 
     body.dark-mode .sidebar-btn {
-        background: #111827;
-        border-color: #374151;
-        color: #f3f4f6;
+        background: #3a3f44;
+        border-color: rgba(169, 124, 80, 0.2);
+        color: #a97c50;
     }
 
     body.dark-mode .sidebar-btn:hover {
-        background: #1f2937;
-        border-color: #4b5563;
+        background: #a97c50;
+        color: white;
+        border-color: #a97c50;
     }
 
     .sidebar-btn.logout-btn:hover {
-        background: #fee2e2;
-        border-color: #fecaca;
-        color: #dc2626;
+        background: #ff5252;
+        border-color: #ff5252;
     }
 
     body.dark-mode .sidebar-btn.logout-btn:hover {
-        background: #7f1d1d;
-        border-color: #b91c1c;
-        color: #fca5a5;
+        background: #ff8a80;
+        border-color: #ff8a80;
     }
 
     /* Close Button (Mobile) */
@@ -299,31 +310,31 @@
         position: absolute;
         top: 1rem;
         right: 1rem;
-        background: #f3f4f6;
+        background: rgba(78, 31, 0, 0.1);
         border: none;
         width: 36px;
         height: 36px;
-        border-radius: 6px;
-        color: #1f2937;
+        border-radius: 50%;
+        color: #4e1f00;
         cursor: pointer;
         font-size: 1.2rem;
         display: none;
         place-items: center;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
         z-index: 100;
     }
 
     .sidebar-close:hover {
-        background: #e5e7eb;
+        background: rgba(78, 31, 0, 0.2);
     }
 
     body.dark-mode .sidebar-close {
-        background: #374151;
-        color: #f3f4f6;
+        background: rgba(169, 124, 80, 0.15);
+        color: #a97c50;
     }
 
     body.dark-mode .sidebar-close:hover {
-        background: #4b5563;
+        background: rgba(169, 124, 80, 0.25);
     }
 
     /* Scrollbar Styling */
@@ -332,31 +343,35 @@
     }
 
     .sidebar::-webkit-scrollbar-track {
-        background: transparent;
+        background: rgba(78, 31, 0, 0.05);
     }
 
     .sidebar::-webkit-scrollbar-thumb {
-        background: #d1d5db;
+        background: rgba(78, 31, 0, 0.2);
         border-radius: 3px;
     }
 
     .sidebar::-webkit-scrollbar-thumb:hover {
-        background: #9ca3af;
+        background: rgba(78, 31, 0, 0.3);
+    }
+
+    body.dark-mode .sidebar::-webkit-scrollbar-track {
+        background: rgba(169, 124, 80, 0.08);
     }
 
     body.dark-mode .sidebar::-webkit-scrollbar-thumb {
-        background: #4b5563;
+        background: rgba(169, 124, 80, 0.2);
     }
 
     body.dark-mode .sidebar::-webkit-scrollbar-thumb:hover {
-        background: #6b7280;
+        background: rgba(169, 124, 80, 0.3);
     }
 
     /* Responsive Design */
     @media (max-width: 900px) {
         .sidebar {
             transform: translateX(-100%);
-            box-shadow: 1px 0 8px rgba(0, 0, 0, 0.15);
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.2);
         }
 
         .sidebar.show {
@@ -370,12 +385,14 @@
 
     /* Main content spacing */
     body {
-        padding-left: 280px;
+        padding-left: 260px;
+        padding-top: 70px;
     }
 
     @media (max-width: 900px) {
         body {
             padding-left: 0;
+            padding-top: 70px;
         }
     }
 </style>
@@ -386,7 +403,7 @@
     <!-- Logo -->
     <div class="sidebar-logo">
         <span class="sidebar-logo-icon">✈️</span>
-        <span class="sidebar-logo-text">Fayyaz<br>CRM</span>
+        <span class="sidebar-logo-text">Fayyaz<br>Travels CRM</span>
     </div>
 
     <!-- Navigation -->
@@ -395,41 +412,44 @@
         <div class="sidebar-nav-label">Main</div>
         <a href="dashboard.php"
             class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : ''; ?>">
-            <i class="bi bi-speedometer2 sidebar-link-icon"></i>
+            <i class="bi bi-house-door sidebar-link-icon"></i>
             <span class="sidebar-link-text">Dashboard</span>
         </a>
 
         <!-- Tickets Section -->
-        <div class="sidebar-nav-label">Work</div>
+        <div class="sidebar-nav-label">Tickets</div>
         <a href="tickets.php"
             class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'tickets.php' ? 'active' : ''; ?>">
-            <i class="bi bi-ticket sidebar-link-icon"></i>
-            <span class="sidebar-link-text">Tickets</span>
+            <i class="bi bi-ticket-perforated sidebar-link-icon"></i>
+            <span class="sidebar-link-text">All Tickets</span>
+            <span class="sidebar-link-badge" id="ticket-badge" style="display: none;">0</span>
         </a>
         <a href="create-ticket.php"
             class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'create-ticket.php' ? 'active' : ''; ?>">
             <i class="bi bi-plus-circle sidebar-link-icon"></i>
-            <span class="sidebar-link-text">New Ticket</span>
+            <span class="sidebar-link-text">Create Ticket</span>
         </a>
 
         <!-- Communication -->
         <div class="sidebar-nav-label">Communication</div>
         <a href="messages.php"
             class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : ''; ?>">
-            <i class="bi bi-chat-left-dots sidebar-link-icon"></i>
+            <i class="bi bi-chat-dots sidebar-link-icon"></i>
             <span class="sidebar-link-text">Messages</span>
+            <span class="sidebar-link-badge" id="message-badge" style="display: none;">0</span>
         </a>
         <a href="notifications.php"
             class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'notifications.php' ? 'active' : ''; ?>">
             <i class="bi bi-bell sidebar-link-icon"></i>
             <span class="sidebar-link-text">Notifications</span>
+            <span class="sidebar-link-badge" id="notification-badge" style="display: none;">0</span>
         </a>
 
         <!-- Other Section -->
         <div class="sidebar-nav-label">Other</div>
         <a href="timeline.php"
             class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'timeline.php' ? 'active' : ''; ?>">
-            <i class="bi bi-hourglass-split sidebar-link-icon"></i>
+            <i class="bi bi-clock-history sidebar-link-icon"></i>
             <span class="sidebar-link-text">Timeline</span>
         </a>
     </nav>
@@ -451,11 +471,11 @@
 
         <!-- Controls -->
         <div class="sidebar-controls">
-            <button class="sidebar-btn" id="mode-toggle-btn" onclick="toggleDarkMode()" title="Toggle dark mode">
+            <button class="sidebar-btn" id="mode-toggle-btn" onclick="toggleDarkMode()">
                 <i class="bi bi-moon-stars" id="mode-icon"></i>
             </button>
             <a href="logout.php" class="sidebar-btn logout-btn" title="Logout">
-                <i class="bi bi-power"></i>
+                <i class="bi bi-box-arrow-left"></i>
             </a>
         </div>
     </div>

@@ -31,7 +31,7 @@ $config = new SdkConfiguration(
     domain: 'fayyaztravels.us.auth0.com',
     clientId: 'tgqsr8C26IrvLpq7z5h4fKEeVkEEkLGC',
     clientSecret: 'CGN13kuWTHq7YYGUSj6fJkryAfw-FXJGcGDMp-UHejly5tk4KFP9N64PvuWz1MdO',
-    redirectUri: 'https://crm.fyyz.link/callback.php',
+    redirectUri: 'http://localhost/crm/callback.php',
     cookieSecret: 'your-secret-key-here', // Should be at least 32 chars
     httpClient: $httpClient,
     usePkce: true // Enable PKCE
@@ -108,9 +108,11 @@ try {
         function saveUserAvatar($userId, $imageUrl)
         {
             $ext = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION);
-            if (!$ext) $ext = 'jpg';
+            if (!$ext)
+                $ext = 'jpg';
             $avatarDir = __DIR__ . '/assets/user_avatars/';
-            if (!is_dir($avatarDir)) mkdir($avatarDir, 0777, true);
+            if (!is_dir($avatarDir))
+                mkdir($avatarDir, 0777, true);
             $localPath = "assets/user_avatars/user_{$userId}." . $ext;
             $fullPath = __DIR__ . '/' . $localPath;
             $imgData = @file_get_contents($imageUrl);

@@ -1,67 +1,61 @@
 <style>
-    /* Corporate Professional Navbar */
+    /* Professional Navbar Styles */
     .navbar {
-        background: #ffffff;
-        border-bottom: 1px solid #e0e0e0;
+        background: linear-gradient(to right, #fff 0%, #f9f7f4 100%);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         padding: 0;
-        position: fixed;
+        border-bottom: 1px solid #e9ecef;
+        position: sticky;
         top: 0;
         left: 0;
         right: 0;
         z-index: 1001;
         transition: all 0.3s ease;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     }
 
     body.dark-mode .navbar {
-        background: #1f2937;
-        border-bottom-color: #374151;
+        background: linear-gradient(to right, #2d3436 0%, #3a3f44 100%);
+        border-bottom-color: #444c56;
     }
 
     .navbar-content {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 1rem 2rem;
+        padding: 0.75rem 2rem;
         max-width: none;
         gap: 2rem;
-        height: 70px;
     }
 
     .navbar-left {
         display: flex;
         align-items: center;
         gap: 1.5rem;
-        flex: 0 0 auto;
     }
 
     .sidebar-hamburger {
         background: none;
         border: none;
-        font-size: 1.25rem;
-        color: #1f2937;
+        font-size: 1.5rem;
+        color: #4e1f00;
         cursor: pointer;
         padding: 0.5rem;
-        border-radius: 6px;
+        border-radius: 8px;
         transition: all 0.3s ease;
         display: none;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
 
     .sidebar-hamburger:hover {
-        background: #f3f4f6;
+        background: rgba(78, 31, 0, 0.1);
+        color: #a97c50;
     }
 
     body.dark-mode .sidebar-hamburger {
-        color: #e5e7eb;
+        color: #a97c50;
     }
 
     body.dark-mode .sidebar-hamburger:hover {
-        background: #374151;
+        background: rgba(169, 124, 80, 0.15);
     }
 
     .navbar-brand {
@@ -69,14 +63,14 @@
         align-items: center;
         gap: 0.75rem;
         font-weight: 700;
-        color: #1f2937;
+        color: #4e1f00;
         text-decoration: none;
         font-size: 1.1rem;
         letter-spacing: 0.5px;
     }
 
     .navbar-brand:hover {
-        color: #374151;
+        color: #a97c50;
     }
 
     .navbar-brand-icon {
@@ -84,11 +78,7 @@
     }
 
     body.dark-mode .navbar-brand {
-        color: #e5e7eb;
-    }
-
-    body.dark-mode .navbar-brand:hover {
-        color: #f3f4f6;
+        color: #a97c50;
     }
 
     .navbar-center {
@@ -102,37 +92,31 @@
         align-items: center;
         gap: 0.5rem;
         font-size: 0.9rem;
-        color: #6b7280;
+        color: #6c757d;
     }
 
     .navbar-breadcrumb a {
-        color: #2d3748;
+        color: #4e1f00;
         text-decoration: none;
         transition: color 0.2s ease;
-        font-weight: 500;
     }
 
     .navbar-breadcrumb a:hover {
-        color: #1f2937;
+        color: #a97c50;
     }
 
     body.dark-mode .navbar-breadcrumb {
-        color: #9ca3af;
+        color: #a0a0a0;
     }
 
     body.dark-mode .navbar-breadcrumb a {
-        color: #e5e7eb;
-    }
-
-    body.dark-mode .navbar-breadcrumb a:hover {
-        color: #f3f4f6;
+        color: #a97c50;
     }
 
     .navbar-actions {
         display: flex;
         align-items: center;
         gap: 1.5rem;
-        flex: 0 0 auto;
     }
 
     .navbar-user {
@@ -142,34 +126,30 @@
     .navbar-avatar {
         width: 40px;
         height: 40px;
-        border-radius: 6px;
+        border-radius: 50%;
         cursor: pointer;
-        border: 2px solid #e0e0e0;
+        border: 2px solid #4e1f00;
         object-fit: cover;
         transition: all 0.3s ease;
     }
 
     .navbar-avatar:hover {
-        border-color: #d1d5db;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-color: #a97c50;
+        box-shadow: 0 2px 8px rgba(78, 31, 0, 0.15);
     }
 
     body.dark-mode .navbar-avatar {
-        border-color: #4b5563;
-    }
-
-    body.dark-mode .navbar-avatar:hover {
-        border-color: #6b7280;
+        border-color: #a97c50;
     }
 
     .dropdown {
         position: absolute;
         top: 100%;
         right: 0;
-        background: #ffffff;
-        border: 1px solid #e0e0e0;
-        border-radius: 6px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        background: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
         display: none;
         margin-top: 0.5rem;
         min-width: 180px;
@@ -181,8 +161,8 @@
     }
 
     body.dark-mode .dropdown {
-        background: #2d3748;
-        border-color: #4b5563;
+        background: #2d3436;
+        border-color: #3a3f44;
     }
 
     .dropdown a {
@@ -190,11 +170,10 @@
         align-items: center;
         gap: 0.75rem;
         padding: 0.75rem 1rem;
-        color: #1f2937;
+        color: #2d3436;
         text-decoration: none;
         transition: all 0.2s ease;
-        border-bottom: 1px solid #f3f4f6;
-        font-size: 0.9rem;
+        border-bottom: 1px solid #f0f0f0;
     }
 
     .dropdown a:last-child {
@@ -202,35 +181,36 @@
     }
 
     .dropdown a:hover {
-        background: #f9fafb;
-        color: #1f2937;
+        background: #f8f9fa;
+        color: #4e1f00;
     }
 
     body.dark-mode .dropdown a {
-        color: #e5e7eb;
-        border-bottom-color: #374151;
+        color: #fff;
+        border-bottom-color: #3a3f44;
     }
 
     body.dark-mode .dropdown a:hover {
-        background: #374151;
-        color: #f3f4f6;
+        background: #3a3f44;
+        color: #a97c50;
     }
 
     .logout-btn {
-        color: #dc2626 !important;
+        color: #ff5252 !important;
     }
 
     .logout-btn:hover {
-        background: rgba(220, 38, 38, 0.1) !important;
+        background: rgba(255, 82, 82, 0.1) !important;
     }
 
     body.dark-mode .logout-btn {
-        color: #f87171 !important;
+        color: #ff8a80 !important;
     }
 
+    /* Responsive */
     @media (max-width: 900px) {
         .sidebar-hamburger {
-            display: flex !important;
+            display: block !important;
         }
 
         .navbar-center {
@@ -252,7 +232,7 @@
             </button>
             <a href="dashboard.php" class="navbar-brand">
                 <span class="navbar-brand-icon">✈️</span>
-                <span>Fayyaz CRM</span>
+                <span>Fayyaz Travels CRM</span>
             </a>
         </div>
 
@@ -270,10 +250,10 @@
                     alt="Profile" class="navbar-avatar" onclick="toggleNavbarDropdown()"
                     title="<?php echo htmlspecialchars($user['name'] ?? 'User'); ?>">
                 <div class="dropdown" id="navbar-dropdown">
-                    <a href="dashboard.php"><i class="bi bi-person"></i> Profile</a>
+                    <a href="dashboard.php"><i class="bi bi-person-circle"></i> Profile</a>
                     <a href="#" onclick="toggleDarkMode(); return false;"><i class="bi bi-moon-stars"
                             id="mode-icon-navbar"></i> <span id="mode-text-navbar">Dark Mode</span></a>
-                    <a href="logout.php" class="logout-btn"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                    <a href="logout.php" class="logout-btn"><i class="bi bi-box-arrow-left"></i> Logout</a>
                 </div>
             </div>
         </div>
@@ -281,6 +261,7 @@
 </nav>
 
 <script>
+    // Update breadcrumb and mode icon
     function updateNavbarState() {
         const page = window.location.pathname.split('/').pop() || 'dashboard.php';
         const pageNames = {
@@ -295,6 +276,7 @@
             label.textContent = pageNames[page] || 'Current Page';
         }
 
+        // Update mode icon in navbar
         const modeIcon = document.getElementById('mode-icon-navbar');
         const modeText = document.getElementById('mode-text-navbar');
         if (modeIcon && modeText) {
@@ -308,14 +290,17 @@
         }
     }
 
+    // Update when page loads
     document.addEventListener('DOMContentLoaded', updateNavbarState);
 
+    // Patch toggleDarkMode to update navbar
     const origToggleDarkMode = window.toggleDarkMode;
     window.toggleDarkMode = function () {
         if (origToggleDarkMode) origToggleDarkMode();
         updateNavbarState();
     };
 
+    // Mobile hamburger
     const mobileHamburger = document.getElementById('mobile-hamburger');
     if (mobileHamburger) {
         mobileHamburger.addEventListener('click', toggleSidebar);

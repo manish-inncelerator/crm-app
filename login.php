@@ -24,7 +24,7 @@ $config = new SdkConfiguration(
     domain: 'fayyaztravels.us.auth0.com',
     clientId: 'tgqsr8C26IrvLpq7z5h4fKEeVkEEkLGC',
     clientSecret: 'CGN13kuWTHq7YYGUSj6fJkryAfw-FXJGcGDMp-UHejly5tk4KFP9N64PvuWz1MdO',
-    redirectUri: 'https://crm.fyyz.link/callback.php',
+    redirectUri: 'http://localhost/crm/callback.php',
     cookieSecret: 'your-secret-key-here',
     httpClient: $httpClient
 );
@@ -74,7 +74,8 @@ echo '<link rel="stylesheet" href="assets/css/login.css">';
         <p>Please sign in to continue</p>
 
         <a href="<?php echo $auth0->login(); ?>" class="google-btn">
-            <img src="https://imagepng.org/wp-content/uploads/2019/08/google-icon.png" alt="Google Icon" class="google-icon">
+            <img src="https://imagepng.org/wp-content/uploads/2019/08/google-icon.png" alt="Google Icon"
+                class="google-icon">
             Sign in with Google
         </a>
     </div>

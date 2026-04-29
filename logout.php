@@ -19,7 +19,7 @@ $config = new SdkConfiguration(
     domain: 'fayyaztravels.us.auth0.com',
     clientId: 'tgqsr8C26IrvLpq7z5h4fKEeVkEEkLGC',
     clientSecret: 'CGN13kuWTHq7YYGUSj6fJkryAfw-FXJGcGDMp-UHejly5tk4KFP9N64PvuWz1MdO',
-    redirectUri: 'https://crm.fyyz.link/callback.php',
+    redirectUri: 'https://crm.fayyaz.travel/callback.php',
     cookieSecret: 'your-secret-key-here',
     httpClient: $httpClient
 );
@@ -36,7 +36,7 @@ session_destroy();
 $auth0->clear();
 
 // Get logout URL from Auth0 with proper returnTo URL
-$logoutUrl = $auth0->logout('https://crm.fyyz.link/login.php');
+$logoutUrl = $auth0->logout('https://crm.fayyaz.travel/login.php');
 
 // Clear any remaining cookies
 if (isset($_COOKIE[session_name()])) {

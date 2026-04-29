@@ -18,7 +18,7 @@ $config = new SdkConfiguration(
     domain: 'fayyaztravels.us.auth0.com',
     clientId: 'tgqsr8C26IrvLpq7z5h4fKEeVkEEkLGC',
     clientSecret: 'CGN13kuWTHq7YYGUSj6fJkryAfw-FXJGcGDMp-UHejly5tk4KFP9N64PvuWz1MdO',
-    redirectUri: 'https://crm.fyyz.link/callback.php',
+    redirectUri: 'https://crm.fayyaz.travel/callback.php',
     cookieSecret: 'your-secret-key-here',
     httpClient: $httpClient
 );
@@ -31,7 +31,8 @@ function timeAgo($datetime)
 {
     $time = strtotime($datetime);
     $diff = time() - $time;
-    if ($diff < 60) return 'just now';
+    if ($diff < 60)
+        return 'just now';
     $units = [
         31536000 => 'year',
         2592000 => 'month',
@@ -955,29 +956,29 @@ html_start('Tickets');
         const diff = Math.floor((now - date) / 1000);
         if (diff < 60) return 'just now';
         const units = [{
-                s: 31536000,
-                n: 'year'
-            },
-            {
-                s: 2592000,
-                n: 'month'
-            },
-            {
-                s: 604800,
-                n: 'week'
-            },
-            {
-                s: 86400,
-                n: 'day'
-            },
-            {
-                s: 3600,
-                n: 'hour'
-            },
-            {
-                s: 60,
-                n: 'minute'
-            }
+            s: 31536000,
+            n: 'year'
+        },
+        {
+            s: 2592000,
+            n: 'month'
+        },
+        {
+            s: 604800,
+            n: 'week'
+        },
+        {
+            s: 86400,
+            n: 'day'
+        },
+        {
+            s: 3600,
+            n: 'hour'
+        },
+        {
+            s: 60,
+            n: 'minute'
+        }
         ];
         for (const u of units) {
             const val = Math.floor(diff / u.s);
@@ -1073,7 +1074,7 @@ html_start('Tickets');
         }
     }
 
-    window.onload = function() {
+    window.onload = function () {
         if (localStorage.getItem('dashboard-dark-mode') === 'true') {
             document.body.classList.add('dark-mode');
         }
@@ -1084,35 +1085,35 @@ html_start('Tickets');
         window.location.href = 'logout.php';
     }
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         // Initialize DataTable for open tickets
         const openTable = $('#openTicketsTable').DataTable({
             dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rtip',
             buttons: [{
-                    extend: 'copy',
-                    className: 'btn',
-                    text: '<i class="bi bi-clipboard"></i> Copy'
-                },
-                {
-                    extend: 'csv',
-                    className: 'btn',
-                    text: '<i class="bi bi-file-earmark-spreadsheet"></i> CSV'
-                },
-                {
-                    extend: 'excel',
-                    className: 'btn',
-                    text: '<i class="bi bi-file-earmark-excel"></i> Excel'
-                },
-                {
-                    extend: 'pdf',
-                    className: 'btn',
-                    text: '<i class="bi bi-file-earmark-pdf"></i> PDF'
-                },
-                {
-                    extend: 'print',
-                    className: 'btn',
-                    text: '<i class="bi bi-printer"></i> Print'
-                }
+                extend: 'copy',
+                className: 'btn',
+                text: '<i class="bi bi-clipboard"></i> Copy'
+            },
+            {
+                extend: 'csv',
+                className: 'btn',
+                text: '<i class="bi bi-file-earmark-spreadsheet"></i> CSV'
+            },
+            {
+                extend: 'excel',
+                className: 'btn',
+                text: '<i class="bi bi-file-earmark-excel"></i> Excel'
+            },
+            {
+                extend: 'pdf',
+                className: 'btn',
+                text: '<i class="bi bi-file-earmark-pdf"></i> PDF'
+            },
+            {
+                extend: 'print',
+                className: 'btn',
+                text: '<i class="bi bi-printer"></i> Print'
+            }
             ],
             pageLength: 10,
             lengthMenu: [
@@ -1128,31 +1129,31 @@ html_start('Tickets');
                 }
             },
             columnDefs: [{
-                    targets: 1, // User column
-                    type: 'string',
-                    render: function(data, type, row) {
-                        if (type === 'sort' || type === 'filter') {
-                            if (typeof data === 'string') {
-                                return data.trim();
-                            }
-                            const tempDiv = document.createElement('div');
-                            tempDiv.innerHTML = data;
-                            return tempDiv.textContent.trim();
+                targets: 1, // User column
+                type: 'string',
+                render: function (data, type, row) {
+                    if (type === 'sort' || type === 'filter') {
+                        if (typeof data === 'string') {
+                            return data.trim();
                         }
-                        return data;
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = data;
+                        return tempDiv.textContent.trim();
                     }
-                },
-                {
-                    targets: <?php echo $isAdmin ? '4' : '3'; ?>, // Priority column
-                    type: 'string',
-                    render: function(data, type, row) {
-                        if (type === 'sort' || type === 'filter') {
-                            const priorityMatch = data.match(/>([A-Z]+)</);
-                            return priorityMatch ? priorityMatch[1] : '';
-                        }
-                        return data;
-                    }
+                    return data;
                 }
+            },
+            {
+                targets: <?php echo $isAdmin ? '4' : '3'; ?>, // Priority column
+                type: 'string',
+                render: function (data, type, row) {
+                    if (type === 'sort' || type === 'filter') {
+                        const priorityMatch = data.match(/>([A-Z]+)</);
+                        return priorityMatch ? priorityMatch[1] : '';
+                    }
+                    return data;
+                }
+            }
             ],
             ordering: false
         });
@@ -1161,30 +1162,30 @@ html_start('Tickets');
         const closedTable = $('#closedTicketsTable').DataTable({
             dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rtip',
             buttons: [{
-                    extend: 'copy',
-                    className: 'btn',
-                    text: '<i class="bi bi-clipboard"></i> Copy'
-                },
-                {
-                    extend: 'csv',
-                    className: 'btn',
-                    text: '<i class="bi bi-file-earmark-spreadsheet"></i> CSV'
-                },
-                {
-                    extend: 'excel',
-                    className: 'btn',
-                    text: '<i class="bi bi-file-earmark-excel"></i> Excel'
-                },
-                {
-                    extend: 'pdf',
-                    className: 'btn',
-                    text: '<i class="bi bi-file-earmark-pdf"></i> PDF'
-                },
-                {
-                    extend: 'print',
-                    className: 'btn',
-                    text: '<i class="bi bi-printer"></i> Print'
-                }
+                extend: 'copy',
+                className: 'btn',
+                text: '<i class="bi bi-clipboard"></i> Copy'
+            },
+            {
+                extend: 'csv',
+                className: 'btn',
+                text: '<i class="bi bi-file-earmark-spreadsheet"></i> CSV'
+            },
+            {
+                extend: 'excel',
+                className: 'btn',
+                text: '<i class="bi bi-file-earmark-excel"></i> Excel'
+            },
+            {
+                extend: 'pdf',
+                className: 'btn',
+                text: '<i class="bi bi-file-earmark-pdf"></i> PDF'
+            },
+            {
+                extend: 'print',
+                className: 'btn',
+                text: '<i class="bi bi-printer"></i> Print'
+            }
             ],
             pageLength: 10,
             lengthMenu: [
@@ -1200,41 +1201,41 @@ html_start('Tickets');
                 }
             },
             columnDefs: [{
-                    targets: 1, // User column
-                    type: 'string',
-                    render: function(data, type, row) {
-                        if (type === 'sort' || type === 'filter') {
-                            if (typeof data === 'string') {
-                                return data.trim();
-                            }
-                            const tempDiv = document.createElement('div');
-                            tempDiv.innerHTML = data;
-                            return tempDiv.textContent.trim();
+                targets: 1, // User column
+                type: 'string',
+                render: function (data, type, row) {
+                    if (type === 'sort' || type === 'filter') {
+                        if (typeof data === 'string') {
+                            return data.trim();
                         }
-                        return data;
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = data;
+                        return tempDiv.textContent.trim();
                     }
-                },
-                {
-                    targets: <?php echo $isAdmin ? '4' : '3'; ?>, // Priority column
-                    type: 'string',
-                    render: function(data, type, row) {
-                        if (type === 'sort' || type === 'filter') {
-                            const priorityMatch = data.match(/>([A-Z]+)</);
-                            return priorityMatch ? priorityMatch[1] : '';
-                        }
-                        return data;
-                    }
+                    return data;
                 }
+            },
+            {
+                targets: <?php echo $isAdmin ? '4' : '3'; ?>, // Priority column
+                type: 'string',
+                render: function (data, type, row) {
+                    if (type === 'sort' || type === 'filter') {
+                        const priorityMatch = data.match(/>([A-Z]+)</);
+                        return priorityMatch ? priorityMatch[1] : '';
+                    }
+                    return data;
+                }
+            }
             ],
             ordering: false
         });
 
         // Priority filter functionality
-        $('#priorityFilter').on('change', function() {
+        $('#priorityFilter').on('change', function () {
             const selectedPriority = $(this).val();
 
             // Custom filtering function for priority
-            $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
                 if (!selectedPriority) return true; // Show all if no priority selected
 
                 // Get the priority cell content - adjust index based on admin status
@@ -1275,11 +1276,11 @@ html_start('Tickets');
 
         // User filter functionality (admin only)
         <?php if ($isAdmin): ?>
-            $('#userFilter').on('change', function() {
+            $('#userFilter').on('change', function () {
                 const selectedUser = $(this).val();
 
                 // Custom filtering function for user
-                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
                     if (!selectedUser) return true; // Show all if no user selected
 
                     // Get the user cell content
@@ -1322,7 +1323,7 @@ html_start('Tickets');
         const ticketModal = document.getElementById('ticketModal');
         let originalEstimatedTime = null;
         if (ticketModal) {
-            ticketModal.addEventListener('show.bs.modal', function(event) {
+            ticketModal.addEventListener('show.bs.modal', function (event) {
                 const button = event.relatedTarget;
                 const ticketId = button.getAttribute('data-ticket-id');
                 const ticketType = button.getAttribute('data-ticket-type');
@@ -1343,7 +1344,7 @@ html_start('Tickets');
             });
 
             // Handle ticket update
-            document.getElementById('updateTicketBtn').addEventListener('click', async function() {
+            document.getElementById('updateTicketBtn').addEventListener('click', async function () {
                 const form = document.getElementById('ticketUpdateForm');
                 const formData = new FormData(form);
                 const data = Object.fromEntries(formData.entries());
@@ -1427,7 +1428,7 @@ html_start('Tickets');
         // View Ticket Modal
         const viewTicketModal = document.getElementById('viewTicketModal');
         if (viewTicketModal) {
-            viewTicketModal.addEventListener('show.bs.modal', async function(event) {
+            viewTicketModal.addEventListener('show.bs.modal', async function (event) {
                 const button = event.relatedTarget;
                 const ticketId = button.getAttribute('data-ticket-id');
                 const ticketType = button.getAttribute('data-ticket-type');
@@ -1724,11 +1725,11 @@ html_start('Tickets');
                                                     <i class="bi bi-file-earmark-text"></i>
                                                     Supplier Invoice
                                                 </div>
-                                                ${ticket.supplier_invoice_path ? 
-                                                    `<a href="uploads/supplier_invoices/${ticket.supplier_invoice_path}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                ${ticket.supplier_invoice_path ?
+                                    `<a href="uploads/supplier_invoices/${ticket.supplier_invoice_path}" target="_blank" class="btn btn-sm btn-outline-primary">
                                                         <i class="bi bi-eye"></i> View
-                                                    </a>` : 
-                                                    '<span class="text-muted">Not uploaded</span>'}
+                                                    </a>` :
+                                    '<span class="text-muted">Not uploaded</span>'}
                                             </div>
                                         </div>
                                         <div class="col-md-4">
@@ -1737,11 +1738,11 @@ html_start('Tickets');
                                                     <i class="bi bi-file-earmark-text"></i>
                                                     Customer Invoice
                                                 </div>
-                                                ${ticket.customer_invoice_path ? 
-                                                    `<a href="uploads/customer_invoices/${ticket.customer_invoice_path}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                ${ticket.customer_invoice_path ?
+                                    `<a href="uploads/customer_invoices/${ticket.customer_invoice_path}" target="_blank" class="btn btn-sm btn-outline-primary">
                                                         <i class="bi bi-eye"></i> View
-                                                    </a>` : 
-                                                    '<span class="text-muted">Not uploaded</span>'}
+                                                    </a>` :
+                                    '<span class="text-muted">Not uploaded</span>'}
                                             </div>
                                         </div>
                                         <div class="col-md-4">
@@ -1750,11 +1751,11 @@ html_start('Tickets');
                                                     <i class="bi bi-receipt"></i>
                                                     Payment Proof
                                                 </div>
-                                                ${ticket.payment_proof_path ? 
-                                                    `<a href="uploads/payment_proofs/${ticket.payment_proof_path}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                ${ticket.payment_proof_path ?
+                                    `<a href="uploads/payment_proofs/${ticket.payment_proof_path}" target="_blank" class="btn btn-sm btn-outline-primary">
                                                         <i class="bi bi-eye"></i> View
-                                                    </a>` : 
-                                                    '<span class="text-muted">Not uploaded</span>'}
+                                                    </a>` :
+                                    '<span class="text-muted">Not uploaded</span>'}
                                             </div>
                                         </div>
                                     </div>
@@ -1770,7 +1771,7 @@ html_start('Tickets');
                             section.appendChild(h6);
                             var ul = document.createElement('ul');
                             ul.className = 'timeline list-unstyled';
-                            ticket.comments.forEach(function(comment) {
+                            ticket.comments.forEach(function (comment) {
                                 var icon = 'bi-person-badge';
                                 var badgeClass = 'bg-primary';
                                 if (comment.comment.startsWith('Priority changed')) {
@@ -1844,25 +1845,25 @@ html_start('Tickets');
                             `;
                         }
                         const imageFields = [{
-                                key: 'supporting_image_path',
-                                label: 'Supporting Image',
-                                folder: 'uploads/supporting_images/'
-                            },
-                            {
-                                key: 'supplier_invoice_path',
-                                label: 'Supplier Invoice',
-                                folder: 'uploads/supplier_invoices/'
-                            },
-                            {
-                                key: 'customer_invoice_path',
-                                label: 'Customer Invoice',
-                                folder: 'uploads/customer_invoices/'
-                            },
-                            {
-                                key: 'payment_proof_path',
-                                label: 'Payment Proof',
-                                folder: 'uploads/payment_proofs/'
-                            }
+                            key: 'supporting_image_path',
+                            label: 'Supporting Image',
+                            folder: 'uploads/supporting_images/'
+                        },
+                        {
+                            key: 'supplier_invoice_path',
+                            label: 'Supplier Invoice',
+                            folder: 'uploads/supplier_invoices/'
+                        },
+                        {
+                            key: 'customer_invoice_path',
+                            label: 'Customer Invoice',
+                            folder: 'uploads/customer_invoices/'
+                        },
+                        {
+                            key: 'payment_proof_path',
+                            label: 'Payment Proof',
+                            folder: 'uploads/payment_proofs/'
+                        }
                         ];
                         let imagesHtml = '';
                         imageFields.forEach(field => {
@@ -1905,7 +1906,7 @@ html_start('Tickets');
     // Add these new functions for quick ticket search
     let searchTimeout = null;
 
-    document.getElementById('quickTicketSearch').addEventListener('input', function(e) {
+    document.getElementById('quickTicketSearch').addEventListener('input', function (e) {
         clearTimeout(searchTimeout);
         const searchTerm = e.target.value.trim();
 
@@ -1921,11 +1922,11 @@ html_start('Tickets');
 
             Promise.all(ticketTypes.map(type =>
                 fetch(`api/tickets.php?type=${type}&search=${searchTerm}`)
-                .then(response => response.json())
-                .then(data => ({
-                    type,
-                    data
-                }))
+                    .then(response => response.json())
+                    .then(data => ({
+                        type,
+                        data
+                    }))
             )).then(results => {
                 const resultsDiv = document.getElementById('quickSearchResults');
                 resultsDiv.innerHTML = '';
@@ -1979,7 +1980,7 @@ html_start('Tickets');
     }
 
     // Close search results when clicking outside
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         const searchContainer = document.querySelector('.quick-search');
         const searchResults = document.getElementById('quickSearchResults');
         if (!searchContainer.contains(e.target)) {
@@ -1988,7 +1989,7 @@ html_start('Tickets');
     });
 
     // Add keyboard navigation for search
-    document.getElementById('quickTicketSearch').addEventListener('keydown', function(e) {
+    document.getElementById('quickTicketSearch').addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
             searchTicket();
         } else if (e.key === 'Escape') {
@@ -2007,12 +2008,14 @@ html_start('Tickets');
                         <!-- Quick Ticket Search -->
                         <div class="quick-search" style="position:relative;">
                             <div class="input-group">
-                                <input type="text" id="quickTicketSearch" class="form-control" placeholder="Search ticket by ID..." style="min-width:200px;">
+                                <input type="text" id="quickTicketSearch" class="form-control"
+                                    placeholder="Search ticket by ID..." style="min-width:200px;">
                                 <button class="btn btn-primary" type="button" onclick="searchTicket()">
                                     <i class="bi bi-search"></i>
                                 </button>
                             </div>
-                            <div id="quickSearchResults" class="dropdown-menu" style="width:100%;display:none;max-height:300px;overflow-y:auto;">
+                            <div id="quickSearchResults" class="dropdown-menu"
+                                style="width:100%;display:none;max-height:300px;overflow-y:auto;">
                             </div>
                         </div>
                         <?php if ($isAdmin): ?>
@@ -2026,10 +2029,12 @@ html_start('Tickets');
         </div>
         <ul class="nav nav-tabs mb-4" id="ticketTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="open-tab" data-bs-toggle="tab" data-bs-target="#open" type="button" role="tab" aria-controls="open" aria-selected="true">Open Tickets</button>
+                <button class="nav-link active" id="open-tab" data-bs-toggle="tab" data-bs-target="#open" type="button"
+                    role="tab" aria-controls="open" aria-selected="true">Open Tickets</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="closed-tab" data-bs-toggle="tab" data-bs-target="#closed" type="button" role="tab" aria-controls="closed" aria-selected="false">Closed Tickets</button>
+                <button class="nav-link" id="closed-tab" data-bs-toggle="tab" data-bs-target="#closed" type="button"
+                    role="tab" aria-controls="closed" aria-selected="false">Closed Tickets</button>
             </li>
         </ul>
         <div class="tab-content" id="ticketTabsContent">
@@ -2061,32 +2066,38 @@ html_start('Tickets');
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="ms-2">
-                                                <div class="fw-bold"><?php echo htmlspecialchars($ticket['user_name']); ?></div>
-                                                <div class="text-muted small"><?php echo htmlspecialchars($ticket['user_email']); ?></div>
+                                                <div class="fw-bold"><?php echo htmlspecialchars($ticket['user_name']); ?>
+                                                </div>
+                                                <div class="text-muted small">
+                                                    <?php echo htmlspecialchars($ticket['user_email']); ?></div>
                                             </div>
                                         </div>
                                     </td>
                                     <td><?php echo htmlspecialchars($ticket['subject']); ?></td>
                                     <td>
-                                        <span class="badge ticket-priority-badge <?php echo getPriorityClass($ticket['priority']); ?>">
+                                        <span
+                                            class="badge ticket-priority-badge <?php echo getPriorityClass($ticket['priority']); ?>">
                                             <i class="bi bi-flag-fill"></i>
                                             <?php echo $ticket['priority']; ?>
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="badge <?php echo $ticket['status'] === 'CLOSED' ? 'bg-success' : ($ticket['status'] === 'IN_PROGRESS' ? 'bg-info' : 'bg-warning text-dark'); ?>">
-                                            <i class="bi <?php echo $ticket['status'] === 'CLOSED' ? 'bi-check-circle-fill' : ($ticket['status'] === 'IN_PROGRESS' ? 'bi-arrow-repeat' : 'bi-clock-fill'); ?>"></i>
+                                        <span
+                                            class="badge <?php echo $ticket['status'] === 'CLOSED' ? 'bg-success' : ($ticket['status'] === 'IN_PROGRESS' ? 'bg-info' : 'bg-warning text-dark'); ?>">
+                                            <i
+                                                class="bi <?php echo $ticket['status'] === 'CLOSED' ? 'bi-check-circle-fill' : ($ticket['status'] === 'IN_PROGRESS' ? 'bi-arrow-repeat' : 'bi-clock-fill'); ?>"></i>
                                             <?php echo $ticket['status']; ?>
                                         </span>
                                     </td>
                                     <td><?php
-                                        $estimatedTime = $ticket['estimated_time'] ?? getDefaultEstimatedTime($ticket['subject']);
-                                        error_log("Ticket ID: " . $ticket['id'] . ", Subject: " . $ticket['subject'] . ", Estimated Time: " . $estimatedTime);
-                                        echo htmlspecialchars($estimatedTime);
-                                        ?></td>
+                                    $estimatedTime = $ticket['estimated_time'] ?? getDefaultEstimatedTime($ticket['subject']);
+                                    error_log("Ticket ID: " . $ticket['id'] . ", Subject: " . $ticket['subject'] . ", Estimated Time: " . $estimatedTime);
+                                    echo htmlspecialchars($estimatedTime);
+                                    ?></td>
                                     <td>
                                         <div class="action-buttons">
-                                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewTicketModal"
+                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                                data-bs-toggle="modal" data-bs-target="#viewTicketModal"
                                                 data-ticket-id="<?php echo $ticket['id']; ?>"
                                                 data-ticket-type="<?php echo htmlspecialchars($ticket['type_key'] ?? ''); ?>"
                                                 data-ticket-estimated-time="<?php echo htmlspecialchars($ticket['estimated_time'] ?? ''); ?>">
@@ -2095,7 +2106,8 @@ html_start('Tickets');
                                             <?php if (
                                                 $isAdmin
                                             ): ?>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#ticketModal"
+                                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                    data-bs-toggle="modal" data-bs-target="#ticketModal"
                                                     data-ticket-id="<?php echo $ticket['id']; ?>"
                                                     data-ticket-type="<?php echo htmlspecialchars($ticket['type_key'] ?? ''); ?>"
                                                     data-ticket-priority="<?php echo $ticket['priority']; ?>"
@@ -2145,8 +2157,10 @@ html_start('Tickets');
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="ms-2">
-                                                <div class="fw-bold"><?php echo htmlspecialchars($ticket['user_name']); ?></div>
-                                                <div class="text-muted small"><?php echo htmlspecialchars($ticket['user_email']); ?></div>
+                                                <div class="fw-bold"><?php echo htmlspecialchars($ticket['user_name']); ?>
+                                                </div>
+                                                <div class="text-muted small">
+                                                    <?php echo htmlspecialchars($ticket['user_email']); ?></div>
                                             </div>
                                         </div>
                                     </td>
@@ -2158,25 +2172,29 @@ html_start('Tickets');
                                     </td>
                                     <td><?php echo htmlspecialchars($ticket['subject']); ?></td>
                                     <td>
-                                        <span class="badge ticket-priority-badge <?php echo getPriorityClass($ticket['priority']); ?>">
+                                        <span
+                                            class="badge ticket-priority-badge <?php echo getPriorityClass($ticket['priority']); ?>">
                                             <i class="bi bi-flag-fill"></i>
                                             <?php echo $ticket['priority']; ?>
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="badge <?php echo $ticket['status'] === 'CLOSED' ? 'bg-success' : ($ticket['status'] === 'IN_PROGRESS' ? 'bg-info' : 'bg-warning text-dark'); ?>">
-                                            <i class="bi <?php echo $ticket['status'] === 'CLOSED' ? 'bi-check-circle-fill' : ($ticket['status'] === 'IN_PROGRESS' ? 'bi-arrow-repeat' : 'bi-clock-fill'); ?>"></i>
+                                        <span
+                                            class="badge <?php echo $ticket['status'] === 'CLOSED' ? 'bg-success' : ($ticket['status'] === 'IN_PROGRESS' ? 'bg-info' : 'bg-warning text-dark'); ?>">
+                                            <i
+                                                class="bi <?php echo $ticket['status'] === 'CLOSED' ? 'bi-check-circle-fill' : ($ticket['status'] === 'IN_PROGRESS' ? 'bi-arrow-repeat' : 'bi-clock-fill'); ?>"></i>
                                             <?php echo $ticket['status']; ?>
                                         </span>
                                     </td>
                                     <td><?php
-                                        $estimatedTime = $ticket['estimated_time'] ?? getDefaultEstimatedTime($ticket['subject']);
-                                        error_log("Ticket ID: " . $ticket['id'] . ", Subject: " . $ticket['subject'] . ", Estimated Time: " . $estimatedTime);
-                                        echo htmlspecialchars($estimatedTime);
-                                        ?></td>
+                                    $estimatedTime = $ticket['estimated_time'] ?? getDefaultEstimatedTime($ticket['subject']);
+                                    error_log("Ticket ID: " . $ticket['id'] . ", Subject: " . $ticket['subject'] . ", Estimated Time: " . $estimatedTime);
+                                    echo htmlspecialchars($estimatedTime);
+                                    ?></td>
                                     <td>
                                         <div class="action-buttons">
-                                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewTicketModal"
+                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                                data-bs-toggle="modal" data-bs-target="#viewTicketModal"
                                                 data-ticket-id="<?php echo $ticket['id']; ?>"
                                                 data-ticket-type="<?php echo htmlspecialchars($ticket['type_key'] ?? ''); ?>"
                                                 data-ticket-estimated-time="<?php echo htmlspecialchars($ticket['estimated_time'] ?? ''); ?>">
@@ -2185,7 +2203,8 @@ html_start('Tickets');
                                             <?php if (
                                                 $isAdmin
                                             ): ?>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#ticketModal"
+                                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                    data-bs-toggle="modal" data-bs-target="#ticketModal"
                                                     data-ticket-id="<?php echo $ticket['id']; ?>"
                                                     data-ticket-type="<?php echo htmlspecialchars($ticket['type_key'] ?? ''); ?>"
                                                     data-ticket-priority="<?php echo $ticket['priority']; ?>"
@@ -2194,7 +2213,8 @@ html_start('Tickets');
                                                     <i class="bi bi-gear"></i> Manage
                                                 </button>
                                             <?php endif; ?>
-                                            <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#timelineModal"
+                                            <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
+                                                data-bs-target="#timelineModal"
                                                 data-ticket-id="<?php echo $ticket['id']; ?>"
                                                 data-ticket-type="<?php echo htmlspecialchars($ticket['type_key'] ?? ''); ?>">
                                                 <i class="bi bi-clock-history"></i> Timeline
