@@ -363,6 +363,13 @@ try {
                 $details .= "<h5>Additional Handover Notes:</h5><div>" . $data['description'] . "</div>";
             }
 
+            if (!empty($data['handover_user_id'])) {
+                $handoverUser = $database->get('users', ['name'], ['id' => $data['handover_user_id']]);
+                if ($handoverUser) {
+                    $details .= "<p><strong>Assigned Handover TC:</strong> " . htmlspecialchars($handoverUser['name']) . "</p>";
+                }
+            }
+
             $ticketData = array_merge($commonFields, [
                 'description' => $details,
                 'ticket_subtype' => 'Employee Offboarding'

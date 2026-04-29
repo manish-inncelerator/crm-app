@@ -169,6 +169,22 @@ function notifyTicketEstimatedTimeChange($userId, $ticketId, $ticketType, $oldTi
 }
 
 /**
+ * Create a notification for ticket reassignment
+ */
+function notifyTicketReassignment($userId, $ticketId, $ticketType, $oldOwnerName)
+{
+    try {
+        $title = 'Ticket Reassigned to You';
+        $message = sprintf('A %s ticket previously owned by %s has been reassigned to you.', ucfirst($ticketType), $oldOwnerName);
+        writeLog("[notifyTicketReassignment] user_id={$userId}, message={$message}", 'DEBUG');
+        return createNotification($userId, $ticketId, $ticketType, 'info', $title, $message);
+    } catch (Exception $e) {
+        writeLog('Error creating reassignment notification: ' . $e->getMessage(), 'ERROR');
+        return false;
+    }
+}
+
+/**
  * Mark a notification as read
  */
 function markNotificationAsRead($notificationId)

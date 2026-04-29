@@ -1,6 +1,8 @@
 <?php
 require_once '../database.php';
 require_once '../vendor/autoload.php';
+require_once '../functions/notifications.php';
+require_once '../function.php';
 
 use Auth0\SDK\Auth0;
 use Auth0\SDK\Configuration\SdkConfiguration;
@@ -24,7 +26,7 @@ if (!$user) {
 }
 
 $dbUser = $database->get('users', '*', ['auth0_id' => $user['sub']]);
-if (!$dbUser || $dbUser['role'] !== 'admin') {
+if (!$dbUser || !($dbUser['is_admin'] ?? false)) {
     http_response_code(403);
     echo json_encode(['error' => 'Forbidden']);
     exit;
@@ -37,13 +39,53 @@ if (!isset($data['user_id']) || !isset($data['is_ex_employee'])) {
     exit;
 }
 
+$userId = $data['user_id'];
+$isExEmployee = $data['is_ex_employee'];
+$replacementId = $data['replacement_user_id'] ?? null;
+
+// Start transaction if possible, or just proceed
 $result = $database->update('users', [
-    'is_ex_employee' => $data['is_ex_employee']
+    'is_ex_employee' => $isExEmployee
 ], [
-    'id' => $data['user_id']
+    'id' => $userId
 ]);
 
 if ($result) {
+    // If marking as ex-employee and a replacement is provided, reassign tickets
+    if ($isExEmployee == 1 && $replacementId) {
+        $oldUser = $database->get('users', ['name'], ['id' => $userId]);
+        $oldUserName = $oldUser['name'] ?? 'Ex-Employee';
+        
+        $tables = ['estimate', 'supplier', 'general'];
+        foreach ($tables as $type) {
+            $tableName = $type . '_tickets';
+            
+            // Find open tickets for this user
+            $openTickets = $database->select($tableName, ['id'], [
+                'user_id' => $userId,
+                'status' => ['OPEN', 'IN_PROGRESS']
+            ]);
+            
+            if ($openTickets) {
+                foreach ($openTickets as $ticket) {
+                    // Update ticket owner
+                    $database->update($tableName, ['user_id' => $replacementId], ['id' => $ticket['id']]);
+                    
+                    // Add audit comment
+                    $database->insert('ticket_comments', [
+                        'ticket_id' => $ticket['id'],
+                        'ticket_type' => $type,
+                        'user_id' => $dbUser['id'], // Admin ID
+                        'comment' => sprintf('Ticket reassigned from %s to new consultant by admin.', $oldUserName),
+                        'created_at' => date('Y-m-d H:i:s')
+                    ]);
+                    
+                    // Notify new owner
+                    notifyTicketReassignment($replacementId, $ticket['id'], $type, $oldUserName);
+                }
+            }
+        }
+    }
     echo json_encode(['success' => true]);
 } else {
     http_response_code(500);

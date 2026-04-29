@@ -70,6 +70,12 @@ try {
         exit;
     }
 
+    // Fetch active users for handover/reassignment
+    $activeUsers = $database->select('users', ['id', 'name'], [
+        'is_ex_employee' => 0,
+        'ORDER' => ['name' => 'ASC']
+    ]);
+
     writeLog('Create Ticket - User data from database: ' . print_r($dbUser, true));
 } catch (\Exception $e) {
     writeLog('Create Ticket Error: ' . $e->getMessage(), 'ERROR');
@@ -655,6 +661,17 @@ html_start('Create Ticket');
                                 Ensure Individual Tracker is fully updated
                             </label>
                         </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Handover to TC/Employee</label>
+                        <select name="handover_user_id" class="form-select" required>
+                            <option value="">Select TC...</option>
+                            <?php foreach ($activeUsers as $au): ?>
+                                <?php if ($au['id'] != $dbUser['id']): ?>
+                                    <option value="<?php echo $au['id']; ?>"><?php echo htmlspecialchars($au['name']); ?></option>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Priority</label>

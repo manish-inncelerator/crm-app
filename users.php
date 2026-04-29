@@ -120,15 +120,88 @@ html_start('Manage Users');
     </div>
 </div>
 
+<!-- Replacement Modal -->
+<div class="modal fade" id="replacementModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title">Mark as Ex-Employee</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p>You are marking this employee as <strong>Ex-Employee</strong>. Please select a replacement consultant to whom all their ongoing tickets/leads will be reassigned.</p>
+                <input type="hidden" id="targetUserId">
+                <div class="mb-3">
+                    <label class="form-label">Replacement Employee</label>
+                    <select class="form-select" id="replacementUserId" required>
+                        <option value="">Select Replacement...</option>
+                        <?php foreach ($users as $u_opt): ?>
+                            <?php if (!$u_opt['is_ex_employee']): ?>
+                                <option value="<?php echo $u_opt['id']; ?>"><?php echo htmlspecialchars($u_opt['name']); ?></option>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="confirmExEmployee()">Confirm & Reassign</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-async function toggleStatus(userId, status) {
-    if (!confirm('Are you sure you want to change this user\'s status?')) return;
+let currentActionUserId = null;
+let replacementModal = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    replacementModal = new bootstrap.Modal(document.getElementById('replacementModal'));
+});
+
+function toggleStatus(userId, status) {
+    if (status === 1) {
+        // Mark as Ex-Employee
+        currentActionUserId = userId;
+        document.getElementById('targetUserId').value = userId;
+        // Reset dropdown
+        document.getElementById('replacementUserId').value = '';
+        replacementModal.show();
+    } else {
+        // Mark as Active
+        if (!confirm('Are you sure you want to mark this user as active?')) return;
+        submitToggle(userId, 0);
+    }
+}
+
+async function confirmExEmployee() {
+    const userId = document.getElementById('targetUserId').value;
+    const replacementId = document.getElementById('replacementUserId').value;
     
+    if (!replacementId) {
+        alert('Please select a replacement employee.');
+        return;
+    }
+    
+    if (userId == replacementId) {
+        alert('You cannot select the same employee as their own replacement.');
+        return;
+    }
+    
+    replacementModal.hide();
+    submitToggle(userId, 1, replacementId);
+}
+
+async function submitToggle(userId, status, replacementId = null) {
     try {
         const response = await fetch('api/toggle-ex-employee.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: userId, is_ex_employee: status })
+            body: JSON.stringify({ 
+                user_id: userId, 
+                is_ex_employee: status,
+                replacement_user_id: replacementId
+            })
         });
         const result = await response.json();
         if (result.success) {
