@@ -496,6 +496,75 @@ html_start('Tickets');
         window.location.href = 'logout.php';
     }
 
+    // Function to handle ticket editing
+    async function editTicket(id, type) {
+        try {
+            const response = await fetch(`api/get-ticket.php?id=${id}&type=${type}`);
+            const result = await response.json();
+
+            if (result.success) {
+                const ticket = result.ticket;
+                document.getElementById('editTicketId').value = ticket.id;
+                document.getElementById('editTicketType').value = type;
+                document.getElementById('editBookingReference').value = ticket.booking_reference || '';
+                document.getElementById('editPriority').value = ticket.priority;
+                document.getElementById('editDescription').value = ticket.description || '';
+
+                // Show/hide type-specific fields
+                const estimateFields = document.getElementById('editEstimateFields');
+                if (type === 'estimate') {
+                    estimateFields.style.display = 'block';
+                    document.getElementById('editCustomerName').value = ticket.customer_name || '';
+                    document.getElementById('editTotalAmount').value = ticket.total_amount || '';
+                } else {
+                    estimateFields.style.display = 'none';
+                }
+
+                const editModal = new bootstrap.Modal(document.getElementById('editTicketModal'));
+                editModal.show();
+            } else {
+                alert('Error fetching ticket data: ' + result.error);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while fetching ticket details.');
+        }
+    }
+
+    // Handle Edit Ticket form submission
+    document.getElementById('editTicketForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch('api/edit-ticket.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                showToast('Success', 'Ticket updated successfully', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('editTicketModal')).hide();
+                location.reload(); // Reload to show updated data in table
+            } else {
+                showToast('Error', result.error || 'Failed to update ticket', 'danger');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('Error', 'An unexpected error occurred', 'danger');
+        }
+    });
+
+    // Auto-trim booking reference inputs
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('booking-ref-input')) {
+            e.target.value = e.target.value.replace(/\s/g, '');
+        }
+    });
+
     $(document).ready(function () {
         // Initialize DataTable for open tickets
         const openTable = $('#openTicketsTable').DataTable({
@@ -1690,6 +1759,10 @@ html_start('Tickets');
                                                 data-ticket-estimated-time="<?php echo htmlspecialchars($ticket['estimated_time'] ?? ''); ?>">
                                                 <i class="bi bi-eye"></i> View
                                             </button>
+                                            <button type="button" class="btn btn-sm btn-outline-warning"
+                                                onclick="editTicket(<?php echo $ticket['id']; ?>, '<?php echo htmlspecialchars($ticket['type_key'] ?? ''); ?>')">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </button>
                                             <?php if (
                                                 $isAdmin
                                             ): ?>
@@ -1803,6 +1876,10 @@ html_start('Tickets');
                                                 data-ticket-estimated-time="<?php echo htmlspecialchars($ticket['estimated_time'] ?? ''); ?>">
                                                 <i class="bi bi-eye"></i> View
                                             </button>
+                                            <button type="button" class="btn btn-sm btn-outline-warning"
+                                                onclick="editTicket(<?php echo $ticket['id']; ?>, '<?php echo htmlspecialchars($ticket['type_key'] ?? ''); ?>')">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </button>
                                             <?php if (
                                                 $isAdmin
                                             ): ?>
@@ -1857,6 +1934,59 @@ html_start('Tickets');
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Ticket Modal -->
+<div class="modal fade" id="editTicketModal" tabindex="-1" aria-labelledby="editTicketModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTicketModalLabel">Edit Ticket</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editTicketForm">
+                <input type="hidden" id="editTicketId" name="id">
+                <input type="hidden" id="editTicketType" name="type">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Booking / Reference Number <span class="text-danger">*</span></label>
+                            <input type="text" id="editBookingReference" name="booking_reference" class="form-control booking-ref-input" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Priority</label>
+                            <select id="editPriority" name="priority" class="form-select" required>
+                                <option value="LOW">LOW</option>
+                                <option value="MEDIUM">MEDIUM</option>
+                                <option value="HIGH">HIGH</option>
+                                <option value="URGENT">URGENT</option>
+                            </select>
+                        </div>
+                        <div class="col-12" id="editEstimateFields" style="display:none;">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Customer Name</label>
+                                    <input type="text" id="editCustomerName" name="customer_name" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Total Amount</label>
+                                    <input type="number" step="0.01" id="editTotalAmount" name="total_amount" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description / Details</label>
+                            <textarea id="editDescription" name="description" class="form-control" rows="6"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Save Changes</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
