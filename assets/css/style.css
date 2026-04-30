@@ -209,7 +209,7 @@ body {
   width: var(--sidebar-width);
   min-width: var(--sidebar-width);
   background: var(--sidebar-bg-glass);
-  box-shadow: 0 8px 32px rgba(78, 31, 0, 0.13), 0 1.5px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 8px 32px rgba(79, 70, 229, 0.13), 0 1.5px 8px rgba(0, 0, 0, 0.04);
   border-radius: 0;
   margin: 0;
   padding: 0;
@@ -234,7 +234,7 @@ body {
   align-items: center;
   justify-content: center;
   margin-bottom: 12px;
-  box-shadow: 0 2px 8px rgba(78, 31, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.1);
   background: #fff;
   object-fit: contain;
   display: block;
@@ -243,7 +243,7 @@ body {
 .sidebar-divider {
   width: 80%;
   height: 1.5px;
-  background: #e7d7c3;
+  background: #cbd5e1;
   margin: 18px auto 18px auto;
   border-radius: 2px;
   border: none;
@@ -281,7 +281,7 @@ body {
 }
 
 .sidebar-nav-link.active {
-  background: #4e1f00;
+  background: #4f46e5;
   color: #fff;
   box-shadow: var(--sidebar-pill-shadow);
 }
@@ -322,9 +322,9 @@ body {
 }
 
 .sidebar-nav-link:hover {
-  background: rgba(78, 31, 0, 0.08);
+  background: rgba(79, 70, 229, 0.08);
   color: var(--sidebar-accent);
-  box-shadow: 0 2px 12px rgba(78, 31, 0, 0.06);
+  box-shadow: 0 2px 12px rgba(79, 70, 229, 0.06);
 }
 
 .sidebar-nav-link:hover .sidebar-nav-icon {
@@ -369,14 +369,14 @@ body {
   object-fit: cover;
   background: #fff;
   border: 2px solid #fff;
-  box-shadow: 0 1px 4px rgba(78, 31, 0, 0.1);
+  box-shadow: 0 1px 4px rgba(79, 70, 229, 0.1);
   margin-bottom: 4px;
 }
 
 .sidebar-user-name {
   font-size: 1.08rem;
   font-weight: 600;
-  color: #4e1f00;
+  color: #4f46e5;
   text-align: center;
   margin: 0;
   letter-spacing: 0.01em;
@@ -385,7 +385,7 @@ body {
 
 .sidebar-user-email {
   font-size: 0.92rem;
-  color: #a98b6d;
+  color: #64748b;
   text-align: center;
   margin: 0;
   letter-spacing: 0.01em;
@@ -401,7 +401,7 @@ body {
   justify-content: center;
   border-radius: 50%;
   background: var(--sidebar-btn-bg);
-  color: #4e1f00;
+  color: #4f46e5;
   font-size: 1.3rem;
   border: none;
   cursor: pointer;
@@ -415,7 +415,7 @@ body {
 .sidebar-logout:hover {
   background: var(--sidebar-btn-hover);
   color: var(--sidebar-btn-hover-text);
-  box-shadow: 0 4px 16px rgba(78, 31, 0, 0.13);
+  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.13);
 }
 
 .main-content {
@@ -436,7 +436,7 @@ body {
   align-items: center;
   background: var(--greeting-bg);
   border-radius: 22px;
-  box-shadow: 0 4px 24px rgba(78, 31, 0, 0.07);
+  box-shadow: 0 4px 24px rgba(79, 70, 229, 0.07);
   padding: 32px 36px;
   margin-bottom: 36px;
   gap: 32px;
@@ -449,7 +449,7 @@ body {
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid #fff;
-  box-shadow: 0 2px 8px rgba(78, 31, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.1);
   background: #fff;
 }
 
@@ -491,7 +491,7 @@ body {
 }
 
 .header-actions .btn-primary {
-  background: #4e1f00;
+  background: #4f46e5;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -499,7 +499,7 @@ body {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(78, 31, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.08);
   transition: background 0.18s;
   display: inline-flex;
   align-items: center;
@@ -507,7 +507,7 @@ body {
 }
 
 .header-actions .btn-primary:hover {
-  background: #a97c50;
+  background: #6366f1;
 }
 
 .dashboard-widgets {
@@ -529,7 +529,7 @@ body {
 }
 
 .widget-link:focus {
-  outline: 2px solid #4e1f00;
+  outline: 2px solid #4f46e5;
   outline-offset: 2px;
 }
 
@@ -554,10 +554,10 @@ body {
 
 .widget:hover,
 .widget-link:hover .widget {
-  box-shadow: 0 12px 48px rgba(78, 31, 0, 0.18), 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 48px rgba(79, 70, 229, 0.18), 0 2px 12px rgba(0, 0, 0, 0.08);
   transform: translateY(-4px) scale(1.03);
-  background: #f3e7db;
-  color: #4e1f00;
+  background: #eef2ff;
+  color: #4f46e5;
 }
 
 .widget-main-content {
@@ -578,7 +578,7 @@ body {
   justify-content: center;
   font-size: 2.2rem;
   margin-bottom: 22px;
-  box-shadow: 0 2px 8px rgba(78, 31, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.08);
   transition: background 0.18s, color 0.18s;
 }
 
@@ -608,20 +608,20 @@ body {
   transform: none;
   width: 40px;
   height: 40px;
-  background: #f3e7db;
+  background: #eef2ff;
   border-radius: 50%;
-  color: #a97c50;
+  color: #6366f1;
   font-size: 1.3rem;
-  box-shadow: 0 1px 4px rgba(78, 31, 0, 0.1);
+  box-shadow: 0 1px 4px rgba(79, 70, 229, 0.1);
   opacity: 0.8;
   transition: color 0.18s, opacity 0.18s, background 0.18s;
   z-index: 2;
 }
 
 .widget-link:hover .widget-chevron {
-  color: #4e1f00;
+  color: #4f46e5;
   opacity: 1;
-  background: #e7d7c3;
+  background: #cbd5e1;
 }
 
 @media (max-width: 1200px) {
@@ -788,12 +788,12 @@ body.dark-mode .mobile-bottom-navbar .mobile-nav-btn:hover {
   font-size: 0.92rem;
   font-weight: 600;
   color: #fff;
-  background: #4e1f00;
+  background: #4f46e5;
   border-radius: 12px;
   margin-left: 8px;
   vertical-align: middle;
   text-align: center;
-  box-shadow: 0 1px 4px rgba(78, 31, 0, 0.1);
+  box-shadow: 0 1px 4px rgba(79, 70, 229, 0.1);
   letter-spacing: 0.01em;
   transition: background 0.18s, color 0.18s;
 }

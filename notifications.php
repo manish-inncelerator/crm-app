@@ -147,60 +147,12 @@ html_start('Notifications');
         }
     }
 
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('dashboard-dark-mode', document.body.classList.contains('dark-mode'));
-        updateMobileModeIcon();
-    }
-
-    function toggleNavbarDropdown() {
-        var dropdown = document.getElementById('navbar-dropdown');
-        dropdown.classList.toggle('show');
-    }
-
     function closeSidebarOnNav() {
         if (window.innerWidth <= 900) {
             var sidebar = document.getElementById('sidebar');
             var backdrop = document.getElementById('sidebar-backdrop');
             sidebar.classList.remove('open');
             if (backdrop) backdrop.remove();
-        }
-    }
-
-    window.onload = function () {
-        if (localStorage.getItem('dashboard-dark-mode') === 'true') {
-            document.body.classList.add('dark-mode');
-        }
-        updateMobileModeIcon();
-    }
-
-    window.onclick = function (event) {
-        if (!event.target.matches('.navbar-avatar')) {
-            var dropdown = document.getElementById('navbar-dropdown');
-            if (dropdown && dropdown.classList.contains('show')) {
-                dropdown.classList.remove('show');
-            }
-        }
-    }
-
-    function sidebarLogout() {
-        window.location.href = 'logout.php';
-    }
-
-    function toggleSidebarMobile() {
-        var sidebar = document.getElementById('sidebar');
-        sidebar.classList.toggle('open');
-    }
-
-    function updateMobileModeIcon() {
-        var icon = document.querySelector('.mobile-bottom-navbar .mode i');
-        if (!icon) return;
-        if (document.body.classList.contains('dark-mode')) {
-            icon.classList.remove('fa-moon');
-            icon.classList.add('fa-sun');
-        } else {
-            icon.classList.remove('fa-sun');
-            icon.classList.add('fa-moon');
         }
     }
 
@@ -232,13 +184,6 @@ html_start('Notifications');
     function clearFilters() {
         window.location.href = window.location.pathname;
     }
-
-    var origToggleDarkMode = window.toggleDarkMode;
-    window.toggleDarkMode = function () {
-        if (origToggleDarkMode) origToggleDarkMode();
-        updateMobileModeIcon();
-    };
-    document.addEventListener('DOMContentLoaded', updateMobileModeIcon);
 </script>
 <link rel="stylesheet" href="assets/css/notifications.css">
 <div class="dashboard-container">

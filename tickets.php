@@ -169,8 +169,7 @@ try {
     }
 
     // Fetch tickets based on user role
-    $is_admin = isset($dbUser['is_admin']) && $dbUser['is_admin'] == 1;
-    $isAdmin = $is_admin;
+    $isAdmin = (bool)($dbUser['is_admin'] ?? false);
 
     // Base conditions for tickets
     $conditions = [];
@@ -626,8 +625,8 @@ html_start('Tickets');
             $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
                 if (!selectedPriority) return true; // Show all if no priority selected
 
-                // Get the priority cell content - adjust index based on admin status
-                const priorityIndex = <?php echo $isAdmin ? '4' : '3'; ?>; // Priority column index
+                // Get the priority cell content - index differs between tables
+                const priorityIndex = (settings.sTableId === 'closedTicketsTable') ? 4 : 3; 
                 const priorityCell = data[priorityIndex];
 
                 // Try different methods to extract priority
@@ -671,8 +670,8 @@ html_start('Tickets');
                 $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
                     if (!selectedUser) return true; // Show all if no user selected
 
-                    // Get the user cell content
-                    const userCell = data[1]; // User name is in the 2nd column (index 1)
+                    // Get the user cell content (always index 1 for both tables)
+                    const userCell = data[1]; 
 
                     // Try different methods to extract user name
                     let userName = '';
@@ -808,7 +807,8 @@ html_start('Tickets');
                             // Update the row data
                             const rowData = table.row(row).data();
                             if (data.priority) {
-                                rowData[<?php echo $isAdmin ? '4' : '3'; ?>] = `<span class="badge ticket-priority-badge ${getPriorityClass(data.priority)}">
+                                const priorityIndex = (table.table().node().id === 'closedTicketsTable') ? 4 : 3;
+                                rowData[priorityIndex] = `<span class="badge ticket-priority-badge ${getPriorityClass(data.priority)}">
                                     <i class="bi bi-flag-fill"></i>
                                     ${data.priority}
                                 </span>`;
@@ -844,13 +844,15 @@ html_start('Tickets');
                                         break;
                                 }
                                 
-                                rowData[<?php echo $isAdmin ? '5' : '4'; ?>] = `<span class="badge ${badgeClass}">
+                                const statusIndex = (table.table().node().id === 'closedTicketsTable') ? 5 : 4;
+                                rowData[statusIndex] = `<span class="badge ${badgeClass}">
                                     <i class="bi ${iconClass}"></i>
                                     ${data.status}
                                 </span>`;
                             }
                             if (data.estimated_time) {
-                                rowData[<?php echo $isAdmin ? '6' : '5'; ?>] = data.estimated_time;
+                                const estTimeIndex = (table.table().node().id === 'closedTicketsTable') ? 6 : 5;
+                                rowData[estTimeIndex] = data.estimated_time;
                             }
 
                             // Update the row and redraw
@@ -1487,7 +1489,7 @@ html_start('Tickets');
             <div class="d-flex justify-content-between align-items-center">
                 <h2 class="main-title">Tickets</h2>
                 <div class="header-actions">
-                    <div class="d-flex gap-2">
+                    <div class="d-flex gap-2 align-items-center">
                         <!-- Quick Ticket Search -->
                         <div class="quick-search" style="position:relative;">
                             <div class="input-group">
@@ -1501,6 +1503,28 @@ html_start('Tickets');
                                 style="width:100%;display:none;max-height:300px;overflow-y:auto;">
                             </div>
                         </div>
+
+                        <!-- Priority Filter -->
+                        <select id="priorityFilter" class="form-select" style="width: auto;">
+                            <option value="">All Priorities</option>
+                            <option value="LOW">Low</option>
+                            <option value="MEDIUM">Medium</option>
+                            <option value="HIGH">High</option>
+                            <option value="URGENT">Urgent</option>
+                        </select>
+
+                        <!-- User Filter (Admin Only) -->
+                        <?php if ($isAdmin && !empty($allUsers)): ?>
+                            <select id="userFilter" class="form-select" style="width: auto;">
+                                <option value="">All Users</option>
+                                <?php foreach ($allUsers as $u): ?>
+                                    <option value="<?php echo htmlspecialchars($u['name']); ?>">
+                                        <?php echo htmlspecialchars($u['name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        <?php endif; ?>
+
                         <?php if ($isAdmin): ?>
                             <button class="btn btn-primary" onclick="showNewTicketModal()">
                                 <i class="bi bi-plus-lg"></i> New Ticket
@@ -1536,17 +1560,10 @@ html_start('Tickets');
                                 <th>ID</th>
                                 <th>User</th>
                                 <th>Subject</th>
-                                <?php if ($isAdmin): ?>
-                                    <th>Priority</th>
-                                    <th>Status</th>
-                                    <th>Est. Time</th>
-                                    <th>Actions</th>
-                                <?php else: ?>
-                                    <th>Priority</th>
-                                    <th>Status</th>
-                                    <th>Est. Time</th>
-                                    <th>Actions</th>
-                                <?php endif; ?>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Est. Time</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1644,17 +1661,10 @@ html_start('Tickets');
                                 <th>User</th>
                                 <th>Type</th>
                                 <th>Subject</th>
-                                <?php if ($isAdmin): ?>
-                                    <th>Priority</th>
-                                    <th>Status</th>
-                                    <th>Est. Time</th>
-                                    <th>Actions</th>
-                                <?php else: ?>
-                                    <th>Priority</th>
-                                    <th>Status</th>
-                                    <th>Est. Time</th>
-                                    <th>Actions</th>
-                                <?php endif; ?>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Est. Time</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
