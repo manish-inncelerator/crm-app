@@ -531,32 +531,6 @@ html_start('Tickets');
         }
     }
 
-    // Handle Edit Ticket form submission
-    document.getElementById('editTicketForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        const data = Object.fromEntries(formData.entries());
-
-        try {
-            const response = await fetch('api/edit-ticket.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            const result = await response.json();
-
-            if (result.success) {
-                showToast('Success', 'Ticket updated successfully', 'success');
-                bootstrap.Modal.getInstance(document.getElementById('editTicketModal')).hide();
-                location.reload(); // Reload to show updated data in table
-            } else {
-                showToast('Error', result.error || 'Failed to update ticket', 'danger');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            showToast('Error', 'An unexpected error occurred', 'danger');
-        }
-    });
 
     // Auto-trim booking reference inputs
     document.addEventListener('input', function(e) {
@@ -566,6 +540,36 @@ html_start('Tickets');
     });
 
     $(document).ready(function () {
+        // Handle Edit Ticket form submission
+        const editTicketForm = document.getElementById('editTicketForm');
+        if (editTicketForm) {
+            editTicketForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData.entries());
+
+                try {
+                    const response = await fetch('api/edit-ticket.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showToast('Success', 'Ticket updated successfully', 'success');
+                        bootstrap.Modal.getInstance(document.getElementById('editTicketModal')).hide();
+                        location.reload(); // Reload to show updated data in table
+                    } else {
+                        showToast('Error', result.error || 'Failed to update ticket', 'danger');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('Error', 'An unexpected error occurred', 'danger');
+                }
+            });
+        }
+
         // Initialize DataTable for open tickets
         const openTable = $('#openTicketsTable').DataTable({
             dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rtip',
@@ -900,71 +904,123 @@ html_start('Tickets');
                             // Remove any existing highlight class
                             row.classList.remove('highlight-update');
 
-                            // Force a reflow to restart the animation
-                            void row.offsetWidth;
+            // Handle Update Ticket button click
+            const updateTicketBtn = document.getElementById('updateTicketBtn');
+            if (updateTicketBtn) {
+                updateTicketBtn.addEventListener('click', async function () {
+                    const form = document.getElementById('ticketUpdateForm');
+                    const formData = new FormData(form);
+                    const data = Object.fromEntries(formData.entries());
 
-                            // Add highlight class
-                            row.classList.add('highlight-update');
-
-                            // Update the row data
-                            const rowData = table.row(row).data();
-                            if (data.priority) {
-                                const priorityIndex = (table.table().node().id === 'closedTicketsTable') ? 6 : 5;
-                                rowData[priorityIndex] = `<span class="badge ticket-priority-badge ${getPriorityClass(data.priority)}">
-                                    <i class="bi bi-flag-fill"></i>
-                                    ${data.priority}
-                                </span>`;
-                            }
-                            if (data.status) {
-                                let badgeClass = 'bg-secondary';
-                                let iconClass = 'bi-clock-fill';
-                                
-                                switch(data.status) {
-                                    case 'CLOSED':
-                                    case 'APPROVED':
-                                    case 'PROCESSED':
-                                        badgeClass = 'bg-success';
-                                        iconClass = 'bi-check-circle-fill';
-                                        break;
-                                    case 'IN_PROGRESS':
-                                    case 'UNDER_REVIEW':
-                                        badgeClass = 'bg-info';
-                                        iconClass = 'bi-arrow-repeat';
-                                        break;
-                                    case 'PENDING_APPROVAL':
-                                        badgeClass = 'bg-orange';
-                                        iconClass = 'bi-hourglass-split';
-                                        break;
-                                    case 'REJECTED':
-                                        badgeClass = 'bg-danger';
-                                        iconClass = 'bi-x-circle-fill';
-                                        break;
-                                    case 'SUBMITTED':
-                                    case 'OPEN':
-                                        badgeClass = 'bg-warning text-dark';
-                                        iconClass = 'bi-clock-fill';
-                                        break;
-                                }
-                                
-                                const statusIndex = (table.table().node().id === 'closedTicketsTable') ? 7 : 6;
-                                rowData[statusIndex] = `<span class="badge ${badgeClass}">
-                                    <i class="bi ${iconClass}"></i>
-                                    ${data.status}
-                                </span>`;
-                            }
-
-                            // Update the row and redraw
-                            table.row(row).data(rowData).draw(false);
-                        }
-                    } else {
-                        throw new Error(result.error || 'Failed to update ticket');
+                    // If refund status is used, override normal status
+                    if (data.refund_status && !document.getElementById('refundStatusContainer').classList.contains('d-none')) {
+                        data.status = data.refund_status;
                     }
-                } catch (error) {
-                    // Show error toast
-                    showToast('Error', error.message, 'error');
-                    console.error('Error details:', error);
-                }
-            });
+
+                    // Add estimated_time_changed flag if estimated_time was changed
+                    const currentEstimatedTime = data.estimated_time || '';
+                    data.estimated_time_changed = (currentEstimatedTime !== originalEstimatedTime);
+
+                    try {
+                        const response = await fetch('api/update-ticket.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            // Show success toast
+                            showToast('Success', result.message, 'success');
+
+                            // Close modal
+                            bootstrap.Modal.getInstance(ticketModal).hide();
+
+                            // Find and highlight the updated row
+                            const ticketId = data.ticket_id;
+                            const ticketType = data.ticket_type;
+                            const table = ticketType === 'Estimate' ? openTable : closedTable;
+
+                            // Find the row by ticket ID
+                            const row = table.row((idx, rowData) => {
+                                // Extract ticket ID from the first column
+                                const rowTicketId = rowData[0].toString();
+                                return rowTicketId === ticketId.toString();
+                            }).node();
+
+                            if (row) {
+                                // Remove any existing highlight class
+                                row.classList.remove('highlight-update');
+
+                                // Force a reflow to restart the animation
+                                void row.offsetWidth;
+
+                                // Add highlight class
+                                row.classList.add('highlight-update');
+
+                                // Update the row data
+                                const rowData = table.row(row).data();
+                                if (data.priority) {
+                                    const priorityIndex = (table.table().node().id === 'closedTicketsTable') ? 6 : 5;
+                                    rowData[priorityIndex] = `<span class="badge ticket-priority-badge ${getPriorityClass(data.priority)}">
+                                        <i class="bi bi-flag-fill"></i>
+                                        ${data.priority}
+                                    </span>`;
+                                }
+                                if (data.status) {
+                                    let badgeClass = 'bg-secondary';
+                                    let iconClass = 'bi-clock-fill';
+                                    
+                                    switch(data.status) {
+                                        case 'CLOSED':
+                                        case 'APPROVED':
+                                        case 'PROCESSED':
+                                            badgeClass = 'bg-success';
+                                            iconClass = 'bi-check-circle-fill';
+                                            break;
+                                        case 'IN_PROGRESS':
+                                        case 'UNDER_REVIEW':
+                                            badgeClass = 'bg-info';
+                                            iconClass = 'bi-arrow-repeat';
+                                            break;
+                                        case 'PENDING_APPROVAL':
+                                            badgeClass = 'bg-orange';
+                                            iconClass = 'bi-hourglass-split';
+                                            break;
+                                        case 'REJECTED':
+                                            badgeClass = 'bg-danger';
+                                            iconClass = 'bi-x-circle-fill';
+                                            break;
+                                        case 'SUBMITTED':
+                                        case 'OPEN':
+                                            badgeClass = 'bg-warning text-dark';
+                                            iconClass = 'bi-clock-fill';
+                                            break;
+                                    }
+                                    
+                                    const statusIndex = (table.table().node().id === 'closedTicketsTable') ? 7 : 6;
+                                    rowData[statusIndex] = `<span class="badge ${badgeClass}">
+                                        <i class="bi ${iconClass}"></i>
+                                        ${data.status}
+                                    </span>`;
+                                }
+
+                                // Update the row and redraw
+                                table.row(row).data(rowData).draw(false);
+                            }
+                        } else {
+                            throw new Error(result.error || 'Failed to update ticket');
+                        }
+                    } catch (error) {
+                        // Show error toast
+                        showToast('Error', error.message, 'error');
+                        console.error('Error details:', error);
+                    }
+                });
+            }
         }
 
         // View Ticket Modal
@@ -1517,43 +1573,27 @@ html_start('Tickets');
     });
 
     // Add these new functions for quick ticket search
-    let searchTimeout = null;
+    const quickSearch = document.getElementById('quickTicketSearch');
+    if (quickSearch) {
+        quickSearch.addEventListener('input', function (e) {
+            const query = e.target.value.trim();
+            const resultsDiv = document.getElementById('quickSearchResults');
+            const type = 'all';
 
-    document.getElementById('quickTicketSearch').addEventListener('input', function (e) {
-        clearTimeout(searchTimeout);
-        const searchTerm = e.target.value.trim();
+            if (query.length < 2) {
+                resultsDiv.classList.remove('show');
+                return;
+            }
 
-        if (searchTerm.length < 1) {
-            document.getElementById('quickSearchResults').style.display = 'none';
-            return;
-        }
+            fetch(`api/get-ticket.php?action=search&query=${encodeURIComponent(query)}&type=${type}`)
+                .then(response => response.json())
+                .then(data => {
+                    resultsDiv.innerHTML = '';
+                    let resultsFound = false;
 
-        searchTimeout = setTimeout(() => {
-            // Search in all ticket types
-            const ticketTypes = ['estimate', 'supplier', 'general'];
-            let resultsFound = false;
-
-            Promise.all(ticketTypes.map(type =>
-                fetch(`api/tickets.php?type=${type}&search=${searchTerm}`)
-                    .then(response => response.json())
-                    .then(data => ({
-                        type,
-                        data
-                    }))
-            )).then(results => {
-                const resultsDiv = document.getElementById('quickSearchResults');
-                resultsDiv.innerHTML = '';
-
-                results.forEach(({
-                    type,
-                    data
-                }) => {
-                    if (data.tickets && data.tickets.length > 0) {
+                    if (data.success && data.tickets && data.tickets.length > 0) {
                         resultsFound = true;
-                        const typeHeader = document.createElement('div');
-                        typeHeader.className = 'dropdown-header';
-                        typeHeader.textContent = type.charAt(0).toUpperCase() + type.slice(1) + ' Tickets';
-                        resultsDiv.appendChild(typeHeader);
+                        resultsDiv.classList.add('show');
 
                         data.tickets.forEach(ticket => {
                             const item = document.createElement('a');
@@ -1571,19 +1611,25 @@ html_start('Tickets');
                             resultsDiv.appendChild(item);
                         });
                     }
+
+                    if (!resultsFound) {
+                        const noResults = document.createElement('div');
+                        noResults.className = 'dropdown-item text-muted';
+                        noResults.textContent = 'No tickets found';
+                        resultsDiv.appendChild(noResults);
+                        resultsDiv.classList.add('show');
+                    }
                 });
+        });
 
-                if (!resultsFound) {
-                    const noResults = document.createElement('div');
-                    noResults.className = 'dropdown-item text-muted';
-                    noResults.textContent = 'No tickets found';
-                    resultsDiv.appendChild(noResults);
-                }
-
-                resultsDiv.style.display = 'block';
-            });
-        }, 300);
-    });
+        quickSearch.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                document.getElementById('quickSearchResults').classList.remove('show');
+            } else if (e.key === 'Enter') {
+                searchTicket();
+            }
+        });
+    }
 
     function searchTicket() {
         const searchTerm = document.getElementById('quickTicketSearch').value.trim();
