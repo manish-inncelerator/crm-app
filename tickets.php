@@ -752,6 +752,25 @@ html_start('Tickets');
                 document.getElementById('ticketEstimatedTime').value = ticketEstimatedTime || '';
                 document.getElementById('ticketComment').value = '';
 
+                // Handle Refund-specific statuses
+                const subject = button.closest('tr').querySelector('td:nth-child(4)').textContent.trim().toLowerCase();
+                const isRefund = subject.includes('refund');
+                const refundContainer = document.getElementById('refundStatusContainer');
+                const normalStatusContainer = document.getElementById('ticketStatus').parentElement;
+
+                if (isRefund) {
+                    refundContainer.classList.remove('d-none');
+                    normalStatusContainer.classList.add('d-none');
+                    document.getElementById('refundStatus').value = ticketStatus;
+                    document.getElementById('ticketStatus').removeAttribute('required');
+                    document.getElementById('refundStatus').setAttribute('required', 'required');
+                } else {
+                    refundContainer.classList.add('d-none');
+                    normalStatusContainer.classList.remove('d-none');
+                    document.getElementById('ticketStatus').setAttribute('required', 'required');
+                    document.getElementById('refundStatus').removeAttribute('required');
+                }
+
                 // Store the original estimated time for change detection
                 originalEstimatedTime = ticketEstimatedTime || '';
             });
@@ -761,6 +780,11 @@ html_start('Tickets');
                 const form = document.getElementById('ticketUpdateForm');
                 const formData = new FormData(form);
                 const data = Object.fromEntries(formData.entries());
+
+                // If refund status is used, override normal status
+                if (data.refund_status && !document.getElementById('refundStatusContainer').classList.contains('d-none')) {
+                    data.status = data.refund_status;
+                }
 
                 // Add estimated_time_changed flag if estimated_time was changed
                 const currentEstimatedTime = data.estimated_time || '';
@@ -815,8 +839,38 @@ html_start('Tickets');
                                 </span>`;
                             }
                             if (data.status) {
-                                rowData[<?php echo $isAdmin ? '5' : '4'; ?>] = `<span class="badge ${data.status === 'CLOSED' ? 'bg-success' : data.status === 'IN_PROGRESS' ? 'bg-info' : 'bg-warning text-dark'}">
-                                    <i class="bi ${data.status === 'CLOSED' ? 'bi-check-circle-fill' : data.status === 'IN_PROGRESS' ? 'bi-arrow-repeat' : 'bi-clock-fill'}"></i>
+                                let badgeClass = 'bg-secondary';
+                                let iconClass = 'bi-clock-fill';
+                                
+                                switch(data.status) {
+                                    case 'CLOSED':
+                                    case 'APPROVED':
+                                    case 'PROCESSED':
+                                        badgeClass = 'bg-success';
+                                        iconClass = 'bi-check-circle-fill';
+                                        break;
+                                    case 'IN_PROGRESS':
+                                    case 'UNDER_REVIEW':
+                                        badgeClass = 'bg-info';
+                                        iconClass = 'bi-arrow-repeat';
+                                        break;
+                                    case 'PENDING_APPROVAL':
+                                        badgeClass = 'bg-orange';
+                                        iconClass = 'bi-hourglass-split';
+                                        break;
+                                    case 'REJECTED':
+                                        badgeClass = 'bg-danger';
+                                        iconClass = 'bi-x-circle-fill';
+                                        break;
+                                    case 'SUBMITTED':
+                                    case 'OPEN':
+                                        badgeClass = 'bg-warning text-dark';
+                                        iconClass = 'bi-clock-fill';
+                                        break;
+                                }
+                                
+                                rowData[<?php echo $isAdmin ? '5' : '4'; ?>] = `<span class="badge ${badgeClass}">
+                                    <i class="bi ${iconClass}"></i>
                                     ${data.status}
                                 </span>`;
                             }
@@ -948,6 +1002,46 @@ html_start('Tickets');
                                     </div>
                                 </div>
                             </div>`;
+
+                        // Add Approval Progress for Refunds
+                        const isRefund = (ticket.ticket_subtype || '').toLowerCase().includes('refund');
+                        if (isRefund) {
+                            const steps = [
+                                { id: 'SUBMITTED', label: 'Submitted', icon: 'bi-send' },
+                                { id: 'UNDER_REVIEW', label: 'Review', icon: 'bi-search' },
+                                { id: 'PENDING_APPROVAL', label: 'Pending', icon: 'bi-hourglass' },
+                                { id: 'APPROVED', label: 'Approved', icon: 'bi-check2-circle' },
+                                { id: 'PROCESSED', label: 'Processed', icon: 'bi-flag' }
+                            ];
+                            
+                            let currentStepIndex = steps.findIndex(s => s.id === ticket.status);
+                            if (ticket.status === 'REJECTED') currentStepIndex = 3; // Position of Approved/Rejected
+
+                            let progressHtml = `
+                                <div class="ticket-details-section">
+                                    <h6><i class="bi bi-diagram-3"></i> Approval Flow</h6>
+                                    <div class="approval-progress">
+                                        ${steps.map((step, index) => {
+                                            let statusClass = '';
+                                            if (ticket.status === 'REJECTED' && index === 3) statusClass = 'rejected';
+                                            else if (index < currentStepIndex) statusClass = 'completed';
+                                            else if (index === currentStepIndex) statusClass = 'active';
+                                            
+                                            const label = (ticket.status === 'REJECTED' && index === 3) ? 'Rejected' : step.label;
+                                            const icon = (ticket.status === 'REJECTED' && index === 3) ? 'bi-x-circle' : step.icon;
+
+                                            return `
+                                                <div class="approval-step ${statusClass}">
+                                                    <div class="step-icon"><i class="bi ${icon}"></i></div>
+                                                    <div class="step-label">${label}</div>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
+                            `;
+                            html = progressHtml + html;
+                        }
 
                         // Add type-specific fields
                         if (ticket.type === 'Estimate') {
@@ -1504,9 +1598,26 @@ html_start('Tickets');
                                     </td>
                                     <td>
                                         <span
-                                            class="badge <?php echo $ticket['status'] === 'CLOSED' ? 'bg-success' : ($ticket['status'] === 'IN_PROGRESS' ? 'bg-info' : 'bg-warning text-dark'); ?>">
+                                            class="badge <?php 
+                                                echo match($ticket['status']) {
+                                                    'CLOSED', 'APPROVED', 'PROCESSED' => 'bg-success',
+                                                    'IN_PROGRESS', 'UNDER_REVIEW' => 'bg-info',
+                                                    'PENDING_APPROVAL' => 'bg-orange',
+                                                    'REJECTED' => 'bg-danger',
+                                                    'SUBMITTED', 'OPEN' => 'bg-warning text-dark',
+                                                    default => 'bg-secondary'
+                                                };
+                                            ?>">
                                             <i
-                                                class="bi <?php echo $ticket['status'] === 'CLOSED' ? 'bi-check-circle-fill' : ($ticket['status'] === 'IN_PROGRESS' ? 'bi-arrow-repeat' : 'bi-clock-fill'); ?>"></i>
+                                                class="bi <?php 
+                                                    echo match($ticket['status']) {
+                                                        'CLOSED', 'APPROVED', 'PROCESSED' => 'bi-check-circle-fill',
+                                                        'IN_PROGRESS', 'UNDER_REVIEW' => 'bi-arrow-repeat',
+                                                        'PENDING_APPROVAL' => 'bi-hourglass-split',
+                                                        'REJECTED' => 'bi-x-circle-fill',
+                                                        default => 'bi-clock-fill'
+                                                    };
+                                                ?>"></i>
                                             <?php echo $ticket['status']; ?>
                                         </span>
                                     </td>
@@ -1601,9 +1712,26 @@ html_start('Tickets');
                                     </td>
                                     <td>
                                         <span
-                                            class="badge <?php echo $ticket['status'] === 'CLOSED' ? 'bg-success' : ($ticket['status'] === 'IN_PROGRESS' ? 'bg-info' : 'bg-warning text-dark'); ?>">
+                                            class="badge <?php 
+                                                echo match($ticket['status']) {
+                                                    'CLOSED', 'APPROVED', 'PROCESSED' => 'bg-success',
+                                                    'IN_PROGRESS', 'UNDER_REVIEW' => 'bg-info',
+                                                    'PENDING_APPROVAL' => 'bg-orange',
+                                                    'REJECTED' => 'bg-danger',
+                                                    'SUBMITTED', 'OPEN' => 'bg-warning text-dark',
+                                                    default => 'bg-secondary'
+                                                };
+                                            ?>">
                                             <i
-                                                class="bi <?php echo $ticket['status'] === 'CLOSED' ? 'bi-check-circle-fill' : ($ticket['status'] === 'IN_PROGRESS' ? 'bi-arrow-repeat' : 'bi-clock-fill'); ?>"></i>
+                                                class="bi <?php 
+                                                    echo match($ticket['status']) {
+                                                        'CLOSED', 'APPROVED', 'PROCESSED' => 'bi-check-circle-fill',
+                                                        'IN_PROGRESS', 'UNDER_REVIEW' => 'bi-arrow-repeat',
+                                                        'PENDING_APPROVAL' => 'bi-hourglass-split',
+                                                        'REJECTED' => 'bi-x-circle-fill',
+                                                        default => 'bi-clock-fill'
+                                                    };
+                                                ?>"></i>
                                             <?php echo $ticket['status']; ?>
                                         </span>
                                     </td>
@@ -1717,6 +1845,17 @@ html_start('Tickets');
                                 <option value="OPEN">Open</option>
                                 <option value="IN_PROGRESS">In Progress</option>
                                 <option value="CLOSED">Closed</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 d-none" id="refundStatusContainer">
+                            <label class="form-label">Refund Approval Step</label>
+                            <select class="form-select" id="refundStatus" name="refund_status">
+                                <option value="SUBMITTED">Submitted (Consultant)</option>
+                                <option value="UNDER_REVIEW">Under Review (Rupesh)</option>
+                                <option value="PENDING_APPROVAL">Pending Approval (Rupesh)</option>
+                                <option value="APPROVED">Approved (Sehar / Muhammad)</option>
+                                <option value="REJECTED">Rejected (Sehar / Muhammad)</option>
+                                <option value="PROCESSED">Processed (Final)</option>
                             </select>
                         </div>
 

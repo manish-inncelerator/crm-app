@@ -244,3 +244,94 @@ body.dark-mode .paginate_button.current {
     border-color: #818cf8 !important;
     color: #818cf8 !important;
 }
+
+/* Approval Progress Bar */
+.approval-progress {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    position: relative;
+    padding: 0 1rem;
+}
+
+.approval-progress::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 2rem;
+    right: 2rem;
+    height: 2px;
+    background: #e2e8f0;
+    z-index: 1;
+}
+
+body.dark-mode .approval-progress::before {
+    background: #334155;
+}
+
+.approval-step {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 20%;
+}
+
+.step-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .step-icon {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+.step-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #64748b;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.approval-step.active .step-icon {
+    border-color: #4f46e5;
+    background: #eef2ff;
+    color: #4f46e5;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.approval-step.completed .step-icon {
+    background: #10b981;
+    border-color: #10b981;
+    color: #ffffff;
+}
+
+.approval-step.rejected .step-icon {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: #ffffff;
+}
+
+.approval-step.active .step-label {
+    color: #4f46e5;
+}
+
+.approval-step.completed .step-label {
+    color: #10b981;
+}
+
+/* Custom Status Badges */
+.bg-purple { background-color: #8b5cf6 !important; color: #ffffff !important; }
+.bg-teal { background-color: #14b8a6 !important; color: #ffffff !important; }
+.bg-orange { background-color: #f97316 !important; color: #ffffff !important; }

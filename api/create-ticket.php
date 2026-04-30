@@ -59,7 +59,7 @@ try {
     $commonFields = [
         'user_id' => $dbUser['id'],
         'priority' => $data['priority'] ?? 'MEDIUM',
-        'status' => 'OPEN',
+        'status' => ($data['ticket_type'] === 'refund' || ($data['ticket_type'] === 'general' && isset($data['ticket_subtype']) && $data['ticket_subtype'] === 'Customers Refund')) ? 'SUBMITTED' : 'OPEN',
         'created_at' => date('Y-m-d H:i:s')
     ];
 
