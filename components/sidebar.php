@@ -6,7 +6,7 @@
     <div class="sidebar-logo">
         <div style="display: flex; align-items: center; gap: 0.75rem;">
             <span class="sidebar-logo-icon"><i class="bi bi-layers-fill"></i></span>
-            <span class="sidebar-logo-text">Fayyaz CRM</span>
+            <span class="sidebar-logo-text">Accounts Ticketing System</span>
         </div>
         <button class="sidebar-close d-md-none" id="sidebar-close" aria-label="Close sidebar">
             <i class="bi bi-x-lg"></i>

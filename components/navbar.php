@@ -300,15 +300,13 @@
             </button>
             <a href="dashboard.php" class="navbar-brand">
                 <span class="navbar-brand-icon">✈️</span>
-                <span>Fayyaz CRM</span>
+                <span>Accounts Ticketing System</span>
             </a>
         </div>
 
         <div class="navbar-center">
             <div class="navbar-breadcrumb">
-                <a href="dashboard.php">Dashboard</a>
-                <span>/</span>
-                <span id="current-page-label">Current Page</span>
+                <span id="current-page-label">Dashboard</span>
             </div>
         </div>
 
@@ -335,10 +333,15 @@
     function updateNavbarState() {
         const page = window.location.pathname.split('/').pop() || 'dashboard.php';
         const pageNames = {
-            'dashboard.php': 'Dashboard',
-            'tickets.php': 'Tickets',
-            'notifications.php': 'Notifications',
-            'messages.php': 'Messages'
+            'dashboard.php': 'Dashboard Overview',
+            'tickets.php': 'Ticket Management',
+            'create-ticket.php': 'Create New Ticket',
+            'notifications.php': 'Notifications Center',
+            'messages.php': 'Internal Messages',
+            'timeline.php': 'Audit Timeline',
+            'knowledgebase.php': 'Knowledge Base',
+            'manage-kb.php': 'KB Administration',
+            'users.php': 'User Management'
         };
 
         const label = document.getElementById('current-page-label');
