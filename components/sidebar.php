@@ -121,12 +121,8 @@
         }
     };
 
-    // Patch toggleDarkMode to update icon
-    var origToggleDarkMode = window.toggleDarkMode;
-    window.toggleDarkMode = function () {
-        if (origToggleDarkMode) origToggleDarkMode();
-        updateModeIcon();
-    };
+    // Listen for theme changes
+    window.addEventListener('themeChanged', updateModeIcon);
 
     // Close sidebar on mobile when clicking outside
     const sidebar = document.getElementById('sidebar');

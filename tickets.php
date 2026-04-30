@@ -469,31 +469,6 @@ html_start('Tickets');
         return '';
     }
 
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('dashboard-dark-mode', document.body.classList.contains('dark-mode'));
-        updateMobileModeIcon();
-    }
-
-    function updateMobileModeIcon() {
-        var icon = document.querySelector('.mobile-bottom-navbar .mode i');
-        if (!icon) return;
-        if (document.body.classList.contains('dark-mode')) {
-            icon.classList.remove('fa-moon');
-            icon.classList.add('fa-sun');
-        } else {
-            icon.classList.remove('fa-sun');
-            icon.classList.add('fa-moon');
-        }
-    }
-
-    window.onload = function () {
-        if (localStorage.getItem('dashboard-dark-mode') === 'true') {
-            document.body.classList.add('dark-mode');
-        }
-        updateMobileModeIcon();
-    }
-
     function sidebarLogout() {
         window.location.href = 'logout.php';
     }

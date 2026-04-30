@@ -57,7 +57,27 @@ function html_start($title = 'CRM System', $additional_css = [])
         ?>
     </head>
 
-    <body>
+    <body class="<?php echo isset($_COOKIE['dark_mode']) && $_COOKIE['dark_mode'] === 'true' ? 'dark-mode' : ''; ?>">
+        <script>
+            // Immediate theme initialization to prevent flash
+            (function() {
+                const savedMode = localStorage.getItem('dashboard-dark-mode');
+                if (savedMode === 'true') {
+                    document.body.classList.add('dark-mode');
+                } else if (savedMode === 'false') {
+                    document.body.classList.remove('dark-mode');
+                }
+            })();
+
+            function toggleDarkMode() {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                localStorage.setItem('dashboard-dark-mode', isDark);
+                
+                // Dispatch custom event for components to update their icons
+                window.dispatchEvent(new CustomEvent('themeChanged', { detail: { isDark } }));
+            }
+        </script>
     <?php
     ob_end_flush(); // Flush the output buffer
 }

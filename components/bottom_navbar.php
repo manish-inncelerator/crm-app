@@ -60,5 +60,18 @@
                 ticking = true;
             }
         });
+
+        // Theme sync for mobile bottom navbar
+        function updateMobileModeIcon() {
+            var icon = document.querySelector('.mobile-bottom-navbar .mode i');
+            if (!icon) return;
+            if (document.body.classList.contains('dark-mode')) {
+                icon.className = 'fas fa-sun';
+            } else {
+                icon.className = 'fas fa-moon';
+            }
+        }
+        window.addEventListener('themeChanged', updateMobileModeIcon);
+        document.addEventListener('DOMContentLoaded', updateMobileModeIcon);
     })();
 </script>

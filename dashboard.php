@@ -171,28 +171,12 @@ html_start('Dashboard - Fayyaz Travels CRM', ['assets/css/dashboard.css']);
         }
     }
 
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('dashboard-dark-mode', document.body.classList.contains('dark-mode'));
-    }
-
-    function toggleNavbarDropdown() {
-        var dropdown = document.getElementById('navbar-dropdown');
-        dropdown.classList.toggle('show');
-    }
-
     function closeSidebarOnNav() {
         if (window.innerWidth <= 900) {
             var sidebar = document.getElementById('sidebar');
             var backdrop = document.getElementById('sidebar-backdrop');
             sidebar.classList.remove('open');
             if (backdrop) backdrop.remove();
-        }
-    }
-
-    window.onload = function () {
-        if (localStorage.getItem('dashboard-dark-mode') === 'true') {
-            document.body.classList.add('dark-mode');
         }
     }
 

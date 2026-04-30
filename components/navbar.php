@@ -360,12 +360,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', updateNavbarState);
-
-    var origToggleDarkMode = window.toggleDarkMode;
-    window.toggleDarkMode = function () {
-        if (origToggleDarkMode) origToggleDarkMode();
-        updateNavbarState();
-    };
+    window.addEventListener('themeChanged', updateNavbarState);
 
     const mobileHamburger = document.getElementById('mobile-hamburger');
     if (mobileHamburger) {

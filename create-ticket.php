@@ -86,17 +86,7 @@ try {
 html_start('Create Ticket');
 ?>
 
-<script>
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('dashboard-dark-mode', document.body.classList.contains('dark-mode'));
-    }
-    window.onload = function() {
-        if (localStorage.getItem('dashboard-dark-mode') === 'true') {
-            document.body.classList.add('dark-mode');
-        }
-    }
-</script>
+
 <link rel="stylesheet" href="assets/css/dashboard.css">
 <style>
     /* Only override the close icon in dark mode */
@@ -106,6 +96,11 @@ html_start('Create Ticket');
 
     .modal .btn-close:hover {
         opacity: 0.75;
+    }
+
+    .modal .form-control,
+    .modal .form-select {
+        border: 1px solid var(--dash-border);
     }
 
     .dashboard-main-area {
