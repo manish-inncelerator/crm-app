@@ -855,54 +855,6 @@ html_start('Tickets');
                 originalEstimatedTime = ticketEstimatedTime || '';
             });
 
-            // Handle ticket update
-            document.getElementById('updateTicketBtn').addEventListener('click', async function () {
-                const form = document.getElementById('ticketUpdateForm');
-                const formData = new FormData(form);
-                const data = Object.fromEntries(formData.entries());
-
-                // If refund status is used, override normal status
-                if (data.refund_status && !document.getElementById('refundStatusContainer').classList.contains('d-none')) {
-                    data.status = data.refund_status;
-                }
-
-                // Add estimated_time_changed flag if estimated_time was changed
-                const currentEstimatedTime = data.estimated_time || '';
-                data.estimated_time_changed = (currentEstimatedTime !== originalEstimatedTime);
-
-                try {
-                    const response = await fetch('api/update-ticket.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
-                    });
-
-                    const result = await response.json();
-
-                    if (result.success) {
-                        // Show success toast
-                        showToast('Success', result.message, 'success');
-
-                        // Close modal
-                        bootstrap.Modal.getInstance(ticketModal).hide();
-
-                        // Find and highlight the updated row
-                        const ticketId = data.ticket_id;
-                        const ticketType = data.ticket_type;
-                        const table = ticketType === 'Estimate' ? openTable : closedTable;
-
-                        // Find the row by ticket ID
-                        const row = table.row((idx, rowData) => {
-                            // Extract ticket ID from the first column
-                            const rowTicketId = rowData[0].toString();
-                            return rowTicketId === ticketId.toString();
-                        }).node();
-
-                        if (row) {
-                            // Remove any existing highlight class
-                            row.classList.remove('highlight-update');
 
             // Handle Update Ticket button click
             const updateTicketBtn = document.getElementById('updateTicketBtn');
@@ -1021,7 +973,7 @@ html_start('Tickets');
                     }
                 });
             }
-        }
+        });
 
         // View Ticket Modal
         const viewTicketModal = document.getElementById('viewTicketModal');
@@ -1570,71 +1522,73 @@ html_start('Tickets');
                     return 'bg-secondary';
             }
         }
+        // Add these new functions for quick ticket search
+        const quickSearch = document.getElementById('quickTicketSearch');
+        if (quickSearch) {
+            quickSearch.addEventListener('input', function (e) {
+                const query = e.target.value.trim();
+                const resultsDiv = document.getElementById('quickSearchResults');
+                const type = 'all';
+
+                if (query.length < 2) {
+                    resultsDiv.classList.remove('show');
+                    return;
+                }
+
+                fetch(`api/get-ticket.php?action=search&query=${encodeURIComponent(query)}&type=${type}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        resultsDiv.innerHTML = '';
+                        let resultsFound = false;
+
+                        if (data.success && data.tickets && data.tickets.length > 0) {
+                            resultsFound = true;
+                            resultsDiv.classList.add('show');
+
+                            data.tickets.forEach(ticket => {
+                                const item = document.createElement('a');
+                                item.className = 'dropdown-item';
+                                item.href = `tickets.php?id=${ticket.id}&type=${type}`;
+                                item.innerHTML = `
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>#${ticket.id}</strong> - ${ticket.subject}
+                                        </div>
+                                        <span class="badge ${getPriorityClass(ticket.priority)}">${ticket.priority}</span>
+                                    </div>
+                                    <small class="text-muted">${ticket.status} - ${timeAgoJS(ticket.created_at)}</small>
+                                `;
+                                resultsDiv.appendChild(item);
+                            });
+                        }
+
+                        if (!resultsFound) {
+                            const noResults = document.createElement('div');
+                            noResults.className = 'dropdown-item text-muted';
+                            noResults.textContent = 'No tickets found';
+                            resultsDiv.appendChild(noResults);
+                            resultsDiv.classList.add('show');
+                        }
+                    });
+            });
+
+            quickSearch.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    document.getElementById('quickSearchResults').classList.remove('show');
+                } else if (e.key === 'Enter') {
+                    searchTicket();
+                }
+            });
+        }
     });
 
-    // Add these new functions for quick ticket search
-    const quickSearch = document.getElementById('quickTicketSearch');
-    if (quickSearch) {
-        quickSearch.addEventListener('input', function (e) {
-            const query = e.target.value.trim();
-            const resultsDiv = document.getElementById('quickSearchResults');
-            const type = 'all';
-
-            if (query.length < 2) {
-                resultsDiv.classList.remove('show');
-                return;
-            }
-
-            fetch(`api/get-ticket.php?action=search&query=${encodeURIComponent(query)}&type=${type}`)
-                .then(response => response.json())
-                .then(data => {
-                    resultsDiv.innerHTML = '';
-                    let resultsFound = false;
-
-                    if (data.success && data.tickets && data.tickets.length > 0) {
-                        resultsFound = true;
-                        resultsDiv.classList.add('show');
-
-                        data.tickets.forEach(ticket => {
-                            const item = document.createElement('a');
-                            item.className = 'dropdown-item';
-                            item.href = `tickets.php?id=${ticket.id}&type=${type}`;
-                            item.innerHTML = `
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>#${ticket.id}</strong> - ${ticket.subject}
-                                    </div>
-                                    <span class="badge ${getPriorityClass(ticket.priority)}">${ticket.priority}</span>
-                                </div>
-                                <small class="text-muted">${ticket.status} - ${timeAgo(ticket.created_at)}</small>
-                            `;
-                            resultsDiv.appendChild(item);
-                        });
-                    }
-
-                    if (!resultsFound) {
-                        const noResults = document.createElement('div');
-                        noResults.className = 'dropdown-item text-muted';
-                        noResults.textContent = 'No tickets found';
-                        resultsDiv.appendChild(noResults);
-                        resultsDiv.classList.add('show');
-                    }
-                });
-        });
-
-        quickSearch.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') {
-                document.getElementById('quickSearchResults').classList.remove('show');
-            } else if (e.key === 'Enter') {
-                searchTicket();
-            }
-        });
-    }
-
     function searchTicket() {
-        const searchTerm = document.getElementById('quickTicketSearch').value.trim();
-        if (searchTerm) {
-            window.location.href = `tickets.php?id=${searchTerm}`;
+        const quickSearchInput = document.getElementById('quickTicketSearch');
+        if (quickSearchInput) {
+            const searchTerm = quickSearchInput.value.trim();
+            if (searchTerm) {
+                window.location.href = `tickets.php?id=${searchTerm}`;
+            }
         }
     }
 
@@ -1642,20 +1596,12 @@ html_start('Tickets');
     document.addEventListener('click', function (e) {
         const searchContainer = document.querySelector('.quick-search');
         const searchResults = document.getElementById('quickSearchResults');
-        if (!searchContainer.contains(e.target)) {
-            searchResults.style.display = 'none';
-        }
-    });
-
-    // Add keyboard navigation for search
-    document.getElementById('quickTicketSearch').addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') {
-            searchTicket();
-        } else if (e.key === 'Escape') {
-            document.getElementById('quickSearchResults').style.display = 'none';
+        if (searchContainer && searchResults && !searchContainer.contains(e.target)) {
+            searchResults.classList.remove('show');
         }
     });
 </script>
+
 <div class="dashboard-container">
     <?php include 'components/sidebar.php'; ?>
     <div class="main-content">
