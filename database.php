@@ -6,8 +6,7 @@ use Medoo\Medoo;
 // Determine environment based on URL or CLI
 $is_localhost = false;
 if (php_sapi_name() === 'cli') {
-    // Default to localhost for CLI operations unless specified otherwise
-    $is_localhost = true;
+    $is_localhost = (DIRECTORY_SEPARATOR === '\\');
 } else if (isset($_SERVER['HTTP_HOST'])) {
     $host = strtolower($_SERVER['HTTP_HOST']);
     if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false || strpos($host, '.local') !== false) {
