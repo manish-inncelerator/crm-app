@@ -1485,16 +1485,16 @@ html_start('Tickets');
     <?php include 'components/sidebar.php'; ?>
     <div class="main-content">
         <?php include 'components/navbar.php'; ?>
-        <div class="content-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2 class="main-title">Tickets</h2>
+        <div class="content-header mb-4">
+            <div class="d-flex justify-content-between align-items-baseline">
+                <h2 class="main-title mb-0">Tickets</h2>
                 <div class="header-actions">
                     <div class="d-flex gap-2 align-items-center">
                         <!-- Quick Ticket Search -->
                         <div class="quick-search" style="position:relative;">
                             <div class="input-group">
                                 <input type="text" id="quickTicketSearch" class="form-control"
-                                    placeholder="Search ticket by ID..." style="min-width:200px;">
+                                    placeholder="Search ticket by ID..." style="min-width:200px; border: 1px solid var(--sidebar-border);">
                                 <button class="btn btn-primary" type="button" onclick="searchTicket()">
                                     <i class="bi bi-search"></i>
                                 </button>
@@ -1505,7 +1505,7 @@ html_start('Tickets');
                         </div>
 
                         <!-- Priority Filter -->
-                        <select id="priorityFilter" class="form-select" style="width: auto;">
+                        <select id="priorityFilter" class="form-select" style="width: auto; border: 1px solid var(--sidebar-border);">
                             <option value="">All Priorities</option>
                             <option value="LOW">Low</option>
                             <option value="MEDIUM">Medium</option>
@@ -1515,7 +1515,7 @@ html_start('Tickets');
 
                         <!-- User Filter (Admin Only) -->
                         <?php if ($isAdmin && !empty($allUsers)): ?>
-                            <select id="userFilter" class="form-select" style="width: auto;">
+                            <select id="userFilter" class="form-select" style="width: auto; border: 1px solid var(--sidebar-border);">
                                 <option value="">All Users</option>
                                 <?php foreach ($allUsers as $u): ?>
                                     <option value="<?php echo htmlspecialchars($u['name']); ?>">
