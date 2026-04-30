@@ -161,6 +161,43 @@ try {
         }
     }
 
+    // Handle expected timeline change
+    if (isset($data['expected_timeline']) && $data['expected_timeline'] !== $currentTicket['expected_timeline']) {
+        $updateData['expected_timeline'] = $data['expected_timeline'];
+        $oldTimeline = $currentTicket['expected_timeline'] ?: 'Not set';
+        $newTimeline = $data['expected_timeline'] ?: 'Not set';
+        
+        $database->insert('ticket_comments', [
+            'ticket_id' => $data['ticket_id'],
+            'ticket_type' => $data['ticket_type'],
+            'user_id' => $dbUser['id'],
+            'comment' => "Expected timeline changed from {$oldTimeline} to {$newTimeline}. Reason: " . ($data['delay_reason'] ?? 'Not provided'),
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    // Handle delay reason
+    if (isset($data['delay_reason']) && $data['delay_reason'] !== $currentTicket['delay_reason']) {
+        $updateData['delay_reason'] = $data['delay_reason'];
+    }
+
+    // Handle ownership reassignment
+    if (isset($data['owner_id']) && $data['owner_id'] != $currentTicket['owner_id']) {
+        $updateData['owner_id'] = $data['owner_id'];
+        $oldOwner = $database->get('users', ['name'], ['id' => $currentTicket['owner_id']]);
+        $newOwner = $database->get('users', ['name'], ['id' => $data['owner_id']]);
+        
+        $database->insert('ticket_comments', [
+            'ticket_id' => $data['ticket_id'],
+            'ticket_type' => $data['ticket_type'],
+            'user_id' => $dbUser['id'],
+            'comment' => "Ticket reassigned from " . ($oldOwner['name'] ?? 'Unknown') . " to " . ($newOwner['name'] ?? 'Unknown'),
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
+        
+        notifyTicketReassignment($data['owner_id'], $data['ticket_id'], $data['ticket_type'], $oldOwner['name'] ?? 'Unknown');
+    }
+
     // Handle comment
     if (isset($data['comment']) && !empty($data['comment'])) {
         // Insert comment
@@ -178,6 +215,7 @@ try {
 
     // Update ticket if there are changes
     if (!empty($updateData)) {
+        $updateData['updated_at'] = date('Y-m-d H:i:s');
         $result = $database->update($ticketTable, $updateData, ['id' => $data['ticket_id']]);
         if (!$result) {
             http_response_code(500);
@@ -194,3 +232,4 @@ try {
     http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);
 }
+

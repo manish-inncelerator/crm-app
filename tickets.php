@@ -168,6 +168,12 @@ try {
         exit;
     }
 
+    // Fetch active users for owner reassignment
+    $activeUsers = $database->select('users', ['id', 'name'], [
+        'is_ex_employee' => 0,
+        'ORDER' => ['name' => 'ASC']
+    ]);
+
     // Fetch tickets based on user role
     $isAdmin = (bool)($dbUser['is_admin'] ?? false);
 
@@ -215,6 +221,9 @@ try {
             $user = $database->get('users', ['name', 'email'], ['id' => $ticket['user_id']]);
             $ticket['user_name'] = $user ? $user['name'] : 'Unknown User';
             $ticket['user_email'] = $user ? $user['email'] : '';
+            // Get owner info
+            $owner = $database->get('users', ['name'], ['id' => $ticket['owner_id']]);
+            $ticket['owner_name'] = $owner ? $owner['name'] : 'Unassigned';
             return $ticket;
         }, $openEstimateTickets),
         array_map(function ($ticket) use ($database) {
@@ -225,6 +234,9 @@ try {
             $user = $database->get('users', ['name', 'email'], ['id' => $ticket['user_id']]);
             $ticket['user_name'] = $user ? $user['name'] : 'Unknown User';
             $ticket['user_email'] = $user ? $user['email'] : '';
+            // Get owner info
+            $owner = $database->get('users', ['name'], ['id' => $ticket['owner_id']]);
+            $ticket['owner_name'] = $owner ? $owner['name'] : 'Unassigned';
             return $ticket;
         }, $openSupplierTickets),
         array_map(function ($ticket) use ($database) {
@@ -235,6 +247,9 @@ try {
             $user = $database->get('users', ['name', 'email'], ['id' => $ticket['user_id']]);
             $ticket['user_name'] = $user ? $user['name'] : 'Unknown User';
             $ticket['user_email'] = $user ? $user['email'] : '';
+            // Get owner info
+            $owner = $database->get('users', ['name'], ['id' => $ticket['owner_id']]);
+            $ticket['owner_name'] = $owner ? $owner['name'] : 'Unassigned';
             return $ticket;
         }, $openGeneralTickets)
     );
@@ -248,6 +263,9 @@ try {
             $user = $database->get('users', ['name', 'email'], ['id' => $ticket['user_id']]);
             $ticket['user_name'] = $user ? $user['name'] : 'Unknown User';
             $ticket['user_email'] = $user ? $user['email'] : '';
+            // Get owner info
+            $owner = $database->get('users', ['name'], ['id' => $ticket['owner_id']]);
+            $ticket['owner_name'] = $owner ? $owner['name'] : 'Unassigned';
             return $ticket;
         }, $closedEstimateTickets),
         array_map(function ($ticket) use ($database) {
@@ -258,6 +276,9 @@ try {
             $user = $database->get('users', ['name', 'email'], ['id' => $ticket['user_id']]);
             $ticket['user_name'] = $user ? $user['name'] : 'Unknown User';
             $ticket['user_email'] = $user ? $user['email'] : '';
+            // Get owner info
+            $owner = $database->get('users', ['name'], ['id' => $ticket['owner_id']]);
+            $ticket['owner_name'] = $owner ? $owner['name'] : 'Unassigned';
             return $ticket;
         }, $closedSupplierTickets),
         array_map(function ($ticket) use ($database) {
@@ -268,6 +289,9 @@ try {
             $user = $database->get('users', ['name', 'email'], ['id' => $ticket['user_id']]);
             $ticket['user_name'] = $user ? $user['name'] : 'Unknown User';
             $ticket['user_email'] = $user ? $user['email'] : '';
+            // Get owner info
+            $owner = $database->get('users', ['name'], ['id' => $ticket['owner_id']]);
+            $ticket['owner_name'] = $owner ? $owner['name'] : 'Unassigned';
             return $ticket;
         }, $closedGeneralTickets)
     );
@@ -726,6 +750,15 @@ html_start('Tickets');
                 document.getElementById('ticketEstimatedTime').value = ticketEstimatedTime || '';
                 document.getElementById('ticketComment').value = '';
 
+                // New fields
+                const ownerId = button.getAttribute('data-ticket-owner-id');
+                const expectedTimeline = button.getAttribute('data-ticket-expected-timeline');
+                const delayReason = button.getAttribute('data-ticket-delay-reason');
+
+                document.getElementById('ticketOwnerId').value = ownerId || '';
+                document.getElementById('ticketExpectedTimeline').value = expectedTimeline ? expectedTimeline.replace(' ', 'T') : '';
+                document.getElementById('ticketDelayReason').value = delayReason || '';
+
                 // Handle Refund-specific statuses
                 const subject = button.closest('tr').querySelector('td:nth-child(4)').textContent.trim().toLowerCase();
                 const isRefund = subject.includes('refund');
@@ -910,7 +943,6 @@ html_start('Tickets');
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="ticket-detail-item">
                                             <div class="ticket-detail-label">
@@ -919,6 +951,28 @@ html_start('Tickets');
                                             </div>
                                             <div class="ticket-detail-value">${ticket.user_name}</div>
                                             <div class="ticket-meta">${ticket.user_email}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="ticket-detail-item">
+                                            <div class="ticket-detail-label">
+                                                <i class="bi bi-person-check"></i>
+                                                Current Owner
+                                            </div>
+                                            <div class="ticket-detail-value">${ticket.owner_name}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <div class="ticket-detail-item">
+                                            <div class="ticket-detail-label">
+                                                <i class="bi bi-hash"></i>
+                                                Booking Reference
+                                            </div>
+                                            <div class="ticket-detail-value">
+                                                <span class="badge bg-light text-dark border">${ticket.booking_reference || 'N/A'}</span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -969,11 +1023,21 @@ html_start('Tickets');
                                         <div class="ticket-detail-item">
                                             <div class="ticket-detail-label">
                                                 <i class="bi bi-clock"></i>
-                                                Estimated Time
+                                                Expected Timeline (SLA)
                                             </div>
                                             <div class="ticket-detail-value">
-                                                ${ticket.estimated_time}
-                                                ${ticket.time_change_comment ? `<div class="text-info small mt-1">${ticket.time_change_comment}</div>` : ''}
+                                                ${ticket.expected_timeline ? new Date(ticket.expected_timeline).toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : '<span class="text-muted">Not set</span>'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="ticket-detail-item">
+                                            <div class="ticket-detail-label">
+                                                <i class="bi bi-exclamation-triangle"></i>
+                                                Delay Reason
+                                            </div>
+                                            <div class="ticket-detail-value">
+                                                ${ticket.delay_reason || '<span class="text-muted">None</span>'}
                                             </div>
                                         </div>
                                     </div>
@@ -1558,11 +1622,12 @@ html_start('Tickets');
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>Booking Ref</th>
                                 <th>User</th>
+                                <th>Owner</th>
                                 <th>Subject</th>
                                 <th>Priority</th>
                                 <th>Status</th>
-                                <th>Est. Time</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -1570,6 +1635,7 @@ html_start('Tickets');
                             <?php foreach ($openTickets as $ticket): ?>
                                 <tr>
                                     <td><?php echo $ticket['id']; ?></td>
+                                    <td><span class="badge bg-light text-dark border"><?php echo htmlspecialchars($ticket['booking_reference'] ?? 'N/A'); ?></span></td>
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="ms-2">
@@ -1579,6 +1645,12 @@ html_start('Tickets');
                                                     <?php echo htmlspecialchars($ticket['user_email']); ?></div>
                                             </div>
                                         </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle">
+                                            <i class="bi bi-person-check"></i>
+                                            <?php echo htmlspecialchars($ticket['owner_name']); ?>
+                                        </span>
                                     </td>
                                     <td><?php echo htmlspecialchars($ticket['subject']); ?></td>
                                     <td>
@@ -1636,6 +1708,9 @@ html_start('Tickets');
                                                     data-ticket-type="<?php echo htmlspecialchars($ticket['type_key'] ?? ''); ?>"
                                                     data-ticket-priority="<?php echo $ticket['priority']; ?>"
                                                     data-ticket-status="<?php echo $ticket['status']; ?>"
+                                                    data-ticket-owner-id="<?php echo htmlspecialchars($ticket['owner_id'] ?? ''); ?>"
+                                                    data-ticket-expected-timeline="<?php echo htmlspecialchars($ticket['expected_timeline'] ?? ''); ?>"
+                                                    data-ticket-delay-reason="<?php echo htmlspecialchars($ticket['delay_reason'] ?? ''); ?>"
                                                     data-ticket-estimated-time="<?php echo htmlspecialchars($ticket['estimated_time'] ?? ''); ?>">
                                                     <i class="bi bi-gear"></i> Manage
                                                 </button>
@@ -1658,12 +1733,13 @@ html_start('Tickets');
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>Booking Ref</th>
                                 <th>User</th>
+                                <th>Owner</th>
                                 <th>Type</th>
                                 <th>Subject</th>
                                 <th>Priority</th>
                                 <th>Status</th>
-                                <th>Est. Time</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -1671,6 +1747,7 @@ html_start('Tickets');
                             <?php foreach ($closedTickets as $ticket): ?>
                                 <tr>
                                     <td><?php echo $ticket['id']; ?></td>
+                                    <td><span class="badge bg-light text-dark border"><?php echo htmlspecialchars($ticket['booking_reference'] ?? 'N/A'); ?></span></td>
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="ms-2">
@@ -1680,6 +1757,12 @@ html_start('Tickets');
                                                     <?php echo htmlspecialchars($ticket['user_email']); ?></div>
                                             </div>
                                         </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle">
+                                            <i class="bi bi-person-check"></i>
+                                            <?php echo htmlspecialchars($ticket['owner_name']); ?>
+                                        </span>
                                     </td>
                                     <td>
                                         <span class="badge bg-primary">
@@ -1743,6 +1826,9 @@ html_start('Tickets');
                                                     data-ticket-type="<?php echo htmlspecialchars($ticket['type_key'] ?? ''); ?>"
                                                     data-ticket-priority="<?php echo $ticket['priority']; ?>"
                                                     data-ticket-status="<?php echo $ticket['status']; ?>"
+                                                    data-ticket-owner-id="<?php echo htmlspecialchars($ticket['owner_id'] ?? ''); ?>"
+                                                    data-ticket-expected-timeline="<?php echo htmlspecialchars($ticket['expected_timeline'] ?? ''); ?>"
+                                                    data-ticket-delay-reason="<?php echo htmlspecialchars($ticket['delay_reason'] ?? ''); ?>"
                                                     data-ticket-estimated-time="<?php echo htmlspecialchars($ticket['estimated_time'] ?? ''); ?>">
                                                     <i class="bi bi-gear"></i> Manage
                                                 </button>
@@ -1827,10 +1913,35 @@ html_start('Tickets');
                         <div class="mb-3">
                             <label class="form-label">Status</label>
                             <select class="form-select" id="ticketStatus" name="status" required>
-                                <option value="OPEN">Open</option>
-                                <option value="IN_PROGRESS">In Progress</option>
+                                <option value="SUBMITTED">Submitted</option>
+                                <option value="PENDING_APPROVAL">Pending Approval</option>
+                                <option value="APPROVED">Approved</option>
+                                <option value="PAID">Paid</option>
+                                <option value="OVERDUE">Overdue</option>
                                 <option value="CLOSED">Closed</option>
+                                <option value="REJECTED">Rejected</option>
+                                <option value="UNDER_REVIEW">Under Review</option>
                             </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Assign Owner</label>
+                            <select class="form-select" id="ticketOwnerId" name="owner_id">
+                                <option value="">Select Owner...</option>
+                                <?php foreach ($activeUsers as $au): ?>
+                                    <option value="<?php echo $au['id']; ?>"><?php echo htmlspecialchars($au['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Expected Timeline (Accounting SLA)</label>
+                            <input type="datetime-local" class="form-control" id="ticketExpectedTimeline" name="expected_timeline">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Delay Reason (if applicable)</label>
+                            <textarea class="form-control" id="ticketDelayReason" name="delay_reason" placeholder="Explain why payment/action is delayed..."></textarea>
                         </div>
                         <div class="mb-3 d-none" id="refundStatusContainer">
                             <label class="form-label">Refund Approval Step</label>

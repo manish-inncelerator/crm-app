@@ -55,12 +55,25 @@ try {
         exit;
     }
 
+    // Every ticket must have a booking/reference number
+    if (empty($data['booking_reference'])) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Booking/Reference number is required']);
+        exit;
+    }
+
+    // Trim booking reference
+    $bookingReference = trim($data['booking_reference']);
+
     // Common fields for all tickets
     $commonFields = [
         'user_id' => $dbUser['id'],
+        'owner_id' => $data['owner_id'] ?? $dbUser['id'],
+        'booking_reference' => $bookingReference,
         'priority' => $data['priority'] ?? 'MEDIUM',
         'status' => ($data['ticket_type'] === 'refund' || ($data['ticket_type'] === 'general' && isset($data['ticket_subtype']) && $data['ticket_subtype'] === 'Customers Refund')) ? 'SUBMITTED' : 'OPEN',
-        'created_at' => date('Y-m-d H:i:s')
+        'created_at' => date('Y-m-d H:i:s'),
+        'expected_timeline' => !empty($data['expected_timeline']) ? $data['expected_timeline'] : null
     ];
 
     // Handle different ticket types
@@ -102,25 +115,17 @@ try {
                 'rate_per_person' => $data['rate_per_person'],
                 'total_amount' => $data['total_amount'],
                 'description' => $data['description'],
-                'estimate_message' => $data['estimate_message'] ?? null
+                'estimate_message' => $data['estimate_message'] ?? null,
+                'supplier_id' => $data['supplier_id'] ?? null
             ]);
 
             $result = $database->insert('estimate_tickets', $ticketData);
             break;
 
         case 'supplier':
-            // Ensure new columns exist safely
-            try {
-                $database->query("ALTER TABLE supplier_tickets ADD COLUMN IF NOT EXISTS supplier_name VARCHAR(255) DEFAULT '' AFTER due_date");
-                $database->query("ALTER TABLE supplier_tickets ADD COLUMN IF NOT EXISTS complete_costing TEXT AFTER bank_details");
-                $database->query("ALTER TABLE supplier_tickets ADD COLUMN IF NOT EXISTS supplier_invoice_path VARCHAR(255) AFTER complete_costing");
-                $database->query("ALTER TABLE supplier_tickets ADD COLUMN IF NOT EXISTS customer_invoice_path VARCHAR(255) AFTER supplier_invoice_path");
-                $database->query("ALTER TABLE supplier_tickets ADD COLUMN IF NOT EXISTS payment_proof_path VARCHAR(255) AFTER customer_invoice_path");
-            } catch (Exception $e) { }
-
             // Validate required text fields
             $requiredFields = [
-                'supplier_name',
+                'supplier_id',
                 'travel_date',
                 'due_date',
                 'payment_type',
@@ -149,7 +154,7 @@ try {
             $paymentProofPath = handleFileUpload($_FILES['payment_proof'], 'payment_proofs');
 
             $ticketData = array_merge($commonFields, [
-                'supplier_name' => $data['supplier_name'],
+                'supplier_id' => $data['supplier_id'],
                 'travel_date' => $data['travel_date'],
                 'due_date' => $data['due_date'],
                 'supplier_invoice_currency' => '',
@@ -212,7 +217,7 @@ try {
             break;
 
         case 'purchase_order':
-            $requiredFields = ['supplier_name', 'client_name', 'from_destination', 'to_destination', 'po_date', 'quantity', 'rate', 'description'];
+            $requiredFields = ['supplier_id', 'client_name', 'from_destination', 'to_destination', 'po_date', 'quantity', 'rate', 'description'];
             foreach ($requiredFields as $field) {
                 if (empty($data[$field])) {
                     http_response_code(400);
@@ -221,8 +226,10 @@ try {
                 }
             }
 
+            $supplier = $database->get('suppliers', ['name'], ['id' => $data['supplier_id']]);
+
             $details = "<h4>Purchase Order Request</h4>";
-            $details .= "<p><strong>Supplier Name:</strong> " . htmlspecialchars($data['supplier_name']) . "</p>";
+            $details .= "<p><strong>Supplier Name:</strong> " . htmlspecialchars($supplier['name'] ?? 'Unknown') . "</p>";
             $details .= "<p><strong>Client Name:</strong> " . htmlspecialchars($data['client_name']) . "</p>";
             $details .= "<p><strong>From (Destination):</strong> " . htmlspecialchars($data['from_destination']) . "</p>";
             $details .= "<p><strong>To (Destination):</strong> " . htmlspecialchars($data['to_destination']) . "</p>";
@@ -469,7 +476,7 @@ try {
             'ticket_id' => $ticketId,
             'ticket_type' => $data['ticket_type'],
             'user_id' => $dbUser['id'],
-            'comment' => sprintf('Ticket created by %s on %s', $dbUser['name'], $formattedDate),
+            'comment' => sprintf('Ticket created by %s on %s with Booking Ref: %s', $dbUser['name'], $formattedDate, $bookingReference),
             'created_at' => $currentDateTime
         ]);
 
@@ -495,6 +502,7 @@ try {
         http_response_code(500);
         echo json_encode(['error' => 'Failed to create ticket']);
     }
+
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);

@@ -76,6 +76,11 @@ try {
         'ORDER' => ['name' => 'ASC']
     ]);
 
+    // Fetch suppliers for dropdowns
+    $suppliers = $database->select('suppliers', ['id', 'name'], [
+        'ORDER' => ['name' => 'ASC']
+    ]);
+
     writeLog('Create Ticket - User data from database: ' . print_r($dbUser, true));
 } catch (\Exception $e) {
     writeLog('Create Ticket Error: ' . $e->getMessage(), 'ERROR');
@@ -222,6 +227,10 @@ html_start('Create Ticket');
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Booking / Reference Number <span class="text-danger">*</span></label>
+                        <input type="text" name="booking_reference" class="form-control booking-ref-input" placeholder="e.g. FT-12345" required>
+                    </div>
                     <div class="col-md-6">
                         <label class="form-label">Customer Name</label>
                         <input type="text" name="customer_name" class="form-control" required>
@@ -241,6 +250,15 @@ html_start('Create Ticket');
                     <div class="col-md-6">
                         <label class="form-label">Consultant Name</label>
                         <input type="text" name="consultant_name" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Supplier (if applicable)</label>
+                        <select name="supplier_id" class="form-select">
+                            <option value="">Select Supplier...</option>
+                            <?php foreach ($suppliers as $s): ?>
+                                <option value="<?php echo $s['id']; ?>"><?php echo htmlspecialchars($s['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Service Date</label>
@@ -302,6 +320,10 @@ html_start('Create Ticket');
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Booking / Reference Number <span class="text-danger">*</span></label>
+                        <input type="text" name="booking_reference" class="form-control booking-ref-input" placeholder="e.g. FT-12345" required>
+                    </div>
                     <div class="alert alert-info col-12 mb-0">
                         <strong>Important:</strong> All supplier invoices must be issued in their local currency:
                         <ul>
@@ -315,7 +337,12 @@ html_start('Create Ticket');
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Supplier Name</label>
-                        <input type="text" name="supplier_name" class="form-control" required>
+                        <select name="supplier_id" class="form-select" required>
+                            <option value="">Select Supplier...</option>
+                            <?php foreach ($suppliers as $s): ?>
+                                <option value="<?php echo $s['id']; ?>"><?php echo htmlspecialchars($s['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Travel Date</label>
@@ -376,6 +403,10 @@ html_start('Create Ticket');
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Booking / Reference Number <span class="text-danger">*</span></label>
+                        <input type="text" name="booking_reference" class="form-control booking-ref-input" placeholder="e.g. FT-12345" required>
+                    </div>
                     <div class="col-md-12">
                         <label class="form-label">Client Type</label>
                         <select name="client_type" class="form-select" id="invoiceClientType" required>
@@ -436,9 +467,18 @@ html_start('Create Ticket');
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Booking / Reference Number <span class="text-danger">*</span></label>
+                        <input type="text" name="booking_reference" class="form-control booking-ref-input" placeholder="e.g. FT-12345" required>
+                    </div>
                     <div class="col-md-6">
                         <label class="form-label">Supplier Name</label>
-                        <input type="text" name="supplier_name" class="form-control" placeholder="e.g., Muhibbah, CTM" required>
+                        <select name="supplier_id" class="form-select" required>
+                            <option value="">Select Supplier...</option>
+                            <?php foreach ($suppliers as $s): ?>
+                                <option value="<?php echo $s['id']; ?>"><?php echo htmlspecialchars($s['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Client Name</label>
@@ -492,6 +532,10 @@ html_start('Create Ticket');
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Booking / Reference Number <span class="text-danger">*</span></label>
+                        <input type="text" name="booking_reference" class="form-control booking-ref-input" placeholder="e.g. FT-12345" required>
+                    </div>
                     <div class="col-md-6">
                         <label class="form-label">Client Name</label>
                         <input type="text" name="client_name" class="form-control" required>
@@ -545,6 +589,10 @@ html_start('Create Ticket');
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Booking / Reference Number <span class="text-danger">*</span></label>
+                        <input type="text" name="booking_reference" class="form-control booking-ref-input" placeholder="e.g. FT-12345" required>
+                    </div>
                     <div class="alert alert-warning col-12 mb-0">
                         <strong>Note:</strong> Requests involving American Express credit card payments must be processed through the designated AMEX form. Please ensure the client has completed this form.
                     </div>
@@ -576,6 +624,10 @@ html_start('Create Ticket');
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Booking / Reference Number <span class="text-danger">*</span></label>
+                        <input type="text" name="booking_reference" class="form-control booking-ref-input" placeholder="e.g. FT-12345" required>
+                    </div>
                     <div class="col-12">
                         <label class="form-label">Reason for Refund</label>
                         <textarea name="reason" class="form-control" required></textarea>
@@ -700,6 +752,10 @@ html_start('Create Ticket');
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Booking / Reference Number <span class="text-danger">*</span></label>
+                        <input type="text" name="booking_reference" class="form-control booking-ref-input" placeholder="e.g. FT-12345" required>
+                    </div>
                     <div class="col-md-6">
                         <label class="form-label">Estimate No</label>
                         <input type="text" name="estimate_no" class="form-control">
@@ -745,6 +801,10 @@ html_start('Create Ticket');
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Booking / Reference Number <span class="text-danger">*</span></label>
+                        <input type="text" name="booking_reference" class="form-control booking-ref-input" placeholder="e.g. FT-12345" required>
+                    </div>
                     <div class="col-md-6">
                         <label class="form-label">Estimate No</label>
                         <input type="text" name="estimate_no" class="form-control">
@@ -791,6 +851,10 @@ html_start('Create Ticket');
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
+                        <label class="form-label">Booking / Reference Number <span class="text-danger">*</span></label>
+                        <input type="text" name="booking_reference" class="form-control booking-ref-input" placeholder="e.g. FT-12345" required>
+                    </div>
+                    <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
                         <textarea class="form-control rich-editor" id="description" name="description"></textarea>
                     </div>
@@ -819,6 +883,13 @@ html_start('Create Ticket');
 <script>
     // Form toggle logic for Invoice Modal
     document.addEventListener('DOMContentLoaded', function() {
+        // Auto-trim booking reference inputs
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('booking-ref-input')) {
+                e.target.value = e.target.value.replace(/\s/g, '');
+            }
+        });
+
         const invoiceClientType = document.getElementById('invoiceClientType');
         if (invoiceClientType) {
             invoiceClientType.addEventListener('change', function() {
