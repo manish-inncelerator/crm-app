@@ -41,24 +41,27 @@ try {
     foreach ($ticketTables as $table) {
         echo "Updating table: $table...\n";
 
-        // Add booking_reference
-        $database->query("ALTER TABLE $table ADD COLUMN IF NOT EXISTS booking_reference VARCHAR(50) AFTER id");
-        
-        // Add owner_id
-        $database->query("ALTER TABLE $table ADD COLUMN IF NOT EXISTS owner_id INT AFTER user_id");
-        
-        // Add expected_timeline
-        $database->query("ALTER TABLE $table ADD COLUMN IF NOT EXISTS expected_timeline DATETIME AFTER status");
-        
-        // Add delay_reason
-        $database->query("ALTER TABLE $table ADD COLUMN IF NOT EXISTS delay_reason TEXT AFTER expected_timeline");
-        
+        $columnsToAdd = [
+            'booking_reference' => 'VARCHAR(50) AFTER id',
+            'owner_id' => 'INT AFTER user_id',
+            'expected_timeline' => 'DATETIME AFTER status',
+            'delay_reason' => 'TEXT AFTER expected_timeline'
+        ];
+
         // Add supplier_id (if not exists)
-        if ($table !== 'supplier_tickets') { // supplier_tickets might already have it or handled differently
-             $database->query("ALTER TABLE $table ADD COLUMN IF NOT EXISTS supplier_id INT AFTER booking_reference");
+        if ($table !== 'supplier_tickets') {
+            $columnsToAdd['supplier_id'] = 'INT AFTER booking_reference';
         } else {
-             // Ensure supplier_id exists in supplier_tickets (it might be there but let's be sure)
-             $database->query("ALTER TABLE $table ADD COLUMN IF NOT EXISTS supplier_id INT AFTER user_id");
+            $columnsToAdd['supplier_id'] = 'INT AFTER user_id';
+        }
+
+        foreach ($columnsToAdd as $column => $definition) {
+            // Check if column exists
+            $check = $database->query("SHOW COLUMNS FROM $table LIKE '$column'")->fetch();
+            if (!$check) {
+                echo "Adding column $column to $table...\n";
+                $database->query("ALTER TABLE $table ADD $column $definition");
+            }
         }
 
         // 4. Update status ENUM values
