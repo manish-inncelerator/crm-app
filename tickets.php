@@ -540,7 +540,7 @@ html_start('Tickets');
                 }
             },
             columnDefs: [{
-                targets: 1, // User column
+                targets: 2, // User column
                 type: 'string',
                 render: function (data, type, row) {
                     if (type === 'sort' || type === 'filter') {
@@ -555,7 +555,7 @@ html_start('Tickets');
                 }
             },
             {
-                targets: <?php echo $isAdmin ? '4' : '3'; ?>, // Priority column
+                targets: 5, // Priority column
                 type: 'string',
                 render: function (data, type, row) {
                     if (type === 'sort' || type === 'filter') {
@@ -612,7 +612,7 @@ html_start('Tickets');
                 }
             },
             columnDefs: [{
-                targets: 1, // User column
+                targets: 2, // User column
                 type: 'string',
                 render: function (data, type, row) {
                     if (type === 'sort' || type === 'filter') {
@@ -627,7 +627,7 @@ html_start('Tickets');
                 }
             },
             {
-                targets: <?php echo $isAdmin ? '4' : '3'; ?>, // Priority column
+                targets: 6, // Priority column
                 type: 'string',
                 render: function (data, type, row) {
                     if (type === 'sort' || type === 'filter') {
@@ -840,7 +840,7 @@ html_start('Tickets');
                             // Update the row data
                             const rowData = table.row(row).data();
                             if (data.priority) {
-                                const priorityIndex = (table.table().node().id === 'closedTicketsTable') ? 4 : 3;
+                                const priorityIndex = (table.table().node().id === 'closedTicketsTable') ? 6 : 5;
                                 rowData[priorityIndex] = `<span class="badge ticket-priority-badge ${getPriorityClass(data.priority)}">
                                     <i class="bi bi-flag-fill"></i>
                                     ${data.priority}
@@ -877,15 +877,11 @@ html_start('Tickets');
                                         break;
                                 }
                                 
-                                const statusIndex = (table.table().node().id === 'closedTicketsTable') ? 5 : 4;
+                                const statusIndex = (table.table().node().id === 'closedTicketsTable') ? 7 : 6;
                                 rowData[statusIndex] = `<span class="badge ${badgeClass}">
                                     <i class="bi ${iconClass}"></i>
                                     ${data.status}
                                 </span>`;
-                            }
-                            if (data.estimated_time) {
-                                const estTimeIndex = (table.table().node().id === 'closedTicketsTable') ? 6 : 5;
-                                rowData[estTimeIndex] = data.estimated_time;
                             }
 
                             // Update the row and redraw
@@ -1685,11 +1681,6 @@ html_start('Tickets');
                                             <?php echo $ticket['status']; ?>
                                         </span>
                                     </td>
-                                    <td><?php
-                                    $estimatedTime = $ticket['estimated_time'] ?? getDefaultEstimatedTime($ticket['subject']);
-                                    error_log("Ticket ID: " . $ticket['id'] . ", Subject: " . $ticket['subject'] . ", Estimated Time: " . $estimatedTime);
-                                    echo htmlspecialchars($estimatedTime);
-                                    ?></td>
                                     <td>
                                         <div class="action-buttons">
                                             <button type="button" class="btn btn-sm btn-outline-primary"
@@ -1803,11 +1794,6 @@ html_start('Tickets');
                                             <?php echo $ticket['status']; ?>
                                         </span>
                                     </td>
-                                    <td><?php
-                                    $estimatedTime = $ticket['estimated_time'] ?? getDefaultEstimatedTime($ticket['subject']);
-                                    error_log("Ticket ID: " . $ticket['id'] . ", Subject: " . $ticket['subject'] . ", Estimated Time: " . $estimatedTime);
-                                    echo htmlspecialchars($estimatedTime);
-                                    ?></td>
                                     <td>
                                         <div class="action-buttons">
                                             <button type="button" class="btn btn-sm btn-outline-primary"
