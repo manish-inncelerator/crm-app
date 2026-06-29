@@ -243,6 +243,74 @@ html_start('Financial Tracking');
                         </div>
                     </div>
                 </div>
+                </div>
+            </div>
+            
+            <!-- All Financial Tickets Table -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="timeline-box">
+                        <h5 class="fw-bold mb-4"><i class="bi bi-table"></i> All Financial Tickets</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Type</th>
+                                        <th>Entity Name</th>
+                                        <th>Amount</th>
+                                        <th>Due Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (empty($financialTickets)): ?>
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted py-4">No financial tickets found.</td>
+                                        </tr>
+                                    <?php else: ?>
+                                        <?php foreach ($financialTickets as $t): 
+                                            $meta = json_decode($t['metadata'], true) ?? [];
+                                            
+                                            $entityName = 'N/A';
+                                            $amount = 0;
+                                            $dueDate = 'N/A';
+                                            
+                                            if ($t['type'] === 'estimate') {
+                                                $entityName = $meta['customer_name'] ?? 'Unknown Customer';
+                                                $amount = floatval($meta['total_amount'] ?? 0);
+                                            } elseif ($t['type'] === 'supplier') {
+                                                $entityName = $t['subtype'] ?? 'Unknown Supplier';
+                                                $amount = floatval($meta['complete_costing'] ?? 0);
+                                                $dueDate = $meta['due_date'] ?? 'N/A';
+                                            }
+                                            
+                                            // Status Badge Color
+                                            $badgeClass = 'bg-secondary';
+                                            if (in_array($t['status'], ['OPEN', 'APPROVED'])) $badgeClass = 'bg-primary';
+                                            if ($t['status'] === 'IN_PROGRESS') $badgeClass = 'bg-warning text-dark';
+                                            if (in_array($t['status'], ['CLOSED', 'PROCESSED'])) $badgeClass = 'bg-success';
+                                            if ($t['status'] === 'REJECTED') $badgeClass = 'bg-danger';
+                                        ?>
+                                        <tr>
+                                            <td class="fw-bold text-primary">#<?= $t['id'] ?></td>
+                                            <td><span class="badge bg-dark"><?= strtoupper($t['type']) ?></span></td>
+                                            <td class="fw-bold"><?= htmlspecialchars($entityName) ?></td>
+                                            <td>$<?= number_format($amount, 2) ?></td>
+                                            <td><?= htmlspecialchars($dueDate) ?></td>
+                                            <td><span class="badge <?= $badgeClass ?>"><?= htmlspecialchars($t['status']) ?></span></td>
+                                            <td>
+                                                <a href="ticket-details.php?id=<?= $t['id'] ?>" class="btn btn-sm btn-outline-primary">View <i class="bi bi-arrow-right"></i></a>
+                                            </td>
+                                        </tr>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
             
         </div>

@@ -77,6 +77,14 @@
             <span class="sidebar-link-text">Refund Approvals</span>
         </a>
         <?php endif; ?>
+        
+        <?php if (($isMasterAdmin ?? $dbUser['is_master_admin'] ?? false) || ($dbUser['can_view_financials'] ?? false)): ?>
+        <a href="payments.php"
+            class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'payments.php' ? 'active' : ''; ?>">
+            <i class="bi bi-wallet2 sidebar-link-icon"></i>
+            <span class="sidebar-link-text">Financials</span>
+        </a>
+        <?php endif; ?>
     </nav>
 
     <!-- Footer with User Info and Controls -->
