@@ -106,7 +106,7 @@ html_start('Create Ticket');
         height: 100vh !important;
         max-height: 100vh !important;
         border: none;
-        background: #f1f5f9; /* sleek light gray backdrop */
+        background: #ffffff; /* Changed to white for full-screen seamless form */
         overflow: hidden;
     }
     .modal-content form {
@@ -120,8 +120,8 @@ html_start('Create Ticket');
         background: #0f172a;
     }
     .modal-header {
-        background: #ffffff;
-        padding: 1.5rem 3rem;
+        background: #f8fafc;
+        padding: 1rem 2rem; /* Reduced padding for normal height */
         border-bottom: 1px solid #e2e8f0;
         flex-shrink: 0;
         z-index: 10;
@@ -131,23 +131,24 @@ html_start('Create Ticket');
         border-color: #334155;
     }
     .modal-title {
-        font-size: 1.5rem;
+        font-size: 1.25rem; /* Slightly smaller for balance */
         font-weight: 700;
         color: #0f172a;
+        margin: 0;
     }
     .dark-mode .modal-title { color: #f8fafc; }
     
     .modal-body {
         flex: 1 1 auto;
         overflow-y: auto;
-        padding: 3rem !important;
-        max-width: 900px;
-        margin: 2rem auto !important;
-        width: calc(100% - 4rem);
+        padding: 2rem !important;
+        max-width: 1200px; /* Larger form width */
+        margin: 0 auto !important; /* Remove floating margins */
+        width: 100%;
         background: #ffffff;
-        border-radius: 16px;
-        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01);
-        border: 1px solid #e2e8f0;
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
         align-content: flex-start;
     }
     /* Custom scrollbar for form area */
@@ -156,15 +157,15 @@ html_start('Create Ticket');
     .modal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     
     .dark-mode .modal-body {
-        background: #1e293b;
-        border-color: #334155;
-        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+        background: #0f172a;
+        border: none;
+        box-shadow: none;
     }
     
     .modal-footer {
-        background: #ffffff;
+        background: #f8fafc;
         border-top: 1px solid #e2e8f0;
-        padding: 1.5rem 3rem;
+        padding: 1rem 2rem; /* Reduced padding for normal height */
         flex-shrink: 0;
         z-index: 10;
         display: flex;
