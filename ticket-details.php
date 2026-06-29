@@ -127,25 +127,38 @@ html_start('Ticket #' . $ticketId);
 <link rel="stylesheet" href="assets/css/dashboard.css">
 <style>
     .ticket-view { max-width: 1200px; margin: 2rem auto; }
-    .thread-box { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; }
-    .dark-mode .thread-box { background: #1f2937; border-color: #374151; }
+    .thread-box { background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); overflow: hidden; }
+    .dark-mode .thread-box { background: #111827; border-color: #374151; }
     
-    .comment-bubble { padding: 1.5rem; border-bottom: 1px solid #e5e7eb; }
-    .dark-mode .comment-bubble { border-color: #374151; }
-    .comment-bubble:last-child { border-bottom: none; }
-    .comment-bubble.is-admin { background: rgba(37, 99, 235, 0.03); }
-    .dark-mode .comment-bubble.is-admin { background: rgba(37, 99, 235, 0.1); }
+    .comment-list { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
     
-    .avatar { width: 40px; height: 40px; border-radius: 50%; background: #2563eb; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1.1rem; }
-    .meta-sidebar { background: #f9fafb; border-radius: 12px; padding: 1.5rem; border: 1px solid #e5e7eb; }
-    .dark-mode .meta-sidebar { background: #111827; border-color: #374151; }
+    .comment-bubble { padding: 1.5rem; border-radius: 12px; background: #fff; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); position: relative; }
+    .dark-mode .comment-bubble { background: #1f2937; border-color: #374151; }
     
-    .meta-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; margin-bottom: 0.25rem; font-weight: 600; }
-    .meta-value { font-size: 0.95rem; font-weight: 500; margin-bottom: 1rem; color: #111827; }
-    .dark-mode .meta-value { color: #f9fafb; }
+    .comment-bubble.is-admin { background: #eff6ff; border-color: #bfdbfe; }
+    .dark-mode .comment-bubble.is-admin { background: rgba(37, 99, 235, 0.1); border-color: rgba(37, 99, 235, 0.2); }
     
-    .reply-box { padding: 1.5rem; background: #f8fafc; border-top: 1px solid #e5e7eb; }
-    .dark-mode .reply-box { background: #111827; border-color: #374151; }
+    .avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1.2rem; box-shadow: 0 2px 4px rgba(37,99,235,0.25); }
+    .avatar.admin-avatar { background: linear-gradient(135deg, #6366f1, #4338ca); box-shadow: 0 2px 4px rgba(99,102,241,0.25); }
+    
+    .meta-sidebar { background: #fff; border-radius: 12px; padding: 1.75rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .dark-mode .meta-sidebar { background: #1f2937; border-color: #374151; }
+    
+    .meta-group { display: flex; flex-direction: column; padding-bottom: 1.25rem; margin-bottom: 1.25rem; border-bottom: 1px solid #f1f5f9; }
+    .dark-mode .meta-group { border-color: #374151; }
+    .meta-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    
+    .meta-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 0.4rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+    .dark-mode .meta-label { color: #94a3b8; }
+    
+    .meta-value { font-size: 1rem; font-weight: 500; color: #0f172a; }
+    .dark-mode .meta-value { color: #f8fafc; }
+    
+    .ticket-header { background: #fff; padding: 1.5rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+    .dark-mode .ticket-header { background: #1f2937; border-color: #374151; }
+    
+    .reply-box { padding: 1.5rem; background: #fff; border-top: 1px solid #e2e8f0; }
+    .dark-mode .reply-box { background: #1f2937; border-color: #374151; }
 </style>
 
 <div class="dashboard-container">
@@ -159,10 +172,13 @@ html_start('Ticket #' . $ticketId);
             </div>
             
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="fw-bold mb-0">Ticket #<?= str_pad($ticket['id'], 5, '0', STR_PAD_LEFT) ?> - <?= htmlspecialchars($ticket['subtype']) ?></h2>
                 <div>
-                    <span class="badge <?= getPriorityBadge($ticket['priority']) ?> fs-6 me-2"><?= $ticket['priority'] ?></span>
-                    <span class="badge bg-secondary fs-6"><?= $ticket['status'] ?></span>
+                    <span class="text-uppercase small fw-bold text-primary mb-1 d-block">Ticket Details</span>
+                    <h2 class="fw-bold mb-0 text-dark">#<?= str_pad($ticket['id'], 5, '0', STR_PAD_LEFT) ?> - <?= htmlspecialchars($ticket['subtype']) ?></h2>
+                </div>
+                <div class="d-flex gap-2">
+                    <span class="badge <?= getPriorityBadge($ticket['priority']) ?> px-3 py-2 rounded-pill shadow-sm fs-6 d-flex align-items-center"><i class="bi bi-flag-fill me-2"></i><?= $ticket['priority'] ?></span>
+                    <span class="badge bg-secondary px-3 py-2 rounded-pill shadow-sm fs-6 d-flex align-items-center"><i class="bi bi-circle-fill me-2 small"></i><?= $ticket['status'] ?></span>
                 </div>
             </div>
 
@@ -170,88 +186,90 @@ html_start('Ticket #' . $ticketId);
                 <!-- Main Thread -->
                 <div class="col-lg-8">
                     <div class="thread-box mb-4">
-                        <!-- Initial Request Content -->
-                        <div class="comment-bubble">
-                            <div class="d-flex mb-3">
-                                <div class="avatar me-3">
-                                    <?= substr($users[$ticket['user_id']]['name'] ?? 'U', 0, 1) ?>
+                        <div class="comment-list">
+                            <!-- Initial Request Content -->
+                            <div class="comment-bubble">
+                                <div class="d-flex mb-3">
+                                    <div class="avatar me-3">
+                                        <?= substr($users[$ticket['user_id']]['name'] ?? 'U', 0, 1) ?>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold fs-5"><?= htmlspecialchars($users[$ticket['user_id']]['name'] ?? 'Unknown User') ?> <span class="badge bg-light text-dark border fw-normal ms-2 align-middle">Requester</span></div>
+                                        <div class="text-muted small"><i class="bi bi-clock me-1"></i><?= date('F j, Y g:i A', strtotime($ticket['created_at'])) ?></div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <div class="fw-bold"><?= htmlspecialchars($users[$ticket['user_id']]['name'] ?? 'Unknown User') ?> <span class="badge bg-light text-dark fw-normal ms-2">Requester</span></div>
-                                    <div class="text-muted small"><?= date('F j, Y g:i A', strtotime($ticket['created_at'])) ?></div>
+                                
+                                <div class="ticket-description ps-2 ms-5 border-start border-3 border-primary bg-light p-3 rounded">
+                                    <?php if (!empty($ticket['description'])): ?>
+                                        <div class="fs-6 text-dark mb-4"><?= nl2br(htmlspecialchars($ticket['description'])) ?></div>
+                                    <?php endif; ?>
+                                    
+                                    <!-- Render specific metadata fields -->
+                                    <?php if (!empty($meta)): ?>
+                                        <div class="p-3 bg-white rounded border shadow-sm mt-3">
+                                            <h6 class="mb-3 text-secondary fw-bold"><i class="bi bi-journal-text me-2"></i>Provided Details</h6>
+                                            <div class="row g-3">
+                                                <?php foreach ($meta as $k => $v): ?>
+                                                    <?php if ($v !== null && $v !== '' && !str_ends_with($k, '_path')): ?>
+                                                        <div class="col-sm-6">
+                                                            <div class="text-muted small text-capitalize fw-bold mb-1"><?= str_replace('_', ' ', $k) ?></div>
+                                                            <div class="fw-medium text-dark bg-light p-2 rounded"><?= htmlspecialchars($v) ?></div>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                    
+                                    <!-- Attachments -->
+                                    <?php
+                                    $attachments = [];
+                                    foreach ($meta as $k => $v) {
+                                        if (str_ends_with($k, '_path') && !empty($v)) {
+                                            $folder = str_replace('_path', 's', $k);
+                                            $attachments[] = ['label' => ucwords(str_replace('_path', '', str_replace('_', ' ', $k))), 'url' => "uploads/$folder/$v"];
+                                        }
+                                    }
+                                    ?>
+                                    <?php if (!empty($attachments)): ?>
+                                        <div class="mt-4">
+                                            <h6 class="text-secondary fw-bold mb-3"><i class="bi bi-paperclip me-2"></i>Attachments</h6>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <?php foreach ($attachments as $att): ?>
+                                                    <a href="<?= $att['url'] ?>" target="_blank" class="btn btn-sm btn-outline-primary shadow-sm rounded-pill px-3">
+                                                        <i class="bi bi-file-earmark-text me-1"></i> <?= $att['label'] ?>
+                                                    </a>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                             
-                            <div class="ticket-description">
-                                <?php if (!empty($ticket['description'])): ?>
-                                    <div class="mb-4"><?= nl2br(htmlspecialchars($ticket['description'])) ?></div>
-                                <?php endif; ?>
-                                
-                                <!-- Render specific metadata fields -->
-                                <?php if (!empty($meta)): ?>
-                                    <div class="p-3 bg-light rounded border">
-                                        <h6 class="mb-3 text-muted"><i class="bi bi-journal-text"></i> Provided Details</h6>
-                                        <div class="row g-3">
-                                            <?php foreach ($meta as $k => $v): ?>
-                                                <?php if ($v !== null && $v !== '' && !str_ends_with($k, '_path')): ?>
-                                                    <div class="col-sm-6">
-                                                        <div class="text-muted small text-capitalize"><?= str_replace('_', ' ', $k) ?></div>
-                                                        <div class="fw-medium"><?= htmlspecialchars($v) ?></div>
-                                                    </div>
+                            <!-- Comments Thread -->
+                            <?php foreach ($comments as $c): ?>
+                                <?php $isCommentAdmin = $users[$c['user_id']]['is_admin'] ?? false; ?>
+                                <div class="comment-bubble <?= $isCommentAdmin ? 'is-admin' : '' ?>">
+                                    <div class="d-flex mb-3">
+                                        <div class="avatar me-3 <?= $isCommentAdmin ? 'admin-avatar' : '' ?>">
+                                            <?= substr($users[$c['user_id']]['name'] ?? 'U', 0, 1) ?>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold fs-6">
+                                                <?= htmlspecialchars($users[$c['user_id']]['name'] ?? 'System') ?>
+                                                <?php if ($isCommentAdmin): ?>
+                                                    <span class="badge bg-purple ms-2 align-middle px-2 py-1"><i class="bi bi-shield-fill-check me-1"></i>Admin</span>
                                                 <?php endif; ?>
-                                            <?php endforeach; ?>
+                                            </div>
+                                            <div class="text-muted small"><i class="bi bi-clock me-1"></i><?= date('F j, Y g:i A', strtotime($c['created_at'])) ?></div>
                                         </div>
                                     </div>
-                                <?php endif; ?>
-                                
-                                <!-- Attachments -->
-                                <?php
-                                $attachments = [];
-                                foreach ($meta as $k => $v) {
-                                    if (str_ends_with($k, '_path') && !empty($v)) {
-                                        $folder = str_replace('_path', 's', $k);
-                                        $attachments[] = ['label' => ucwords(str_replace('_path', '', str_replace('_', ' ', $k))), 'url' => "uploads/$folder/$v"];
-                                    }
-                                }
-                                ?>
-                                <?php if (!empty($attachments)): ?>
-                                    <div class="mt-4">
-                                        <h6 class="text-muted mb-2"><i class="bi bi-paperclip"></i> Attachments</h6>
-                                        <div class="d-flex flex-wrap gap-2">
-                                            <?php foreach ($attachments as $att): ?>
-                                                <a href="<?= $att['url'] ?>" target="_blank" class="btn btn-sm btn-outline-secondary">
-                                                    <i class="bi bi-file-earmark-text"></i> <?= $att['label'] ?>
-                                                </a>
-                                            <?php endforeach; ?>
-                                        </div>
+                                    <div class="comment-content ps-2 ms-5 fs-6 text-dark">
+                                        <?= $c['comment'] // HTML is allowed because we formatted it before inserting ?>
                                     </div>
-                                <?php endif; ?>
-                            </div>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
-                        
-                        <!-- Comments Thread -->
-                        <?php foreach ($comments as $c): ?>
-                            <?php $isCommentAdmin = $users[$c['user_id']]['is_admin'] ?? false; ?>
-                            <div class="comment-bubble <?= $isCommentAdmin ? 'is-admin' : '' ?>">
-                                <div class="d-flex mb-3">
-                                    <div class="avatar me-3 <?= $isCommentAdmin ? 'bg-dark' : 'bg-primary' ?>">
-                                        <?= substr($users[$c['user_id']]['name'] ?? 'U', 0, 1) ?>
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold">
-                                            <?= htmlspecialchars($users[$c['user_id']]['name'] ?? 'System') ?>
-                                            <?php if ($isCommentAdmin): ?>
-                                                <span class="badge bg-purple ms-2">Admin</span>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="text-muted small"><?= date('F j, Y g:i A', strtotime($c['created_at'])) ?></div>
-                                    </div>
-                                </div>
-                                <div class="comment-content">
-                                    <?= $c['comment'] // HTML is allowed because we formatted it before inserting ?>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
                         
                         <!-- Reply Box -->
                         <div class="reply-box">
@@ -303,34 +321,54 @@ html_start('Ticket #' . $ticketId);
                 <!-- Sidebar -->
                 <div class="col-lg-4">
                     <div class="meta-sidebar">
-                        <div class="meta-label">Ticket Type</div>
-                        <div class="meta-value"><?= ucfirst($ticket['type']) ?></div>
+                        <h5 class="fw-bold mb-4 pb-2 border-bottom"><i class="bi bi-info-circle me-2 text-primary"></i>Ticket Info</h5>
                         
-                        <div class="meta-label">Booking Reference</div>
-                        <div class="meta-value">
-                            <span class="badge bg-light text-dark border"><?= htmlspecialchars($ticket['booking_reference'] ?: 'N/A') ?></span>
+                        <div class="meta-group">
+                            <div class="meta-label"><i class="bi bi-tag"></i>Ticket Type</div>
+                            <div class="meta-value"><?= ucfirst($ticket['type']) ?></div>
                         </div>
                         
-                        <div class="meta-label">Created By</div>
-                        <div class="meta-value"><?= htmlspecialchars($users[$ticket['user_id']]['name'] ?? 'Unknown') ?></div>
-                        
-                        <div class="meta-label">Assigned Owner</div>
-                        <div class="meta-value">
-                            <?php if ($isAdmin): ?>
-                                <a href="#" class="text-decoration-none fw-bold"><i class="bi bi-person-fill-gear"></i> <?= htmlspecialchars($users[$ticket['owner_id']]['name'] ?? 'Unassigned') ?></a>
-                            <?php else: ?>
-                                <?= htmlspecialchars($users[$ticket['owner_id']]['name'] ?? 'Unassigned') ?>
-                            <?php endif; ?>
+                        <div class="meta-group">
+                            <div class="meta-label"><i class="bi bi-hash"></i>Booking Reference</div>
+                            <div class="meta-value">
+                                <span class="badge bg-light text-dark border px-3 py-2 fs-6 shadow-sm"><?= htmlspecialchars($ticket['booking_reference'] ?: 'N/A') ?></span>
+                            </div>
                         </div>
                         
-                        <div class="meta-label">Expected Timeline</div>
-                        <div class="meta-value">
-                            <?= $ticket['expected_timeline'] ? date('M d, Y h:i A', strtotime($ticket['expected_timeline'])) : '<span class="text-muted small">Not set</span>' ?>
+                        <div class="meta-group">
+                            <div class="meta-label"><i class="bi bi-person"></i>Created By</div>
+                            <div class="meta-value d-flex align-items-center">
+                                <div class="avatar me-2" style="width: 32px; height: 32px; font-size: 0.9rem;"><?= substr($users[$ticket['user_id']]['name'] ?? 'U', 0, 1) ?></div>
+                                <?= htmlspecialchars($users[$ticket['user_id']]['name'] ?? 'Unknown') ?>
+                            </div>
                         </div>
                         
-                        <div class="meta-label">Delay Reason</div>
-                        <div class="meta-value">
-                            <?= $ticket['delay_reason'] ? htmlspecialchars($ticket['delay_reason']) : '<span class="text-muted small">None</span>' ?>
+                        <div class="meta-group">
+                            <div class="meta-label"><i class="bi bi-person-badge"></i>Assigned Owner</div>
+                            <div class="meta-value">
+                                <?php if ($isAdmin): ?>
+                                    <a href="#" class="text-decoration-none fw-bold text-primary bg-primary bg-opacity-10 px-3 py-2 rounded d-inline-flex align-items-center"><i class="bi bi-person-fill-gear me-2"></i> <?= htmlspecialchars($users[$ticket['owner_id']]['name'] ?? 'Unassigned') ?></a>
+                                <?php else: ?>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar admin-avatar me-2" style="width: 32px; height: 32px; font-size: 0.9rem;"><?= substr($users[$ticket['owner_id']]['name'] ?? 'U', 0, 1) ?></div>
+                                        <?= htmlspecialchars($users[$ticket['owner_id']]['name'] ?? 'Unassigned') ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        
+                        <div class="meta-group">
+                            <div class="meta-label"><i class="bi bi-calendar-event"></i>Expected Timeline</div>
+                            <div class="meta-value">
+                                <?= $ticket['expected_timeline'] ? '<span class="badge bg-info text-dark rounded-pill px-3 py-2"><i class="bi bi-clock me-1"></i>' . date('M d, Y h:i A', strtotime($ticket['expected_timeline'])) . '</span>' : '<span class="text-muted small fst-italic">Not set</span>' ?>
+                            </div>
+                        </div>
+                        
+                        <div class="meta-group">
+                            <div class="meta-label"><i class="bi bi-exclamation-triangle"></i>Delay Reason</div>
+                            <div class="meta-value">
+                                <?= $ticket['delay_reason'] ? '<div class="alert alert-warning p-2 mb-0 small border-warning border-opacity-50">' . htmlspecialchars($ticket['delay_reason']) . '</div>' : '<span class="text-muted small fst-italic">None</span>' ?>
+                            </div>
                         </div>
                     </div>
                 </div>
