@@ -167,18 +167,19 @@ html_start('Manage Users');
                                     </button>
                                 <?php endif; ?>
 
-                                <!-- Role Toggles (Only Admins can promote Users to Admins. Super Admins can do everything.) -->
-                                <?php if ($isMasterAdmin && $u['id'] != $dbUser['id']): ?>
+                                <?php if ($isMasterAdmin): ?>
                                     <!-- Super Admin Controls -->
-                                    <button class="btn btn-light border btn-sm w-100 mb-1" onclick="updateRole(<?= $u['id'] ?>, 'admin', <?= $uIsAdmin ? '0' : '1' ?>)">
-                                        <i class="bi bi-shield"></i> <?= $uIsAdmin ? 'Demote to User' : 'Make Admin' ?>
-                                    </button>
-                                    <button class="btn btn-light border btn-sm w-100 mb-1" onclick="updateRole(<?= $u['id'] ?>, 'master', <?= $uIsMasterAdmin ? '0' : '1' ?>)">
-                                        <i class="bi bi-star"></i> <?= $uIsMasterAdmin ? 'Remove Super Admin' : 'Make Super Admin' ?>
-                                    </button>
-                                    <button class="btn btn-light border btn-sm w-100 mb-1" onclick="updateRole(<?= $u['id'] ?>, 'finance', <?= $uCanViewFinancials ? '0' : '1' ?>)">
-                                        <i class="bi bi-currency-dollar"></i> <?= $uCanViewFinancials ? 'Revoke Finance Access' : 'Grant Finance Access' ?>
-                                    </button>
+                                    <?php if ($u['id'] != $dbUser['id']): ?>
+                                        <button class="btn btn-light border btn-sm w-100 mb-1" onclick="updateRole(<?= $u['id'] ?>, 'admin', <?= $uIsAdmin ? '0' : '1' ?>)">
+                                            <i class="bi bi-shield"></i> <?= $uIsAdmin ? 'Demote to User' : 'Make Admin' ?>
+                                        </button>
+                                        <button class="btn btn-light border btn-sm w-100 mb-1" onclick="updateRole(<?= $u['id'] ?>, 'master', <?= $uIsMasterAdmin ? '0' : '1' ?>)">
+                                            <i class="bi bi-star"></i> <?= $uIsMasterAdmin ? 'Remove Super Admin' : 'Make Super Admin' ?>
+                                        </button>
+                                        <button class="btn btn-light border btn-sm w-100 mb-1" onclick="updateRole(<?= $u['id'] ?>, 'finance', <?= $uCanViewFinancials ? '0' : '1' ?>)">
+                                            <i class="bi bi-currency-dollar"></i> <?= $uCanViewFinancials ? 'Revoke Finance Access' : 'Grant Finance Access' ?>
+                                        </button>
+                                    <?php endif; ?>
                                     <button class="btn btn-light border btn-sm w-100" onclick="toggleEmailPref(<?= $u['id'] ?>, <?= $uReceiveEmails ? '0' : '1' ?>)">
                                         <i class="bi <?= $uReceiveEmails ? 'bi-bell-slash' : 'bi-bell' ?>"></i> <?= $uReceiveEmails ? 'Disable Email Alerts' : 'Enable Email Alerts' ?>
                                     </button>
