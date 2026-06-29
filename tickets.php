@@ -84,15 +84,24 @@ try {
         $conditions['user_id'] = $dbUser['id'];
     }
 
-    $allTickets = $database->select('tickets_unified', '*', array_merge($conditions, ['ORDER' => ['id' => 'DESC']]));
-    
-    $openTickets = array_filter($allTickets, fn($t) => $t['status'] !== 'CLOSED' && $t['status'] !== 'RESOLVED' && $t['status'] !== 'REJECTED');
-    $closedTickets = array_filter($allTickets, fn($t) => $t['status'] === 'CLOSED' || $t['status'] === 'RESOLVED' || $t['status'] === 'REJECTED');
+    $openStatuses = ['SUBMITTED', 'OPEN', 'IN_PROGRESS', 'UNDER_REVIEW', 'PENDING_APPROVAL'];
+    $closedStatuses = ['RESOLVED', 'CLOSED', 'APPROVED', 'PROCESSED', 'REJECTED'];
 
-    $userIds = array_unique(array_merge(array_column($allTickets, 'user_id'), array_column($allTickets, 'owner_id')));
+    // Fetch Open Tickets
+    $openConditions = array_merge($conditions, ['status' => $openStatuses]);
+    $openTickets = $database->select('tickets_unified', '*', array_merge($openConditions, ['ORDER' => ['id' => 'DESC']]));
+
+    // Fetch Recent Closed Tickets (Limit 500 to save memory)
+    $closedConditions = array_merge($conditions, ['status' => $closedStatuses]);
+    $closedTickets = $database->select('tickets_unified', '*', array_merge($closedConditions, ['ORDER' => ['id' => 'DESC'], 'LIMIT' => 500]));
+
+    // Combine for Kanban and User Extraction
+    $allLoadedTickets = array_merge($openTickets, $closedTickets);
+
+    $userIds = array_unique(array_merge(array_column($allLoadedTickets, 'user_id'), array_column($allLoadedTickets, 'owner_id')));
     $users = [];
     if (!empty($userIds)) {
-        $userRows = $database->select('users', ['id', 'name', 'email'], ['id' => $userIds]);
+        $userRows = $database->select('users', ['id', 'name', 'email'], ['id' => array_filter($userIds)]);
         foreach ($userRows as $u) $users[$u['id']] = $u;
     }
     $allUsersList = $isAdmin ? $database->select('users', ['id', 'name'], ['ORDER' => ['name' => 'ASC']]) : [];
@@ -310,7 +319,7 @@ html_start('Tickets Dashboard');
                 <div class="kanban-board">
                     <?php foreach ($columns as $colName => $statuses): ?>
                         <?php 
-                            $colTickets = array_filter($allTickets, function($t) use ($statuses) {
+                            $colTickets = array_filter($allLoadedTickets, function($t) use ($statuses) {
                                 return in_array($t['status'], $statuses);
                             });
                         ?>

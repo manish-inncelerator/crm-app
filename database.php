@@ -18,7 +18,7 @@ if ($is_localhost) {
     // Localhost Configuration
     $database = new Medoo([
         'type' => 'mysql',
-        'host' => 'localhost',
+        'host' => '127.0.0.1',
         'database' => 'crm',
         'username' => 'root',
         'password' => '',
@@ -36,7 +36,7 @@ if ($is_localhost) {
     // Production Configuration
     $database = new Medoo([
         'type' => 'mysql',
-        'host' => 'localhost',
+        'host' => '127.0.0.1',
         'database' => 'crm',
         'username' => 'root',
         'password' => 'Inncelerator@2025@#',
