@@ -236,13 +236,15 @@ try {
             }
         }
 
-        // 2. Email admins who opted in (exclude the person making the reply)
-        $emailAdmins = $database->select('users', ['email'], [
-            'AND' => [
-                'receive_emails' => 1,
-                'id[!]' => $dbUser['id']
-            ]
-        ]);
+        // 2. Email admins (excluding super admins, unless it's a refund)
+        $adminFilters = [
+            'receive_emails' => 1,
+            'id[!]' => $dbUser['id']
+        ];
+        if ($ticket['type'] !== 'refund') {
+            $adminFilters['is_master_admin'] = 0;
+        }
+        $emailAdmins = $database->select('users', ['email'], ['AND' => $adminFilters]);
         if (!empty($emailAdmins)) {
             $adminEmails = array_column($emailAdmins, 'email');
             $body = "<p>A new reply/update has been added to ticket (<strong>#{$data['ticket_id']}</strong>) by <strong>{$dbUser['name']}</strong>.</p><hr><p>{$data['comment']}</p><hr><p>Please review it in the CRM.</p>";
