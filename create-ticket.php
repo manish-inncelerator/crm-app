@@ -89,16 +89,32 @@ html_start('Create Ticket');
     }
 
     /* Fullscreen modal styling */
+    .modal {
+        z-index: 99999 !important;
+    }
+    .modal-backdrop {
+        z-index: 99998 !important;
+    }
     .modal-dialog {
         max-width: 100% !important;
         margin: 0 !important;
+        width: 100% !important;
         height: 100% !important;
     }
     .modal-content {
         border-radius: 0 !important;
-        min-height: 100vh !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
         border: none;
         background: #f1f5f9; /* sleek light gray backdrop */
+        overflow: hidden;
+    }
+    .modal-content form {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
     }
     .dark-mode .modal-content {
         background: #0f172a;
@@ -107,8 +123,7 @@ html_start('Create Ticket');
         background: #ffffff;
         padding: 1.5rem 3rem;
         border-bottom: 1px solid #e2e8f0;
-        position: sticky;
-        top: 0;
+        flex-shrink: 0;
         z-index: 10;
     }
     .dark-mode .modal-header {
@@ -123,16 +138,23 @@ html_start('Create Ticket');
     .dark-mode .modal-title { color: #f8fafc; }
     
     .modal-body {
+        flex: 1 1 auto;
+        overflow-y: auto;
         padding: 3rem !important;
         max-width: 900px;
-        margin: 3rem auto !important;
-        width: 100%;
+        margin: 2rem auto !important;
+        width: calc(100% - 4rem);
         background: #ffffff;
         border-radius: 16px;
         box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01);
         border: 1px solid #e2e8f0;
         align-content: flex-start;
     }
+    /* Custom scrollbar for form area */
+    .modal-body::-webkit-scrollbar { width: 6px; }
+    .modal-body::-webkit-scrollbar-track { background: transparent; }
+    .modal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    
     .dark-mode .modal-body {
         background: #1e293b;
         border-color: #334155;
@@ -143,8 +165,7 @@ html_start('Create Ticket');
         background: #ffffff;
         border-top: 1px solid #e2e8f0;
         padding: 1.5rem 3rem;
-        position: sticky;
-        bottom: 0;
+        flex-shrink: 0;
         z-index: 10;
         display: flex;
         justify-content: flex-end;
