@@ -93,8 +93,8 @@ try {
         exit;
     }
 
-    // Get the ticket table name based on type
-    $ticketTable = $data['ticket_type'] . '_tickets';
+    // Get the ticket table name
+    $ticketTable = 'tickets_unified';
 
     // Get current ticket data
     $currentTicket = $database->get($ticketTable, '*', ['id' => $data['ticket_id']]);
