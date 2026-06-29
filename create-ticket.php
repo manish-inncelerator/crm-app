@@ -54,9 +54,89 @@ try {
         'ORDER' => ['name' => 'ASC']
     ]);
 
-    $suppliers = $database->select('suppliers', ['id', 'name'], [
-        'ORDER' => ['name' => 'ASC']
-    ]);
+    // Fetch suppliers from SheetDB API with 24-hour cache
+    $cacheFile = __DIR__ . '/cache/suppliers.json';
+    $cacheDir = __DIR__ . '/cache';
+    $cacheTime = 86400; // 24 hours in seconds
+    
+    if (!file_exists($cacheDir)) {
+        mkdir($cacheDir, 0755, true);
+    }
+    
+    $suppliers = [];
+    if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheTime) {
+        $cachedData = json_decode(file_get_contents($cacheFile), true);
+        if (is_array($cachedData) && !empty($cachedData)) {
+            $suppliers = $cachedData;
+        }
+    }
+    
+    // If not loaded from cache, fetch from API
+    if (empty($suppliers)) {
+        try {
+            $res = $httpClient->request('GET', 'https://sheetdb.io/api/v1/3ygnp4vnvd4z4', [
+                'query' => [
+                    'sort_by' => 'name', // Sorting by name
+                    'sort_order' => 'asc' // Ascending order
+                ]
+            ]);
+            $sheetdb_data = json_decode($res->getBody(), true);
+            
+            if (is_array($sheetdb_data)) {
+                foreach ($sheetdb_data as $row) {
+                    if (!is_array($row)) continue;
+                    
+                    $isActive = false;
+                    $supplierName = '';
+                    $supplierId = '';
+                    
+                    foreach ($row as $key => $value) {
+                        $lKey = strtolower(trim($key));
+                        $lVal = strtolower(trim((string)$value));
+                        
+                        // Check if it's an active status field
+                        if ((strpos($lKey, 'status') !== false || strpos($lKey, 'active') !== false) && $lVal === 'active') {
+                            $isActive = true;
+                        }
+                        
+                        // Identify name
+                        if ($lKey === 'name' || $lKey === 'supplier name' || $lKey === 'supplier' || $lKey === 'vendor name' || $lKey === 'vendor') {
+                            $supplierName = $value;
+                        }
+                        
+                        // Identify ID
+                        if ($lKey === 'id' || $lKey === 'supplier id' || $lKey === 'vendor id') {
+                            $supplierId = $value;
+                        }
+                    }
+                    
+                    // If it's active and we found a name, add it to the list
+                    if ($isActive && !empty($supplierName)) {
+                        if (empty($supplierId)) {
+                            $supplierId = $supplierName; // Fallback to name as ID if no ID column
+                        }
+                        $suppliers[] = [
+                            'id' => $supplierId,
+                            'name' => $supplierName
+                        ];
+                    }
+                }
+            }
+            
+            // Sort suppliers alphabetically by name
+            usort($suppliers, function($a, $b) {
+                return strcasecmp($a['name'], $b['name']);
+            });
+            
+            // Save to cache if data exists
+            if (!empty($suppliers)) {
+                file_put_contents($cacheFile, json_encode($suppliers));
+            }
+            
+        } catch (\Exception $e) {
+            // Keep suppliers empty or whatever was loaded
+        }
+    }
 } catch (\Exception $e) {
     header('Location: login.php');
     exit;
@@ -66,6 +146,68 @@ html_start('Create Ticket');
 ?>
 
 <link rel="stylesheet" href="assets/css/dashboard.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    /* Premium Select2 Styling */
+    .select2-container .select2-selection--single {
+        height: 48px !important;
+        border-radius: 10px !important;
+        border: 1.5px solid #cbd5e1 !important;
+        background-color: #f8fafc !important;
+        display: flex;
+        align-items: center;
+    }
+    .dark-mode .select2-container .select2-selection--single {
+        background-color: #0f172a !important;
+        border-color: #334155 !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #0f172a !important;
+        line-height: normal !important;
+        padding-left: 1.2rem !important;
+        font-size: 1rem;
+    }
+    .dark-mode .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #f8fafc !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 46px !important;
+        right: 10px !important;
+    }
+    .select2-dropdown {
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 10px !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    }
+    .dark-mode .select2-dropdown {
+        background-color: #1e293b !important;
+        border-color: #334155 !important;
+    }
+    .select2-search__field {
+        border-radius: 6px !important;
+        border: 1px solid #cbd5e1 !important;
+        padding: 6px !important;
+        outline: none;
+    }
+    .select2-search__field:focus {
+        border-color: #3b82f6 !important;
+    }
+    .dark-mode .select2-search__field {
+        background-color: #0f172a !important;
+        border-color: #475569 !important;
+        color: #f8fafc !important;
+    }
+    .select2-results__option {
+        padding: 8px 12px !important;
+    }
+    .dark-mode .select2-results__option {
+        color: #f8fafc !important;
+    }
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #3b82f6 !important;
+        color: white !important;
+    }
+</style>
 <style>
     .modal .btn-close {
         background-color: #f1f5f9;
@@ -1175,6 +1317,20 @@ html_start('Create Ticket');
         toolbar: 'bold italic underline | bullist numlist | link',
         height: 300,
         menubar: false
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Initialize Select2 when a modal is shown
+        $('.modal').on('shown.bs.modal', function () {
+            $(this).find('select[name="supplier_id"]').select2({
+                dropdownParent: $(this),
+                placeholder: "Search and select a supplier...",
+                allowClear: true,
+                width: '100%'
+            });
+        });
     });
 </script>
 <?php include 'components/bottom_navbar.php'; ?>
