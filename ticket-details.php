@@ -210,6 +210,7 @@ html_start('Ticket #' . $ticketId);
     .dark-mode .is-admin-card::before { background: #1f2937; border-color: rgba(37, 99, 235, 0.2); }
     
     /* Sidebar styling overrides */
+    .col-lg-4 { position: sticky; top: 2rem; height: max-content; }
     .meta-sidebar { background: #fff; border-radius: 12px; padding: 1.75rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
     .dark-mode .meta-sidebar { background: #1f2937; border-color: #374151; }
     
@@ -224,7 +225,7 @@ html_start('Ticket #' . $ticketId);
     .dark-mode .meta-value { color: #f8fafc; }
     
     /* Reply Box */
-    .reply-box { padding: 1.5rem; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-top: 1.5rem; }
+    .reply-box { padding: 1.5rem; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-top: 1.5rem; position: sticky; bottom: 2rem; z-index: 10; }
     .dark-mode .reply-box { background: #1f2937; border-color: #374151; }
 </style>
 
@@ -395,7 +396,6 @@ html_start('Ticket #' . $ticketId);
                             </form>
                         </div>
                     </div>
-                </div>
                 
                 <!-- Sidebar -->
                 <div class="col-lg-4">
