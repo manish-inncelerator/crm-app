@@ -210,7 +210,7 @@ html_start('Ticket #' . $ticketId);
     .dark-mode .is-admin-card::before { background: #1f2937; border-color: rgba(37, 99, 235, 0.2); }
     
     /* Sidebar styling overrides */
-    .col-lg-4 { position: sticky; top: 2rem; height: max-content; }
+    .sticky-col { position: sticky; top: 2rem; height: max-content; align-self: flex-start; z-index: 10; }
     .meta-sidebar { background: #fff; border-radius: 12px; padding: 1.75rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
     .dark-mode .meta-sidebar { background: #1f2937; border-color: #374151; }
     
@@ -225,7 +225,7 @@ html_start('Ticket #' . $ticketId);
     .dark-mode .meta-value { color: #f8fafc; }
     
     /* Reply Box */
-    .reply-box { padding: 1.5rem; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-top: 1.5rem; position: sticky; bottom: 2rem; z-index: 10; }
+    .reply-box { padding: 1.5rem; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
     .dark-mode .reply-box { background: #1f2937; border-color: #374151; }
 </style>
 
@@ -252,7 +252,7 @@ html_start('Ticket #' . $ticketId);
 
             <div class="row g-4">
                 <!-- Main Thread -->
-                <div class="col-lg-8">
+                <div class="col-lg-5 mb-4">
                     <div class="timeline-container">
                         <!-- Initial Request Content -->
                         <div class="timeline-item">
@@ -340,9 +340,11 @@ html_start('Ticket #' . $ticketId);
                             </div>
                         <?php endforeach; ?>
                     </div>
+                </div>
                         
-                        <!-- Reply Box -->
-                        <div class="reply-box">
+                <!-- Reply Box -->
+                <div class="col-lg-4 sticky-col mb-4">
+                    <div class="reply-box">
                             <form method="POST">
                                 <input type="hidden" name="action" value="update_ticket">
                                 
@@ -398,7 +400,7 @@ html_start('Ticket #' . $ticketId);
                     </div>
                 
                 <!-- Sidebar -->
-                <div class="col-lg-4">
+                <div class="col-lg-3 sticky-col">
                     <div class="meta-sidebar">
                         <h5 class="fw-bold mb-4 pb-2 border-bottom"><i class="bi bi-info-circle me-2 text-primary"></i>Ticket Info</h5>
                         
