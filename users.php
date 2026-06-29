@@ -125,6 +125,7 @@ html_start('Manage Users');
                         $uIsAdmin = (bool)($u['is_admin'] ?? false);
                         $uIsMasterAdmin = (bool)($u['is_master_admin'] ?? false);
                         $uCanViewFinancials = (bool)($u['can_view_financials'] ?? false);
+                        $uReceiveEmails = (bool)($u['receive_emails'] ?? false);
                     ?>
                     <div class="col-xl-3 col-lg-4 col-md-6">
                         <div class="user-card">
@@ -166,27 +167,28 @@ html_start('Manage Users');
                                     </button>
                                 <?php endif; ?>
 
-                                <!-- Role Toggles (Only Admins can promote Users to Admins. Master Admins can do everything.) -->
+                                <!-- Role Toggles (Only Admins can promote Users to Admins. Super Admins can do everything.) -->
                                 <?php if ($isMasterAdmin && $u['id'] != $dbUser['id']): ?>
-                                    <!-- Master Admin Controls -->
-                                    <div class="dropdown w-100">
-                                        <button class="btn btn-light border btn-sm w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                            <i class="bi bi-shield-lock"></i> Edit Roles
-                                        </button>
-                                        <ul class="dropdown-menu shadow">
-                                            <li><a class="dropdown-item" href="#" onclick="updateRole(<?= $u['id'] ?>, 'admin', <?= $uIsAdmin ? '0' : '1' ?>)"><?= $uIsAdmin ? 'Demote to User' : 'Promote to Admin' ?></a></li>
-                                            <?php if ($uIsAdmin): ?>
-                                                <li><a class="dropdown-item" href="#" onclick="updateRole(<?= $u['id'] ?>, 'master', <?= $uIsMasterAdmin ? '0' : '1' ?>)"><?= $uIsMasterAdmin ? 'Remove Master Admin' : 'Make Master Admin' ?></a></li>
-                                            <?php endif; ?>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item" href="#" onclick="updateRole(<?= $u['id'] ?>, 'finance', <?= $uCanViewFinancials ? '0' : '1' ?>)"><?= $uCanViewFinancials ? 'Revoke Finance Access' : 'Grant Finance Access' ?></a></li>
-                                        </ul>
-                                    </div>
+                                    <!-- Super Admin Controls -->
+                                    <button class="btn btn-light border btn-sm w-100 mb-1" onclick="updateRole(<?= $u['id'] ?>, 'admin', <?= $uIsAdmin ? '0' : '1' ?>)">
+                                        <i class="bi bi-shield"></i> <?= $uIsAdmin ? 'Demote to User' : 'Make Admin' ?>
+                                    </button>
+                                    <?php if ($uIsAdmin): ?>
+                                    <button class="btn btn-light border btn-sm w-100 mb-1" onclick="updateRole(<?= $u['id'] ?>, 'master', <?= $uIsMasterAdmin ? '0' : '1' ?>)">
+                                        <i class="bi bi-star"></i> <?= $uIsMasterAdmin ? 'Remove Super Admin' : 'Make Super Admin' ?>
+                                    </button>
+                                    <?php endif; ?>
+                                    <button class="btn btn-light border btn-sm w-100 mb-1" onclick="updateRole(<?= $u['id'] ?>, 'finance', <?= $uCanViewFinancials ? '0' : '1' ?>)">
+                                        <i class="bi bi-currency-dollar"></i> <?= $uCanViewFinancials ? 'Revoke Finance Access' : 'Grant Finance Access' ?>
+                                    </button>
+                                    <button class="btn btn-light border btn-sm w-100" onclick="toggleEmailPref(<?= $u['id'] ?>, <?= $uReceiveEmails ? '0' : '1' ?>)">
+                                        <i class="bi <?= $uReceiveEmails ? 'bi-bell-slash' : 'bi-bell' ?>"></i> <?= $uReceiveEmails ? 'Disable Email Alerts' : 'Enable Email Alerts' ?>
+                                    </button>
                                 <?php elseif ($u['id'] != $dbUser['id']): ?>
                                     <!-- Standard Admin Controls -->
-                                    <?php if (!$uIsMasterAdmin): // Admins can't demote Master Admins ?>
+                                    <?php if (!$uIsMasterAdmin): // Admins can't demote Super Admins ?>
                                         <button class="btn btn-light border btn-sm w-100" onclick="updateRole(<?= $u['id'] ?>, 'admin', <?= $uIsAdmin ? '0' : '1' ?>)">
-                                            <i class="bi bi-shield"></i> <?= $uIsAdmin ? 'Demote to User' : 'Promote to Admin' ?>
+                                            <i class="bi bi-shield"></i> <?= $uIsAdmin ? 'Demote to User' : 'Make Admin' ?>
                                         </button>
                                     <?php endif; ?>
                                 <?php endif; ?>
@@ -301,6 +303,29 @@ async function updateRole(userId, roleType, actionValue) {
             location.reload();
         } else {
             alert(result.error || 'Failed to update role');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred');
+    }
+}
+
+async function toggleEmailPref(userId, receiveValue) {
+    if (!confirm('Are you sure you want to change email alert preferences for this user?')) return;
+    try {
+        const response = await fetch('api/toggle-receive-emails.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                user_id: userId, 
+                receive_emails: receiveValue
+            })
+        });
+        const result = await response.json();
+        if (result.success) {
+            location.reload();
+        } else {
+            alert(result.error || 'Failed to update email preferences');
         }
     } catch (error) {
         console.error('Error:', error);

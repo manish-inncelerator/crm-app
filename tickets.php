@@ -139,7 +139,8 @@ html_start('Tickets Dashboard');
     .kanban-count { background: #e5e7eb; color: #4b5563; padding: 0.1rem 0.5rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; }
     .dark-mode .kanban-count { background: #374151; color: #d1d5db; }
     
-    .kanban-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .kanban-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; cursor: grab; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .kanban-card:active { cursor: grabbing; }
     .kanban-card:hover { transform: translateY(-3px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
     .dark-mode .kanban-card { background: #111827; border-color: #374151; }
     .kanban-card-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; color: #111827; }
@@ -329,9 +330,9 @@ html_start('Tickets Dashboard');
                                 <div class="kanban-count"><?= count($colTickets) ?></div>
                             </div>
                             
-                            <div class="kanban-cards">
+                            <div class="kanban-cards" data-column-status="<?= $statuses[0] ?>">
                                 <?php foreach ($colTickets as $t): ?>
-                                    <div class="kanban-card" onclick="window.location='ticket-details.php?id=<?= $t['id'] ?>'">
+                                    <div class="kanban-card" data-ticket-id="<?= $t['id'] ?>" data-ticket-type="<?= $t['type'] ?>" onclick="window.location='ticket-details.php?id=<?= $t['id'] ?>'">
                                         <div class="d-flex justify-content-between mb-2">
                                             <span class="text-muted small fw-bold">#<?= $t['id'] ?></span>
                                             <span class="badge <?= getPriorityClass($t['priority']) ?>" style="font-size: 0.65rem;"><?= $t['priority'] ?></span>
@@ -360,6 +361,7 @@ html_start('Tickets Dashboard');
 
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script>
     $(document).ready(function() {
         const tableOptions = {
@@ -402,6 +404,55 @@ html_start('Tickets Dashboard');
             document.getElementById('kanbanView').style.display = 'block';
         }
     }
+
+    // Initialize Sortable for Kanban Drag and Drop
+    document.querySelectorAll('.kanban-cards').forEach(function(column) {
+        new Sortable(column, {
+            group: 'kanban',
+            animation: 150,
+            ghostClass: 'bg-light',
+            onEnd: function(evt) {
+                const itemEl = evt.item; // The dragged card
+                const toList = evt.to;   // The target column
+                const fromList = evt.from;
+                
+                if (toList !== fromList) {
+                    const ticketId = itemEl.getAttribute('data-ticket-id');
+                    const ticketType = itemEl.getAttribute('data-ticket-type');
+                    const newStatus = toList.getAttribute('data-column-status');
+                    
+                    // Call API to update ticket status
+                    fetch('api/update-ticket.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ticket_id: ticketId,
+                            ticket_type: ticketType,
+                            status: newStatus
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            alert('Failed to update status: ' + (data.error || 'Unknown error'));
+                            // Optional: Revert the card to the original list if failed
+                        } else {
+                            // Update count badges
+                            const fromCountEl = fromList.previousElementSibling.querySelector('.kanban-count');
+                            const toCountEl = toList.previousElementSibling.querySelector('.kanban-count');
+                            fromCountEl.textContent = parseInt(fromCountEl.textContent) - 1;
+                            toCountEl.textContent = parseInt(toCountEl.textContent) + 1;
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('Network error while updating status.');
+                    });
+                }
+            }
+        });
+    });
 </script>
 
 <?php include 'components/bottom_navbar.php'; ?>
+<?php html_end(); ?>

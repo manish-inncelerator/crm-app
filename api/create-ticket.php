@@ -152,6 +152,16 @@ try {
             }
         }
 
+        // Email admins who opted in for email alerts
+        require_once '../sendMail.php';
+        $emailAdmins = $database->select('users', ['email'], ['receive_emails' => 1]);
+        if (!empty($emailAdmins)) {
+            $adminEmails = array_column($emailAdmins, 'email');
+            $ticketLink = "https://crm.fayyaz.travel/ticket-details.php?id=$ticketId";
+            $emailBody = "<p>A new ticket (<strong>#$ticketId - $subtype</strong>) has been created by <strong>{$dbUser['name']}</strong>.</p><p><strong>Booking Ref:</strong> $bookingReference</p><p>Please review it in the CRM.</p>";
+            sendEmail($adminEmails, "New Ticket Created: #$ticketId - $subtype", 'default', $emailBody, true, $ticketLink);
+        }
+
         echo json_encode([
             'success' => true,
             'message' => 'Ticket created successfully',

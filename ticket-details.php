@@ -38,6 +38,8 @@ try {
 
     $meta = json_decode($ticket['metadata'], true) ?? [];
     
+    $isMasterAdmin = (bool)($dbUser['is_master_admin'] ?? false);
+    
     // Handle form submission for comment / status update
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_ticket') {
         $newStatus = $_POST['status'] ?? $ticket['status'];
@@ -47,6 +49,9 @@ try {
         $updates = [];
         $changes = [];
         if ($isAdmin) {
+            if ($ticket['type'] === 'refund' && !$isMasterAdmin && in_array($newStatus, ['APPROVED', 'REJECTED'])) {
+                die("Only Super Admins can Approve or Reject refunds.");
+            }
             if ($newStatus !== $ticket['status']) {
                 $updates['status'] = $newStatus;
                 $changes[] = "Status changed to " . $newStatus;
@@ -74,6 +79,32 @@ try {
                 'comment' => $fullComment,
                 'created_at' => date('Y-m-d H:i:s')
             ]);
+            
+            // EMAIL NOTIFICATIONS FOR REPLIES
+            require_once 'sendMail.php';
+            $ticketLink = "https://crm.fayyaz.travel/ticket-details.php?id=$ticketId";
+            
+            // 1. Email the ticket creator if it wasn't them who replied
+            if ($ticket['user_id'] != $dbUser['id']) {
+                $creator = $database->get('users', ['email', 'name'], ['id' => $ticket['user_id']]);
+                if ($creator && !empty($creator['email'])) {
+                    $body = "<p>Hello {$creator['name']},</p><p>A new reply/update has been added to your ticket (<strong>#$ticketId - {$ticket['subtype']}</strong>) by <strong>{$dbUser['name']}</strong>.</p><hr><p>$fullComment</p><hr><p>View your ticket to respond.</p>";
+                    sendEmail($creator['email'], "Update on Ticket #$ticketId", 'default', $body, true, $ticketLink);
+                }
+            }
+
+            // 2. Email admins who opted in (exclude the person making the reply)
+            $emailAdmins = $database->select('users', ['email'], [
+                'AND' => [
+                    'receive_emails' => 1,
+                    'id[!]' => $dbUser['id']
+                ]
+            ]);
+            if (!empty($emailAdmins)) {
+                $adminEmails = array_column($emailAdmins, 'email');
+                $body = "<p>A new reply/update has been added to ticket (<strong>#$ticketId - {$ticket['subtype']}</strong>) by <strong>{$dbUser['name']}</strong>.</p><hr><p>$fullComment</p><hr><p>Please review it in the CRM.</p>";
+                sendEmail($adminEmails, "New Reply on Ticket #$ticketId", 'default', $body, true, $ticketLink);
+            }
             
             // Reload page to show new comment
             header("Location: ticket-details.php?id=$ticketId");
@@ -127,20 +158,42 @@ html_start('Ticket #' . $ticketId);
 <link rel="stylesheet" href="assets/css/dashboard.css">
 <style>
     .ticket-view { max-width: 1200px; margin: 2rem auto; }
-    .thread-box { background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); overflow: hidden; }
-    .dark-mode .thread-box { background: #111827; border-color: #374151; }
     
-    .comment-list { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    /* Timeline Container */
+    .timeline-container { position: relative; padding: 2rem 1.5rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .dark-mode .timeline-container { background: #111827; border-color: #374151; }
     
-    .comment-bubble { padding: 1.5rem; border-radius: 12px; background: #fff; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); position: relative; }
-    .dark-mode .comment-bubble { background: #1f2937; border-color: #374151; }
+    /* The vertical line */
+    .timeline-container::before { content: ''; position: absolute; top: 2rem; bottom: 2rem; left: 3.8rem; width: 2px; background: #e2e8f0; z-index: 0; }
+    .dark-mode .timeline-container::before { background: #374151; }
+
+    .timeline-item { position: relative; display: flex; gap: 1.5rem; margin-bottom: 2rem; z-index: 1; }
+    .timeline-item:last-child { margin-bottom: 0; }
     
-    .comment-bubble.is-admin { background: #eff6ff; border-color: #bfdbfe; }
-    .dark-mode .comment-bubble.is-admin { background: rgba(37, 99, 235, 0.1); border-color: rgba(37, 99, 235, 0.2); }
+    .timeline-avatar { flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1.2rem; box-shadow: 0 0 0 6px #f8fafc; z-index: 2; margin-left: 0.25rem; }
+    .dark-mode .timeline-avatar { box-shadow: 0 0 0 6px #111827; }
+    .timeline-avatar.admin-avatar { background: linear-gradient(135deg, #6366f1, #4338ca); }
     
-    .avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1.2rem; box-shadow: 0 2px 4px rgba(37,99,235,0.25); }
-    .avatar.admin-avatar { background: linear-gradient(135deg, #6366f1, #4338ca); box-shadow: 0 2px 4px rgba(99,102,241,0.25); }
+    .timeline-content-card { flex-grow: 1; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: relative; }
+    .dark-mode .timeline-content-card { background: #1f2937; border-color: #374151; }
     
+    /* Pointer arrow to avatar */
+    .timeline-content-card::before { content: ''; position: absolute; left: -6px; top: 18px; width: 12px; height: 12px; background: #fff; border-left: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; transform: rotate(45deg); }
+    .dark-mode .timeline-content-card::before { background: #1f2937; border-color: #374151; }
+    
+    .timeline-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #f1f5f9; }
+    .dark-mode .timeline-header { border-color: #374151; }
+    
+    .timeline-body { font-size: 0.95rem; color: #334155; line-height: 1.6; }
+    .dark-mode .timeline-body { color: #cbd5e1; }
+    
+    /* Admin Card Highlight */
+    .is-admin-card { background: #f8fafc; border-color: #bfdbfe; }
+    .dark-mode .is-admin-card { background: rgba(37, 99, 235, 0.05); border-color: rgba(37, 99, 235, 0.2); }
+    .is-admin-card::before { background: #f8fafc; border-color: #bfdbfe; }
+    .dark-mode .is-admin-card::before { background: #1f2937; border-color: rgba(37, 99, 235, 0.2); }
+    
+    /* Sidebar styling overrides */
     .meta-sidebar { background: #fff; border-radius: 12px; padding: 1.75rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
     .dark-mode .meta-sidebar { background: #1f2937; border-color: #374151; }
     
@@ -154,10 +207,8 @@ html_start('Ticket #' . $ticketId);
     .meta-value { font-size: 1rem; font-weight: 500; color: #0f172a; }
     .dark-mode .meta-value { color: #f8fafc; }
     
-    .ticket-header { background: #fff; padding: 1.5rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
-    .dark-mode .ticket-header { background: #1f2937; border-color: #374151; }
-    
-    .reply-box { padding: 1.5rem; background: #fff; border-top: 1px solid #e2e8f0; }
+    /* Reply Box */
+    .reply-box { padding: 1.5rem; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-top: 1.5rem; }
     .dark-mode .reply-box { background: #1f2937; border-color: #374151; }
 </style>
 
@@ -185,35 +236,36 @@ html_start('Ticket #' . $ticketId);
             <div class="row g-4">
                 <!-- Main Thread -->
                 <div class="col-lg-8">
-                    <div class="thread-box mb-4">
-                        <div class="comment-list">
-                            <!-- Initial Request Content -->
-                            <div class="comment-bubble">
-                                <div class="d-flex mb-3">
-                                    <div class="avatar me-3">
-                                        <?= substr($users[$ticket['user_id']]['name'] ?? 'U', 0, 1) ?>
-                                    </div>
+                    <div class="timeline-container">
+                        <!-- Initial Request Content -->
+                        <div class="timeline-item">
+                            <div class="timeline-avatar">
+                                <?= substr($users[$ticket['user_id']]['name'] ?? 'U', 0, 1) ?>
+                            </div>
+                            <div class="timeline-content-card">
+                                <div class="timeline-header">
                                     <div>
-                                        <div class="fw-bold fs-5"><?= htmlspecialchars($users[$ticket['user_id']]['name'] ?? 'Unknown User') ?> <span class="badge bg-light text-dark border fw-normal ms-2 align-middle">Requester</span></div>
-                                        <div class="text-muted small"><i class="bi bi-clock me-1"></i><?= date('F j, Y g:i A', strtotime($ticket['created_at'])) ?></div>
+                                        <span class="fw-bold fs-6"><?= htmlspecialchars($users[$ticket['user_id']]['name'] ?? 'Unknown User') ?></span>
+                                        <span class="badge bg-light text-dark border fw-normal ms-2 align-middle">Requester</span>
                                     </div>
+                                    <div class="text-muted small"><i class="bi bi-clock me-1"></i><?= date('F j, Y g:i A', strtotime($ticket['created_at'])) ?></div>
                                 </div>
                                 
-                                <div class="ticket-description ps-2 ms-5 border-start border-3 border-primary bg-light p-3 rounded">
+                                <div class="timeline-body">
                                     <?php if (!empty($ticket['description'])): ?>
-                                        <div class="fs-6 text-dark mb-4"><?= nl2br(htmlspecialchars($ticket['description'])) ?></div>
+                                        <div class="mb-3"><?= $ticket['description'] // Render HTML natively ?></div>
                                     <?php endif; ?>
                                     
                                     <!-- Render specific metadata fields -->
                                     <?php if (!empty($meta)): ?>
-                                        <div class="p-3 bg-white rounded border shadow-sm mt-3">
-                                            <h6 class="mb-3 text-secondary fw-bold"><i class="bi bi-journal-text me-2"></i>Provided Details</h6>
+                                        <div class="p-3 bg-light rounded border mt-3">
+                                            <h6 class="mb-3 text-secondary fw-bold fs-6"><i class="bi bi-journal-text me-2"></i>Provided Details</h6>
                                             <div class="row g-3">
                                                 <?php foreach ($meta as $k => $v): ?>
                                                     <?php if ($v !== null && $v !== '' && !str_ends_with($k, '_path')): ?>
                                                         <div class="col-sm-6">
                                                             <div class="text-muted small text-capitalize fw-bold mb-1"><?= str_replace('_', ' ', $k) ?></div>
-                                                            <div class="fw-medium text-dark bg-light p-2 rounded"><?= htmlspecialchars($v) ?></div>
+                                                            <div class="fw-medium text-dark"><?= htmlspecialchars($v) ?></div>
                                                         </div>
                                                     <?php endif; ?>
                                                 <?php endforeach; ?>
@@ -233,7 +285,7 @@ html_start('Ticket #' . $ticketId);
                                     ?>
                                     <?php if (!empty($attachments)): ?>
                                         <div class="mt-4">
-                                            <h6 class="text-secondary fw-bold mb-3"><i class="bi bi-paperclip me-2"></i>Attachments</h6>
+                                            <h6 class="text-secondary fw-bold mb-2"><i class="bi bi-paperclip me-2"></i>Attachments</h6>
                                             <div class="d-flex flex-wrap gap-2">
                                                 <?php foreach ($attachments as $att): ?>
                                                     <a href="<?= $att['url'] ?>" target="_blank" class="btn btn-sm btn-outline-primary shadow-sm rounded-pill px-3">
@@ -245,31 +297,32 @@ html_start('Ticket #' . $ticketId);
                                     <?php endif; ?>
                                 </div>
                             </div>
-                            
-                            <!-- Comments Thread -->
-                            <?php foreach ($comments as $c): ?>
-                                <?php $isCommentAdmin = $users[$c['user_id']]['is_admin'] ?? false; ?>
-                                <div class="comment-bubble <?= $isCommentAdmin ? 'is-admin' : '' ?>">
-                                    <div class="d-flex mb-3">
-                                        <div class="avatar me-3 <?= $isCommentAdmin ? 'admin-avatar' : '' ?>">
-                                            <?= substr($users[$c['user_id']]['name'] ?? 'U', 0, 1) ?>
-                                        </div>
+                        </div>
+                        
+                        <!-- Comments Thread -->
+                        <?php foreach ($comments as $c): ?>
+                            <?php $isCommentAdmin = $users[$c['user_id']]['is_admin'] ?? false; ?>
+                            <div class="timeline-item">
+                                <div class="timeline-avatar <?= $isCommentAdmin ? 'admin-avatar' : '' ?>">
+                                    <?= substr($users[$c['user_id']]['name'] ?? 'U', 0, 1) ?>
+                                </div>
+                                <div class="timeline-content-card <?= $isCommentAdmin ? 'is-admin-card' : '' ?>">
+                                    <div class="timeline-header">
                                         <div>
-                                            <div class="fw-bold fs-6">
-                                                <?= htmlspecialchars($users[$c['user_id']]['name'] ?? 'System') ?>
-                                                <?php if ($isCommentAdmin): ?>
-                                                    <span class="badge bg-purple ms-2 align-middle px-2 py-1"><i class="bi bi-shield-fill-check me-1"></i>Admin</span>
-                                                <?php endif; ?>
-                                            </div>
-                                            <div class="text-muted small"><i class="bi bi-clock me-1"></i><?= date('F j, Y g:i A', strtotime($c['created_at'])) ?></div>
+                                            <span class="fw-bold fs-6"><?= htmlspecialchars($users[$c['user_id']]['name'] ?? 'System') ?></span>
+                                            <?php if ($isCommentAdmin): ?>
+                                                <span class="badge bg-purple ms-2 align-middle px-2 py-1"><i class="bi bi-shield-fill-check me-1"></i>Admin</span>
+                                            <?php endif; ?>
                                         </div>
+                                        <div class="text-muted small"><i class="bi bi-clock me-1"></i><?= date('F j, Y g:i A', strtotime($c['created_at'])) ?></div>
                                     </div>
-                                    <div class="comment-content ps-2 ms-5 fs-6 text-dark">
-                                        <?= $c['comment'] // HTML is allowed because we formatted it before inserting ?>
+                                    <div class="timeline-body">
+                                        <?= $c['comment'] ?>
                                     </div>
                                 </div>
-                            <?php endforeach; ?>
-                        </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                         
                         <!-- Reply Box -->
                         <div class="reply-box">
@@ -282,7 +335,17 @@ html_start('Ticket #' . $ticketId);
                                             <label class="form-label fw-bold">Update Status</label>
                                             <select name="status" class="form-select">
                                                 <?php
-                                                $statuses = ['SUBMITTED', 'OPEN', 'UNDER_REVIEW', 'PENDING_APPROVAL', 'APPROVED', 'PROCESSED', 'IN_PROGRESS', 'RESOLVED', 'REJECTED', 'CLOSED'];
+                                                if ($ticket['type'] === 'refund') {
+                                                    if ($isMasterAdmin) {
+                                                        $statuses = ['SUBMITTED', 'UNDER_REVIEW', 'PENDING_APPROVAL', 'APPROVED', 'REJECTED', 'PROCESSED'];
+                                                    } else {
+                                                        $statuses = ['SUBMITTED', 'UNDER_REVIEW', 'PENDING_APPROVAL', 'PROCESSED'];
+                                                        if (!in_array($ticket['status'], $statuses)) $statuses[] = $ticket['status'];
+                                                    }
+                                                } else {
+                                                    $statuses = ['SUBMITTED', 'OPEN', 'UNDER_REVIEW', 'PENDING_APPROVAL', 'APPROVED', 'PROCESSED', 'IN_PROGRESS', 'RESOLVED', 'REJECTED', 'CLOSED'];
+                                                }
+                                                
                                                 foreach ($statuses as $s) {
                                                     $sel = ($ticket['status'] === $s) ? 'selected' : '';
                                                     echo "<option value=\"$s\" $sel>$s</option>";

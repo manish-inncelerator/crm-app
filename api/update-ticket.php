@@ -109,6 +109,17 @@ try {
 
     // Handle status change
     if (isset($data['status']) && $data['status'] !== $currentTicket['status']) {
+        // Enforce Refund Workflow
+        $tType = $data['ticket_type'] ?? ($currentTicket['type'] ?? '');
+        if ($tType === 'refund') {
+            $isMasterAdmin = (bool)($dbUser['is_master_admin'] ?? false);
+            if (!$isMasterAdmin && in_array($data['status'], ['APPROVED', 'REJECTED'])) {
+                http_response_code(403);
+                echo json_encode(['error' => 'Only Super Admins can Approve or Reject refunds.']);
+                exit;
+            }
+        }
+        
         $updateData['status'] = $data['status'];
         // Create notification for status change
         notifyTicketStatusChange($currentTicket['user_id'], $data['ticket_id'], $data['ticket_type'], $currentTicket['status'], $data['status']);
@@ -211,6 +222,32 @@ try {
 
         // Create notification for new comment
         notifyNewComment($currentTicket['user_id'], $data['ticket_id'], $data['ticket_type'], $dbUser['id']);
+        
+        // Email Notifications
+        require_once '../sendMail.php';
+        $ticketLink = "https://crm.fayyaz.travel/ticket-details.php?id={$data['ticket_id']}";
+        
+        // 1. Email the ticket creator
+        if ($currentTicket['user_id'] != $dbUser['id']) {
+            $creator = $database->get('users', ['email', 'name'], ['id' => $currentTicket['user_id']]);
+            if ($creator && !empty($creator['email'])) {
+                $body = "<p>Hello {$creator['name']},</p><p>A new reply/update has been added to your ticket (<strong>#{$data['ticket_id']}</strong>) by <strong>{$dbUser['name']}</strong>.</p><hr><p>{$data['comment']}</p><hr><p>View your ticket to respond.</p>";
+                sendEmail($creator['email'], "Update on Ticket #{$data['ticket_id']}", 'default', $body, true, $ticketLink);
+            }
+        }
+
+        // 2. Email admins who opted in (exclude the person making the reply)
+        $emailAdmins = $database->select('users', ['email'], [
+            'AND' => [
+                'receive_emails' => 1,
+                'id[!]' => $dbUser['id']
+            ]
+        ]);
+        if (!empty($emailAdmins)) {
+            $adminEmails = array_column($emailAdmins, 'email');
+            $body = "<p>A new reply/update has been added to ticket (<strong>#{$data['ticket_id']}</strong>) by <strong>{$dbUser['name']}</strong>.</p><hr><p>{$data['comment']}</p><hr><p>Please review it in the CRM.</p>";
+            sendEmail($adminEmails, "New Reply on Ticket #{$data['ticket_id']}", 'default', $body, true, $ticketLink);
+        }
     }
 
     // Update ticket if there are changes
