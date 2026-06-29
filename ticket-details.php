@@ -160,8 +160,24 @@ html_start('Ticket #' . $ticketId);
     .ticket-view { max-width: 1200px; margin: 2rem auto; }
     
     /* Timeline Container */
-    .timeline-container { position: relative; padding: 2rem 1.5rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .timeline-container { 
+        position: relative; 
+        padding: 2rem 1.5rem; 
+        background: #f8fafc; 
+        border-radius: 12px; 
+        border: 1px solid #e2e8f0; 
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); 
+        max-height: 600px;
+        overflow-y: auto;
+    }
     .dark-mode .timeline-container { background: #111827; border-color: #374151; }
+    
+    /* Custom Scrollbar for Timeline */
+    .timeline-container::-webkit-scrollbar { width: 6px; }
+    .timeline-container::-webkit-scrollbar-track { background: transparent; }
+    .timeline-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .timeline-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .dark-mode .timeline-container::-webkit-scrollbar-thumb { background: #4b5563; }
     
     /* The vertical line */
     .timeline-container::before { content: ''; position: absolute; top: 2rem; bottom: 2rem; left: 3.8rem; width: 2px; background: #e2e8f0; z-index: 0; }
