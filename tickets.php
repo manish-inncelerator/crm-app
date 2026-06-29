@@ -150,6 +150,8 @@ html_start('Tickets Dashboard');
     .view-btn { padding: 0.5rem 1rem; border: 1px solid #e5e7eb; background: #fff; color: #4b5563; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
     .dark-mode .view-btn { background: #1f2937; border-color: #374151; color: #d1d5db; }
     .view-btn.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+    
+    .kanban-cards { min-height: 200px; flex-grow: 1; padding-bottom: 2rem; }
 </style>
 
 <div class="dashboard-container">
@@ -410,50 +412,52 @@ html_start('Tickets Dashboard');
     }
 
     // Initialize Sortable for Kanban Drag and Drop
-    document.querySelectorAll('.kanban-cards').forEach(function(column) {
-        new Sortable(column, {
-            group: 'kanban',
-            animation: 150,
-            ghostClass: 'bg-light',
-            onEnd: function(evt) {
-                const itemEl = evt.item; // The dragged card
-                const toList = evt.to;   // The target column
-                const fromList = evt.from;
-                
-                if (toList !== fromList) {
-                    const ticketId = itemEl.getAttribute('data-ticket-id');
-                    const ticketType = itemEl.getAttribute('data-ticket-type');
-                    const newStatus = toList.getAttribute('data-column-status');
+    $(document).ready(function() {
+        document.querySelectorAll('.kanban-cards').forEach(function(column) {
+            new Sortable(column, {
+                group: 'kanban',
+                animation: 150,
+                ghostClass: 'bg-light',
+                onEnd: function(evt) {
+                    const itemEl = evt.item; // The dragged card
+                    const toList = evt.to;   // The target column
+                    const fromList = evt.from;
                     
-                    // Call API to update ticket status
-                    fetch('api/update-ticket.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            ticket_id: ticketId,
-                            ticket_type: ticketType,
-                            status: newStatus
+                    if (toList !== fromList) {
+                        const ticketId = itemEl.getAttribute('data-ticket-id');
+                        const ticketType = itemEl.getAttribute('data-ticket-type');
+                        const newStatus = toList.getAttribute('data-column-status');
+                        
+                        // Call API to update ticket status
+                        fetch('api/update-ticket.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                ticket_id: ticketId,
+                                ticket_type: ticketType,
+                                status: newStatus
+                            })
                         })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (!data.success) {
-                            alert('Failed to update status: ' + (data.error || 'Unknown error'));
-                            // Optional: Revert the card to the original list if failed
-                        } else {
-                            // Update count badges
-                            const fromCountEl = fromList.previousElementSibling.querySelector('.kanban-count');
-                            const toCountEl = toList.previousElementSibling.querySelector('.kanban-count');
-                            fromCountEl.textContent = parseInt(fromCountEl.textContent) - 1;
-                            toCountEl.textContent = parseInt(toCountEl.textContent) + 1;
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        alert('Network error while updating status.');
-                    });
+                        .then(response => response.json())
+                        .then(data => {
+                            if (!data.success) {
+                                alert('Failed to update status: ' + (data.error || 'Unknown error'));
+                                // Optional: Revert the card to the original list if failed
+                            } else {
+                                // Update count badges
+                                const fromCountEl = fromList.previousElementSibling.querySelector('.kanban-count');
+                                const toCountEl = toList.previousElementSibling.querySelector('.kanban-count');
+                                fromCountEl.textContent = parseInt(fromCountEl.textContent) - 1;
+                                toCountEl.textContent = parseInt(toCountEl.textContent) + 1;
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            alert('Network error while updating status.');
+                        });
+                    }
                 }
-            }
+            });
         });
     });
 </script>
