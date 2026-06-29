@@ -5,7 +5,6 @@
     <!-- Logo -->
     <div class="sidebar-logo">
         <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <span class="sidebar-logo-icon"><i class="bi bi-layers-fill"></i></span>
             <span class="sidebar-logo-text">Accounts Ticketing System</span>
         </div>
         <button class="sidebar-close d-md-none" id="sidebar-close" aria-label="Close sidebar">
@@ -69,6 +68,13 @@
             class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'manage-kb.php' ? 'active' : ''; ?>">
             <i class="bi bi-gear sidebar-link-icon"></i>
             <span class="sidebar-link-text">Manage KB</span>
+        </a>
+        <?php endif; ?>
+        <?php if ($isMasterAdmin ?? $dbUser['is_master_admin'] ?? false): ?>
+        <a href="refund-approvals.php"
+            class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'refund-approvals.php' ? 'active' : ''; ?>">
+            <i class="bi bi-cash-coin sidebar-link-icon"></i>
+            <span class="sidebar-link-text">Refund Approvals</span>
         </a>
         <?php endif; ?>
     </nav>

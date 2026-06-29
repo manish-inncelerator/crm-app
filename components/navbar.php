@@ -299,7 +299,6 @@
                 <i class="bi bi-list"></i>
             </button>
             <a href="dashboard.php" class="navbar-brand">
-                <span class="navbar-brand-icon">✈️</span>
                 <span>Accounts Ticketing System</span>
             </a>
         </div>

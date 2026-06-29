@@ -40,13 +40,14 @@ body.dark-mode .sidebar {
 
 /* Sidebar Logo Section */
 .sidebar-logo {
-    padding: 1.5rem 1.5rem;
+    padding: 0 1.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     position: relative;
     background: transparent;
-    height: 70px;
+    height: 64px;
+    border-bottom: 1px solid transparent; /* Keeps layout consistent if navbar has border */
 }
 
 .sidebar-logo-icon {
@@ -62,7 +63,7 @@ body.dark-mode .sidebar-logo-icon {
 .sidebar-logo-text {
     font-weight: 700;
     color: #0f172a;
-    font-size: 1rem;
+    font-size: 1.15rem;
     letter-spacing: -0.01em;
     line-height: 1.2;
 }
