@@ -113,8 +113,7 @@ try {
 
 html_start('Tickets Dashboard');
 ?>
-<!-- jQuery & DataTables -->
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="assets/css/dashboard.css">
 <style>
@@ -332,12 +331,14 @@ html_start('Tickets Dashboard');
                             
                             <div class="kanban-cards" data-column-status="<?= $statuses[0] ?>">
                                 <?php foreach ($colTickets as $t): ?>
-                                    <div class="kanban-card" data-ticket-id="<?= $t['id'] ?>" data-ticket-type="<?= $t['type'] ?>" onclick="window.location='ticket-details.php?id=<?= $t['id'] ?>'">
+                                    <div class="kanban-card" data-ticket-id="<?= $t['id'] ?>" data-ticket-type="<?= $t['type'] ?>">
                                         <div class="d-flex justify-content-between mb-2">
                                             <span class="text-muted small fw-bold">#<?= $t['id'] ?></span>
                                             <span class="badge <?= getPriorityClass($t['priority']) ?>" style="font-size: 0.65rem;"><?= $t['priority'] ?></span>
                                         </div>
-                                        <div class="kanban-card-title"><?= htmlspecialchars($t['subtype']) ?></div>
+                                        <div class="kanban-card-title">
+                                            <a href="ticket-details.php?id=<?= $t['id'] ?>" class="text-decoration-none" style="color: inherit;"><?= htmlspecialchars($t['subtype']) ?></a>
+                                        </div>
                                         <div class="mb-2"><?= getStatusBadge($t['status']) ?></div>
                                         <div class="kanban-card-meta mt-3 pt-2 border-top">
                                             <div title="<?= htmlspecialchars($users[$t['user_id']]['name'] ?? '') ?>">
@@ -359,9 +360,12 @@ html_start('Tickets Dashboard');
     </div>
 </div>
 
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<?php include 'components/bottom_navbar.php'; ?>
+<?php html_end([
+    'https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js',
+    'https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js',
+    'https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js'
+]); ?>
 <script>
     $(document).ready(function() {
         const tableOptions = {
@@ -454,5 +458,4 @@ html_start('Tickets Dashboard');
     });
 </script>
 
-<?php include 'components/bottom_navbar.php'; ?>
-<?php html_end(); ?>
+<!-- Footer included above scripts -->

@@ -40,7 +40,7 @@ try {
         exit;
     }
 
-    if (!isset($data['ticket_category'])) {
+    if (!isset($data['ticket_type'])) {
         http_response_code(400);
         echo json_encode(['error' => 'Ticket category is required']);
         exit;
@@ -52,7 +52,7 @@ try {
         exit;
     }
 
-    $category = $data['ticket_category'];
+    $category = $data['ticket_type'];
     $bookingReference = trim($data['booking_reference']);
     $priority = $data['priority'] ?? 'MEDIUM';
     

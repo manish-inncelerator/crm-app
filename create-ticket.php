@@ -631,7 +631,7 @@ html_start('Create Ticket');
                         <div class="form-check mt-2">
                             <input class="form-check-input" type="checkbox" name="policy_confirmation" id="policyConfirmation" required>
                             <label class="form-check-label" for="policyConfirmation">
-                                I confirm that the customer has been informed of the 14-day refund policy.
+                                I confirm that the customer has been informed of the 40-day refund policy.
                             </label>
                         </div>
                     </div>
@@ -927,6 +927,12 @@ html_start('Create Ticket');
     document.querySelectorAll('form').forEach(form => {
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            if (!this.checkValidity()) {
+                e.stopPropagation();
+                this.classList.add('was-validated');
+                return;
+            }
 
             const modalId = this.closest('.modal').id;
             let ticketType = '';

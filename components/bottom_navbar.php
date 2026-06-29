@@ -1,3 +1,9 @@
+<style>
+    /* Hide bottom navbar when modal is open */
+    body.modal-open .mobile-bottom-navbar {
+        display: none !important;
+    }
+</style>
 <div class="mobile-bottom-navbar">
     <button class="mobile-nav-btn<?php if (basename($_SERVER['PHP_SELF']) == 'dashboard.php') echo ' active'; ?>" onclick="window.location.href='dashboard.php'">
         <i class="fas fa-home"></i>
