@@ -32,6 +32,8 @@ if (!$dbUser || !($dbUser['is_admin'] ?? false)) {
     exit;
 }
 
+$isMasterAdmin = (bool)($dbUser['is_master_admin'] ?? false);
+
 // Fetch all users
 $users = $database->select('users', '*', ['ORDER' => ['name' => 'ASC']]);
 
@@ -41,20 +43,25 @@ html_start('Manage Users');
 <link rel="stylesheet" href="assets/css/dashboard.css">
 <style>
     .user-card {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
         border-radius: 15px;
         padding: 1.5rem;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
         height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .user-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
     }
     .dark-mode .user-card {
-        background: rgba(30, 41, 59, 0.7);
+        background: #1f2937;
+        border-color: #374151;
     }
     .user-avatar {
         width: 80px;
@@ -62,21 +69,40 @@ html_start('Manage Users');
         border-radius: 50%;
         margin-bottom: 1rem;
         object-fit: cover;
-        border: 3px solid var(--primary-color);
+        border: 3px solid #2563eb;
     }
     .status-badge {
         font-size: 0.75rem;
         padding: 0.25rem 0.75rem;
         border-radius: 50px;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
     }
     .status-active { background: #dcfce7; color: #166534; }
     .status-ex { background: #fee2e2; color: #991b1b; }
     
-    .btn-toggle-status {
+    .role-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        margin: 0.25rem;
+        display: inline-block;
+    }
+    .role-master { background: #4f46e5; color: white; }
+    .role-admin { background: #2563eb; color: white; }
+    .role-finance { background: #059669; color: white; }
+    .role-user { background: #6b7280; color: white; }
+    
+    .actions-container {
         width: 100%;
         margin-top: auto;
+        padding-top: 1rem;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
     }
+    .dark-mode .actions-container { border-color: #374151; }
 </style>
 
 <div class="dashboard-container">
@@ -87,31 +113,84 @@ html_start('Manage Users');
         <div class="container-fluid py-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h2 class="mb-1">Employee Management</h2>
-                    <p class="text-muted">Manage system users and active/ex-employee status.</p>
+                    <h2 class="mb-1 fw-bold">Team Management</h2>
+                    <p class="text-muted">Manage roles, financial access, and active status.</p>
                 </div>
             </div>
 
             <div class="row g-4">
                 <?php foreach ($users as $u): ?>
+                    <?php 
+                        $isEx = (bool)($u['is_ex_employee'] ?? false);
+                        $uIsAdmin = (bool)($u['is_admin'] ?? false);
+                        $uIsMasterAdmin = (bool)($u['is_master_admin'] ?? false);
+                        $uCanViewFinancials = (bool)($u['can_view_financials'] ?? false);
+                    ?>
                     <div class="col-xl-3 col-lg-4 col-md-6">
                         <div class="user-card">
                             <img src="<?php echo htmlspecialchars($u['picture'] ?: 'https://via.placeholder.com/80'); ?>" alt="" class="user-avatar">
-                            <h5 class="mb-1"><?php echo htmlspecialchars($u['name']); ?></h5>
-                            <p class="text-muted small mb-2"><?php echo htmlspecialchars($u['email']); ?></p>
-                            <p class="small mb-3">Role: <span class="badge bg-secondary"><?php echo ($u['is_admin'] ? 'Admin' : 'User'); ?></span></p>
+                            <h5 class="mb-1 fw-bold"><?php echo htmlspecialchars($u['name']); ?></h5>
+                            <p class="text-muted small mb-3"><?php echo htmlspecialchars($u['email']); ?></p>
                             
-                            <?php if ($u['is_ex_employee']): ?>
-                                <span class="status-badge status-ex">Ex-Employee</span>
-                                <button class="btn btn-outline-success btn-sm btn-toggle-status" onclick="toggleStatus(<?php echo $u['id']; ?>, 0)">
-                                    <i class="bi bi-person-check me-1"></i> Mark as Active
-                                </button>
-                            <?php else: ?>
-                                <span class="status-badge status-active">Active</span>
-                                <button class="btn btn-outline-danger btn-sm btn-toggle-status" onclick="toggleStatus(<?php echo $u['id']; ?>, 1)">
-                                    <i class="bi bi-person-x me-1"></i> Mark as Ex-Employee
-                                </button>
-                            <?php endif; ?>
+                            <div class="mb-3">
+                                <?php if ($isEx): ?>
+                                    <div class="status-badge status-ex">Ex-Employee</div>
+                                <?php else: ?>
+                                    <div class="status-badge status-active">Active</div>
+                                <?php endif; ?>
+                                
+                                <div>
+                                    <?php if ($uIsMasterAdmin): ?>
+                                        <span class="role-badge role-master"><i class="bi bi-star-fill"></i> Master Admin</span>
+                                    <?php elseif ($uIsAdmin): ?>
+                                        <span class="role-badge role-admin">Admin</span>
+                                    <?php else: ?>
+                                        <span class="role-badge role-user">User</span>
+                                    <?php endif; ?>
+                                    
+                                    <?php if ($uCanViewFinancials): ?>
+                                        <span class="role-badge role-finance"><i class="bi bi-currency-dollar"></i> Finance Access</span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            
+                            <div class="actions-container">
+                                <!-- Status Toggle -->
+                                <?php if ($isEx): ?>
+                                    <button class="btn btn-outline-success btn-sm w-100" onclick="toggleStatus(<?php echo $u['id']; ?>, 0)">
+                                        <i class="bi bi-person-check me-1"></i> Mark Active
+                                    </button>
+                                <?php else: ?>
+                                    <button class="btn btn-outline-danger btn-sm w-100" onclick="toggleStatus(<?php echo $u['id']; ?>, 1)">
+                                        <i class="bi bi-person-x me-1"></i> Mark Ex-Employee
+                                    </button>
+                                <?php endif; ?>
+
+                                <!-- Role Toggles (Only Admins can promote Users to Admins. Master Admins can do everything.) -->
+                                <?php if ($isMasterAdmin && $u['id'] != $dbUser['id']): ?>
+                                    <!-- Master Admin Controls -->
+                                    <div class="dropdown w-100">
+                                        <button class="btn btn-light border btn-sm w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            <i class="bi bi-shield-lock"></i> Edit Roles
+                                        </button>
+                                        <ul class="dropdown-menu shadow">
+                                            <li><a class="dropdown-item" href="#" onclick="updateRole(<?= $u['id'] ?>, 'admin', <?= $uIsAdmin ? '0' : '1' ?>)"><?= $uIsAdmin ? 'Demote to User' : 'Promote to Admin' ?></a></li>
+                                            <?php if ($uIsAdmin): ?>
+                                                <li><a class="dropdown-item" href="#" onclick="updateRole(<?= $u['id'] ?>, 'master', <?= $uIsMasterAdmin ? '0' : '1' ?>)"><?= $uIsMasterAdmin ? 'Remove Master Admin' : 'Make Master Admin' ?></a></li>
+                                            <?php endif; ?>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="#" onclick="updateRole(<?= $u['id'] ?>, 'finance', <?= $uCanViewFinancials ? '0' : '1' ?>)"><?= $uCanViewFinancials ? 'Revoke Finance Access' : 'Grant Finance Access' ?></a></li>
+                                        </ul>
+                                    </div>
+                                <?php elseif ($u['id'] != $dbUser['id']): ?>
+                                    <!-- Standard Admin Controls -->
+                                    <?php if (!$uIsMasterAdmin): // Admins can't demote Master Admins ?>
+                                        <button class="btn btn-light border btn-sm w-100" onclick="updateRole(<?= $u['id'] ?>, 'admin', <?= $uIsAdmin ? '0' : '1' ?>)">
+                                            <i class="bi bi-shield"></i> <?= $uIsAdmin ? 'Demote to User' : 'Promote to Admin' ?>
+                                        </button>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -136,7 +215,7 @@ html_start('Manage Users');
                     <select class="form-select" id="replacementUserId" required>
                         <option value="">Select Replacement...</option>
                         <?php foreach ($users as $u_opt): ?>
-                            <?php if (!$u_opt['is_ex_employee']): ?>
+                            <?php if (!($u_opt['is_ex_employee'] ?? false)): ?>
                                 <option value="<?php echo $u_opt['id']; ?>"><?php echo htmlspecialchars($u_opt['name']); ?></option>
                             <?php endif; ?>
                         <?php endforeach; ?>
@@ -161,14 +240,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function toggleStatus(userId, status) {
     if (status === 1) {
-        // Mark as Ex-Employee
         currentActionUserId = userId;
         document.getElementById('targetUserId').value = userId;
-        // Reset dropdown
         document.getElementById('replacementUserId').value = '';
         replacementModal.show();
     } else {
-        // Mark as Active
         if (!confirm('Are you sure you want to mark this user as active?')) return;
         submitToggle(userId, 0);
     }
@@ -178,15 +254,8 @@ async function confirmExEmployee() {
     const userId = document.getElementById('targetUserId').value;
     const replacementId = document.getElementById('replacementUserId').value;
     
-    if (!replacementId) {
-        alert('Please select a replacement employee.');
-        return;
-    }
-    
-    if (userId == replacementId) {
-        alert('You cannot select the same employee as their own replacement.');
-        return;
-    }
+    if (!replacementId) { alert('Please select a replacement employee.'); return; }
+    if (userId == replacementId) { alert('You cannot select the same employee as their own replacement.'); return; }
     
     replacementModal.hide();
     submitToggle(userId, 1, replacementId);
@@ -208,6 +277,30 @@ async function submitToggle(userId, status, replacementId = null) {
             location.reload();
         } else {
             alert(result.error || 'Failed to update status');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred');
+    }
+}
+
+async function updateRole(userId, roleType, actionValue) {
+    if (!confirm('Are you sure you want to update this user\'s permissions?')) return;
+    try {
+        const response = await fetch('api/update-role.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                user_id: userId, 
+                role_type: roleType,
+                action_value: actionValue
+            })
+        });
+        const result = await response.json();
+        if (result.success) {
+            location.reload();
+        } else {
+            alert(result.error || 'Failed to update role');
         }
     } catch (error) {
         console.error('Error:', error);

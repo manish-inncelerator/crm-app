@@ -363,7 +363,7 @@ crm/
 ├── login.php             # Authentication
 ├── dashboard.php         # Main dashboard
 ├── tickets.php           # Ticket management
-├── messages.php          # Messaging system
+
 ├── notifications.php     # Notification center
 ├── timeline.php          # Activity timeline
 ├── callback.php          # OAuth callback

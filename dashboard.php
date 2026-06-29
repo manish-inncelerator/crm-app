@@ -66,32 +66,24 @@ try {
     writeLog('Dashboard - User data from database: ' . print_r($dbUser, true));
     $is_admin = (bool)($dbUser['is_admin'] ?? false);
 
-    // Get ticket counts
-    $ticketTypes = ['estimate', 'supplier', 'general'];
-    $openTickets = 0;
-    $closedTickets = 0;
-
-    foreach ($ticketTypes as $type) {
-        $table = $type . '_tickets';
-        if ($dbUser['is_admin']) {
-            // Admin sees all tickets
-            $openTickets += $database->count($table, [
-                'status' => ['OPEN', 'IN_PROGRESS']
-            ]);
-            $closedTickets += $database->count($table, [
-                'status' => ['RESOLVED', 'CLOSED']
-            ]);
-        } else {
-            // Regular users see only their tickets
-            $openTickets += $database->count($table, [
-                'user_id' => $dbUser['id'],
-                'status' => ['OPEN', 'IN_PROGRESS']
-            ]);
-            $closedTickets += $database->count($table, [
-                'user_id' => $dbUser['id'],
-                'status' => ['RESOLVED', 'CLOSED']
-            ]);
-        }
+    // Get ticket counts from unified table
+    $openStatuses = ['SUBMITTED', 'OPEN', 'IN_PROGRESS', 'UNDER_REVIEW', 'PENDING_APPROVAL'];
+    $closedStatuses = ['RESOLVED', 'CLOSED', 'APPROVED', 'PROCESSED', 'REJECTED'];
+    
+    if ($dbUser['is_admin']) {
+        // Admin sees all tickets
+        $openTickets = $database->count('tickets_unified', ['status' => $openStatuses]);
+        $closedTickets = $database->count('tickets_unified', ['status' => $closedStatuses]);
+    } else {
+        // Regular users see only their tickets
+        $openTickets = $database->count('tickets_unified', [
+            'user_id' => $dbUser['id'],
+            'status' => $openStatuses
+        ]);
+        $closedTickets = $database->count('tickets_unified', [
+            'user_id' => $dbUser['id'],
+            'status' => $closedStatuses
+        ]);
     }
 
     // Get unread notifications count
@@ -100,34 +92,7 @@ try {
         'is_read' => false
     ]);
 
-    // Get new messages count (unread comments on tickets)
-    $newMessages = 0;
-    foreach ($ticketTypes as $type) {
-        $table = $type . '_tickets';
 
-        if ($dbUser['is_admin']) {
-            // For admin: count all new comments on all tickets
-            $newMessages += $database->count('ticket_comments', [
-                'ticket_type' => $type,
-                'user_id[!]' => $dbUser['id'],
-                'created_at[>]' => $dbUser['last_activity']
-            ]);
-        } else {
-            // For regular users: count new comments on their tickets
-            $ticketIds = $database->select($table, 'id', [
-                'user_id' => $dbUser['id']
-            ]);
-
-            if (!empty($ticketIds)) {
-                $newMessages += $database->count('ticket_comments', [
-                    'ticket_id' => $ticketIds,
-                    'ticket_type' => $type,
-                    'user_id[!]' => $dbUser['id'],
-                    'created_at[>]' => $dbUser['last_activity']
-                ]);
-            }
-        }
-    }
 
     // Get recent activity
     $recentActivity = $database->select('notifications', '*', [
@@ -237,9 +202,7 @@ html_start('Dashboard - Fayyaz Travels CRM', ['assets/css/dashboard.css']);
                 <a href="create-ticket.php" class="btn-premium">
                     <i class="fas fa-plus"></i> New Ticket
                 </a>
-                <a href="messages.php" class="btn-premium">
-                    <i class="fas fa-envelope"></i> New Message
-                </a>
+
             </div>
         </div>
 
@@ -263,17 +226,7 @@ html_start('Dashboard - Fayyaz Travels CRM', ['assets/css/dashboard.css']);
                 </div>
             </a>
             
-            <a href="messages.php" class="bento-card" title="Go to Messages">
-                <div class="bento-icon-wrapper"><i class="fas fa-envelope"></i></div>
-                <h3>Messages</h3>
-                <p>Check your recent messages</p>
-                <div class="bento-badges">
-                    <span class="bento-badge <?php echo $newMessages > 0 ? 'alert' : 'secondary'; ?>">
-                        <?php echo $newMessages; ?> New
-                    </span>
-                </div>
-            </a>
-            
+
             <a href="notifications.php" class="bento-card" title="Go to Notifications">
                 <div class="bento-icon-wrapper"><i class="fas fa-bell"></i></div>
                 <h3>Notifications</h3>

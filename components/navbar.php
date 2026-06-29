@@ -337,7 +337,7 @@
             'tickets.php': 'Ticket Management',
             'create-ticket.php': 'Create New Ticket',
             'notifications.php': 'Notifications Center',
-            'messages.php': 'Internal Messages',
+
             'timeline.php': 'Audit Timeline',
             'knowledgebase.php': 'Knowledge Base',
             'manage-kb.php': 'KB Administration',

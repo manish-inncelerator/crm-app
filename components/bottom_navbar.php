@@ -13,10 +13,7 @@
         <span>New</span>
     </button>
     <?php endif; ?>
-    <button class="mobile-nav-btn<?php if (basename($_SERVER['PHP_SELF']) == 'messages.php') echo ' active'; ?>" onclick="window.location.href='messages.php'">
-        <i class="fas fa-envelope"></i>
-        <span>Messages</span>
-    </button>
+
     <button class="mobile-nav-btn<?php if (basename($_SERVER['PHP_SELF']) == 'notifications.php') echo ' active'; ?>" onclick="window.location.href='notifications.php'">
         <i class="fas fa-bell"></i>
         <span>Notifications</span>

@@ -40,11 +40,7 @@
 
         <!-- Communication -->
         <div class="sidebar-nav-label">Communication</div>
-        <a href="messages.php"
-            class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : ''; ?>">
-            <i class="bi bi-chat-left-dots sidebar-link-icon"></i>
-            <span class="sidebar-link-text">Messages</span>
-        </a>
+
         <a href="notifications.php"
             class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'notifications.php' ? 'active' : ''; ?>">
             <i class="bi bi-bell sidebar-link-icon"></i>
