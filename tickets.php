@@ -168,10 +168,12 @@ html_start('Tickets Dashboard');
                     <?php endif; ?>
                 </div>
                 <div class="d-flex gap-3 align-items-center">
+                    <?php if ($isAdmin): ?>
                     <div class="view-toggle">
                         <button class="view-btn active" onclick="switchView('list')" id="btn-list"><i class="bi bi-list-task"></i> List</button>
                         <button class="view-btn" onclick="switchView('kanban')" id="btn-kanban"><i class="bi bi-kanban"></i> Board</button>
                     </div>
+                    <?php endif; ?>
                     <a href="create-ticket.php" class="btn btn-primary"><i class="bi bi-plus-lg"></i> New Ticket</a>
                 </div>
             </div>
@@ -310,6 +312,7 @@ html_start('Tickets Dashboard');
             </div>
 
             <!-- Kanban View Container -->
+            <?php if ($isAdmin): ?>
             <div id="kanbanView" style="display: none;">
                 <?php 
                     $columns = [
@@ -357,6 +360,7 @@ html_start('Tickets Dashboard');
                     <?php endforeach; ?>
                 </div>
             </div>
+            <?php endif; ?>
 
         </div>
     </div>
@@ -412,6 +416,7 @@ html_start('Tickets Dashboard');
     }
 
     // Initialize Sortable for Kanban Drag and Drop
+    <?php if ($isAdmin): ?>
     $(document).ready(function() {
         document.querySelectorAll('.kanban-cards').forEach(function(column) {
             new Sortable(column, {
@@ -460,6 +465,7 @@ html_start('Tickets Dashboard');
             });
         });
     });
+    <?php endif; ?>
 </script>
 
 <!-- Footer included above scripts -->
