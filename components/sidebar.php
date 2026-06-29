@@ -5,7 +5,7 @@
     <!-- Logo -->
     <div class="sidebar-logo">
         <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <span class="sidebar-logo-text">Accounts Ticketing System</span>
+            <!-- Removed redundant sidebar text -->
         </div>
         <button class="sidebar-close d-md-none" id="sidebar-close" aria-label="Close sidebar">
             <i class="bi bi-x-lg"></i>

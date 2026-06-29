@@ -173,24 +173,15 @@ html_start('Manage Users');
                                     <button class="btn btn-light border btn-sm w-100 mb-1" onclick="updateRole(<?= $u['id'] ?>, 'admin', <?= $uIsAdmin ? '0' : '1' ?>)">
                                         <i class="bi bi-shield"></i> <?= $uIsAdmin ? 'Demote to User' : 'Make Admin' ?>
                                     </button>
-                                    <?php if ($uIsAdmin): ?>
                                     <button class="btn btn-light border btn-sm w-100 mb-1" onclick="updateRole(<?= $u['id'] ?>, 'master', <?= $uIsMasterAdmin ? '0' : '1' ?>)">
                                         <i class="bi bi-star"></i> <?= $uIsMasterAdmin ? 'Remove Super Admin' : 'Make Super Admin' ?>
                                     </button>
-                                    <?php endif; ?>
                                     <button class="btn btn-light border btn-sm w-100 mb-1" onclick="updateRole(<?= $u['id'] ?>, 'finance', <?= $uCanViewFinancials ? '0' : '1' ?>)">
                                         <i class="bi bi-currency-dollar"></i> <?= $uCanViewFinancials ? 'Revoke Finance Access' : 'Grant Finance Access' ?>
                                     </button>
                                     <button class="btn btn-light border btn-sm w-100" onclick="toggleEmailPref(<?= $u['id'] ?>, <?= $uReceiveEmails ? '0' : '1' ?>)">
                                         <i class="bi <?= $uReceiveEmails ? 'bi-bell-slash' : 'bi-bell' ?>"></i> <?= $uReceiveEmails ? 'Disable Email Alerts' : 'Enable Email Alerts' ?>
                                     </button>
-                                <?php elseif ($u['id'] != $dbUser['id']): ?>
-                                    <!-- Standard Admin Controls -->
-                                    <?php if (!$uIsMasterAdmin): // Admins can't demote Super Admins ?>
-                                        <button class="btn btn-light border btn-sm w-100" onclick="updateRole(<?= $u['id'] ?>, 'admin', <?= $uIsAdmin ? '0' : '1' ?>)">
-                                            <i class="bi bi-shield"></i> <?= $uIsAdmin ? 'Demote to User' : 'Make Admin' ?>
-                                        </button>
-                                    <?php endif; ?>
                                 <?php endif; ?>
                             </div>
                         </div>
