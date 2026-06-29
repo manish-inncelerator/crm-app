@@ -1,0 +1,10 @@
+# Disable directory browsing
+Options -Indexes
+
+# Prevent access to sensitive files
+<FilesMatch "\.(json|env|log|ini)$">
+    Require all denied
+</FilesMatch>
+
+# Optional: Disable search engines from indexing via header
+Header set X-Robots-Tag "noindex, nofollow"
