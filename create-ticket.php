@@ -67,18 +67,140 @@ html_start('Create Ticket');
 
 <link rel="stylesheet" href="assets/css/dashboard.css">
 <style>
-    /* Only override the close icon in dark mode */
+    .modal .btn-close {
+        background-color: #f1f5f9;
+        border-radius: 50%;
+        padding: 0.8rem;
+        opacity: 0.7;
+        transition: all 0.3s ease;
+        background-size: 10px;
+    }
     .dark-mode .modal .btn-close {
+        background-color: #334155;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M2.146 2.146a.5.5 0 0 1 .708 0L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E") !important;
     }
-
     .modal .btn-close:hover {
-        opacity: 0.75;
+        opacity: 1;
+        background-color: #e2e8f0;
+        transform: rotate(90deg);
+    }
+    .dark-mode .modal .btn-close:hover {
+        background-color: #475569;
     }
 
-    .modal .form-control,
-    .modal .form-select {
-        border: 1px solid var(--dash-border);
+    /* Fullscreen modal styling */
+    .modal-dialog {
+        max-width: 100% !important;
+        margin: 0 !important;
+        height: 100% !important;
+    }
+    .modal-content {
+        border-radius: 0 !important;
+        min-height: 100vh !important;
+        border: none;
+        background: #f1f5f9; /* sleek light gray backdrop */
+    }
+    .dark-mode .modal-content {
+        background: #0f172a;
+    }
+    .modal-header {
+        background: #ffffff;
+        padding: 1.5rem 3rem;
+        border-bottom: 1px solid #e2e8f0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    .dark-mode .modal-header {
+        background: #1e293b;
+        border-color: #334155;
+    }
+    .modal-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+    .dark-mode .modal-title { color: #f8fafc; }
+    
+    .modal-body {
+        padding: 3rem !important;
+        max-width: 900px;
+        margin: 3rem auto !important;
+        width: 100%;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01);
+        border: 1px solid #e2e8f0;
+        align-content: flex-start;
+    }
+    .dark-mode .modal-body {
+        background: #1e293b;
+        border-color: #334155;
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+    }
+    
+    .modal-footer {
+        background: #ffffff;
+        border-top: 1px solid #e2e8f0;
+        padding: 1.5rem 3rem;
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+    .dark-mode .modal-footer {
+        background: #1e293b;
+        border-color: #334155;
+    }
+    .modal-footer .btn {
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        border-radius: 8px;
+        font-size: 1rem;
+        letter-spacing: 0.02em;
+    }
+
+    /* Premium form fields */
+    .form-label {
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+    .dark-mode .form-label { color: #cbd5e1; }
+    
+    .form-control, .form-select {
+        padding: 0.85rem 1.2rem;
+        border-radius: 10px;
+        border: 1.5px solid #cbd5e1 !important;
+        background-color: #f8fafc;
+        transition: all 0.2s ease;
+        font-size: 1rem;
+        color: #0f172a;
+    }
+    .dark-mode .form-control, .dark-mode .form-select {
+        background-color: #0f172a;
+        border-color: #334155 !important;
+        color: #f8fafc;
+    }
+    .form-control:focus, .form-select:focus {
+        background-color: #ffffff;
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important;
+    }
+    .dark-mode .form-control:focus, .dark-mode .form-select:focus {
+        background-color: #1e293b;
+    }
+
+    /* Modal transition overrides for a smoother pop */
+    .modal.fade .modal-dialog {
+        transform: scale(0.98);
+        transition: transform 0.2s ease-out;
+    }
+    .modal.show .modal-dialog {
+        transform: scale(1);
     }
 
     .dashboard-main-area {
