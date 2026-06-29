@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('Asia/Singapore');
+
 // Logging function
 function writeLog($message, $type = 'INFO')
 {

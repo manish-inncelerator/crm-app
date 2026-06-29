@@ -122,13 +122,13 @@ try {
                 'AND' => ['ticket_id' => $ticketId, 'ticket_type' => $ticket['type']],
                 'AND' => ['ticket_id' => $mapping['old_id'], 'ticket_type' => $mapping['old_type']]
             ],
-            'ORDER' => ['created_at' => 'ASC']
+            'ORDER' => ['created_at' => 'DESC']
         ]);
     } else {
         $comments = $database->select('ticket_comments', '*', [
             'ticket_id' => $ticketId,
             'ticket_type' => $ticket['type'],
-            'ORDER' => ['created_at' => 'ASC']
+            'ORDER' => ['created_at' => 'DESC']
         ]);
     }
     
@@ -328,7 +328,7 @@ html_start('Ticket #' . $ticketId);
                                         <div>
                                             <span class="fw-bold fs-6"><?= htmlspecialchars($users[$c['user_id']]['name'] ?? 'System') ?></span>
                                             <?php if ($isCommentAdmin): ?>
-                                                <span class="badge bg-purple ms-2 align-middle px-2 py-1"><i class="bi bi-shield-fill-check me-1"></i>Admin</span>
+                                                <span class="badge bg-warning text-dark ms-2 align-middle px-2 py-1"><i class="bi bi-shield-fill-check me-1"></i>Admin</span>
                                             <?php endif; ?>
                                         </div>
                                         <div class="text-muted small"><i class="bi bi-clock me-1"></i><?= date('F j, Y g:i A', strtotime($c['created_at'])) ?></div>
