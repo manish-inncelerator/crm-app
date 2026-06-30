@@ -417,7 +417,7 @@ for ($i = 0; $i < count($cleanSteps); $i++) {
                             </div>
                         <?php endforeach; ?>
                     </div>
-                </div>
+                    
                     <!-- Reply Box -->
                     <div class="reply-box mt-4">
                             <form method="POST">
@@ -485,6 +485,7 @@ for ($i = 0; $i < count($cleanSteps); $i++) {
                                 </div>
                             </form>
                         </div>
+                </div> <!-- End col-lg-8 -->
                 
                 <!-- Sidebar -->
                 <div class="col-lg-4 sticky-col">

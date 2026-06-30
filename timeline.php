@@ -40,9 +40,19 @@ $isGlobal = (!$ticketId || !$ticketType);
 // Fetch tickets for dropdown
 $allTickets = [];
 if ($is_admin) {
-    $allTickets = $database->select('tickets_unified', ['id', 'subtype', 'type'], ['ORDER' => ['id' => 'DESC']]);
+    $allTickets = $database->select('tickets_unified', [
+        '[>]users' => ['owner_id' => 'id']
+    ], [
+        'tickets_unified.id', 'tickets_unified.subtype', 'tickets_unified.type', 'tickets_unified.created_at',
+        'users.name(consultant_name)'
+    ], ['ORDER' => ['tickets_unified.id' => 'DESC']]);
 } else {
-    $allTickets = $database->select('tickets_unified', ['id', 'subtype', 'type'], ['user_id' => $dbUser['id'], 'ORDER' => ['id' => 'DESC']]);
+    $allTickets = $database->select('tickets_unified', [
+        '[>]users' => ['owner_id' => 'id']
+    ], [
+        'tickets_unified.id', 'tickets_unified.subtype', 'tickets_unified.type', 'tickets_unified.created_at',
+        'users.name(consultant_name)'
+    ], ['tickets_unified.user_id' => $dbUser['id'], 'ORDER' => ['tickets_unified.id' => 'DESC']]);
 }
 
 if ($isGlobal) {
@@ -157,7 +167,7 @@ html_start($pageTitle);
                             <option value="">-- Choose a Ticket --</option>
                             <?php foreach($allTickets as $t): ?>
                                 <option value="<?= $t['id'] ?>" <?= $t['id'] == $ticketId ? 'selected' : '' ?>>
-                                    #<?= str_pad($t['id'], 5, '0', STR_PAD_LEFT) ?> - <?= htmlspecialchars($t['subtype']) ?> (<?= ucfirst($t['type']) ?>)
+                                    #<?= str_pad($t['id'], 5, '0', STR_PAD_LEFT) ?> - <?= htmlspecialchars($t['subtype']) ?> (<?= ucfirst($t['type']) ?>) | Consultant: <?= htmlspecialchars($t['consultant_name'] ?? 'Unassigned') ?> | Date: <?= date('M d, Y', strtotime($t['created_at'])) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
