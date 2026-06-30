@@ -135,13 +135,13 @@ try {
                 'AND' => ['ticket_id' => $ticketId, 'ticket_type' => $ticket['type']],
                 'AND' => ['ticket_id' => $mapping['old_id'], 'ticket_type' => $mapping['old_type']]
             ],
-            'ORDER' => ['created_at' => 'DESC']
+            'ORDER' => ['created_at' => 'ASC']
         ]);
     } else {
         $comments = $database->select('ticket_comments', '*', [
             'ticket_id' => $ticketId,
             'ticket_type' => $ticket['type'],
-            'ORDER' => ['created_at' => 'DESC']
+            'ORDER' => ['created_at' => 'ASC']
         ]);
     }
     
