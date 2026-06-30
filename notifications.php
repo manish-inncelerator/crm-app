@@ -343,7 +343,6 @@ html_start('Notifications');
                         </table>
                     </div>
                 </div>
-                <?php endif; ?>
 
                 <!-- Pagination -->
                 <?php if ($total_pages > 1): ?>
