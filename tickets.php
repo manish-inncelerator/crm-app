@@ -45,6 +45,20 @@ function getPriorityClass($priority) {
     }
 }
 
+function getSLABadge($sla_due_date, $status) {
+    if (!$sla_due_date || in_array($status, ['CLOSED', 'RESOLVED', 'PROCESSED', 'REJECTED'])) return '';
+    $due = strtotime($sla_due_date);
+    $now = time();
+    $diff = $due - $now;
+    if ($diff < 0) {
+        return '<span class="badge bg-danger ms-1" title="SLA Breached"><i class="bi bi-fire"></i> Overdue</span>';
+    } elseif ($diff < 86400) {
+        return '<span class="badge bg-warning text-dark ms-1" title="SLA Warning"><i class="bi bi-exclamation-triangle"></i> Due Soon</span>';
+    } else {
+        return '<span class="badge bg-success ms-1" title="SLA OK"><i class="bi bi-shield-check"></i> On Track</span>';
+    }
+}
+
 function getStatusBadge($status) {
     switch ($status) {
         case 'CLOSED':
@@ -105,6 +119,16 @@ try {
         foreach ($userRows as $u) $users[$u['id']] = $u;
     }
     $allUsersList = $isAdmin ? $database->select('users', ['id', 'name'], ['ORDER' => ['name' => 'ASC']]) : [];
+    $employeesList = [];
+    if ($isAdmin) {
+        $allUsersFull = $database->select('users', '*');
+        foreach ($allUsersFull as $u) {
+            if (empty($u['is_admin']) && empty($u['is_master_admin'])) {
+                $employeesList[] = ['id' => $u['id'], 'name' => $u['name']];
+            }
+        }
+        usort($employeesList, function($a, $b) { return strcmp($a['name'], $b['name']); });
+    }
 
 } catch (\Exception $e) {
     header('Location: login.php');
@@ -174,7 +198,9 @@ html_start('Tickets Dashboard');
                         <button class="view-btn" onclick="switchView('kanban')" id="btn-kanban"><i class="bi bi-kanban"></i> Board</button>
                     </div>
                     <?php endif; ?>
+                    <?php if (!$isAdmin): ?>
                     <a href="create-ticket.php" class="btn btn-primary"><i class="bi bi-plus-lg"></i> New Ticket</a>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -200,6 +226,24 @@ html_start('Tickets Dashboard');
                             <?php foreach ($allUsersList as $u): ?>
                                 <option value="<?php echo htmlspecialchars($u['name']); ?>"><?php echo htmlspecialchars($u['name']); ?></option>
                             <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted mb-1">Employee Filter</label>
+                        <select id="employeeFilter" class="form-select form-select-sm">
+                            <option value="">All Employees</option>
+                            <?php foreach ($employeesList as $u): ?>
+                                <option value="<?php echo htmlspecialchars($u['name']); ?>"><?php echo htmlspecialchars($u['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted mb-1">Sort By</label>
+                        <select id="customSort" class="form-select form-select-sm">
+                            <option value="latest">Latest</option>
+                            <option value="oldest">Oldest</option>
+                            <option value="name_asc">Employee Name (A-Z)</option>
+                            <option value="name_desc">Employee Name (Z-A)</option>
                         </select>
                     </div>
                     <?php endif; ?>
@@ -244,7 +288,7 @@ html_start('Tickets Dashboard');
                                                 <?php $creator = $users[$t['user_id']] ?? ['name'=>'Unknown','email'=>'']; ?>
                                                 <tr class="ticket-row" onclick="window.location='ticket-details.php?id=<?= $t['id'] ?>'">
                                                     <td><span class="text-muted fw-bold">#<?= str_pad($t['id'], 5, '0', STR_PAD_LEFT) ?></span></td>
-                                                    <td>
+                                                    <td data-order="<?= htmlspecialchars($creator['name']) ?>">
                                                         <div class="d-flex align-items-center">
                                                             <div class="ms-2">
                                                                 <div class="fw-bold"><?= htmlspecialchars($creator['name']) ?></div>
@@ -254,12 +298,12 @@ html_start('Tickets Dashboard');
                                                     </td>
                                                     <td>
                                                         <div class="ticket-title"><?= htmlspecialchars($t['subtype']) ?></div>
-                                                        <div class="ticket-meta"><?= ucfirst($t['type']) ?> Request</div>
+                                                        <div class="ticket-meta"><?= ucfirst($t['type']) ?> Request <?= getSLABadge($t['sla_due_date'] ?? null, $t['status']) ?></div>
                                                     </td>
                                                     <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($t['booking_reference'] ?: 'N/A') ?></span></td>
                                                     <td><span class="badge <?= getPriorityClass($t['priority']) ?>"><?= $t['priority'] ?></span></td>
                                                     <td><?= getStatusBadge($t['status']) ?></td>
-                                                    <td>
+                                                    <td data-order="<?= strtotime($t['created_at']) ?>">
                                                         <div><?= date('M d, Y', strtotime($t['created_at'])) ?></div>
                                                         <div class="ticket-meta"><?= timeAgo($t['created_at']) ?></div>
                                                     </td>
@@ -294,12 +338,12 @@ html_start('Tickets Dashboard');
                                                 <?php $creator = $users[$t['user_id']] ?? ['name'=>'Unknown','email'=>'']; ?>
                                                 <tr class="ticket-row" onclick="window.location='ticket-details.php?id=<?= $t['id'] ?>'">
                                                     <td><span class="text-muted fw-bold">#<?= str_pad($t['id'], 5, '0', STR_PAD_LEFT) ?></span></td>
-                                                    <td><div class="fw-bold"><?= htmlspecialchars($creator['name']) ?></div></td>
+                                                    <td data-order="<?= htmlspecialchars($creator['name']) ?>"><div class="fw-bold"><?= htmlspecialchars($creator['name']) ?></div></td>
                                                     <td><div class="ticket-title"><?= htmlspecialchars($t['subtype']) ?></div></td>
                                                     <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($t['booking_reference'] ?: 'N/A') ?></span></td>
                                                     <td><span class="badge <?= getPriorityClass($t['priority']) ?>"><?= $t['priority'] ?></span></td>
                                                     <td><?= getStatusBadge($t['status']) ?></td>
-                                                    <td><?= date('M d, Y', strtotime($t['created_at'])) ?></td>
+                                                    <td data-order="<?= strtotime($t['created_at']) ?>"><?= date('M d, Y', strtotime($t['created_at'])) ?></td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>
@@ -343,6 +387,7 @@ html_start('Tickets Dashboard');
                                         </div>
                                         <div class="kanban-card-title">
                                             <a href="ticket-details.php?id=<?= $t['id'] ?>" class="text-decoration-none" style="color: inherit;"><?= htmlspecialchars($t['subtype']) ?></a>
+                                            <?= getSLABadge($t['sla_due_date'] ?? null, $t['status']) ?>
                                         </div>
                                         <div class="mb-2"><?= getStatusBadge($t['status']) ?></div>
                                         <div class="kanban-card-meta mt-3 pt-2 border-top">
@@ -397,6 +442,32 @@ html_start('Tickets Dashboard');
         $('#userFilter').on('change', function () {
             const val = $.fn.dataTable.util.escapeRegex($(this).val());
             openTable.column(1).search(val ? val : '', true, false).draw();
+            closedTable.column(1).search(val ? val : '', true, false).draw();
+            if ($(this).val()) $('#employeeFilter').val('');
+        });
+
+        $('#employeeFilter').on('change', function () {
+            const val = $.fn.dataTable.util.escapeRegex($(this).val());
+            openTable.column(1).search(val ? val : '', true, false).draw();
+            closedTable.column(1).search(val ? val : '', true, false).draw();
+            if ($(this).val()) $('#userFilter').val('');
+        });
+
+        $('#customSort').on('change', function () {
+            const val = $(this).val();
+            if (val === 'latest') {
+                openTable.order([6, 'desc']).draw();
+                closedTable.order([6, 'desc']).draw();
+            } else if (val === 'oldest') {
+                openTable.order([6, 'asc']).draw();
+                closedTable.order([6, 'asc']).draw();
+            } else if (val === 'name_asc') {
+                openTable.order([1, 'asc']).draw();
+                closedTable.order([1, 'asc']).draw();
+            } else if (val === 'name_desc') {
+                openTable.order([1, 'desc']).draw();
+                closedTable.order([1, 'desc']).draw();
+            }
         });
         <?php endif; ?>
     });

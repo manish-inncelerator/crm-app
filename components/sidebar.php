@@ -64,6 +64,11 @@
             <i class="bi bi-people sidebar-link-icon"></i>
             <span class="sidebar-link-text">Manage Users</span>
         </a>
+        <a href="clients.php"
+            class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'clients.php' || basename($_SERVER['PHP_SELF']) === 'client-details.php' ? 'active' : ''; ?>">
+            <i class="bi bi-person-lines-fill sidebar-link-icon"></i>
+            <span class="sidebar-link-text">Client Ledgers</span>
+        </a>
         <a href="manage-kb.php"
             class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'manage-kb.php' ? 'active' : ''; ?>">
             <i class="bi bi-gear sidebar-link-icon"></i>
@@ -79,10 +84,20 @@
         <?php endif; ?>
         
         <?php if (($isMasterAdmin ?? $dbUser['is_master_admin'] ?? false) || ($dbUser['can_view_financials'] ?? false)): ?>
+        <a href="finance-dashboard.php"
+            class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'finance-dashboard.php' ? 'active' : ''; ?>">
+            <i class="bi bi-graph-up-arrow sidebar-link-icon"></i>
+            <span class="sidebar-link-text">Finance Dashboard</span>
+        </a>
+        <a href="bulk-operations.php"
+            class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'bulk-operations.php' ? 'active' : ''; ?>">
+            <i class="bi bi-ui-checks-grid sidebar-link-icon"></i>
+            <span class="sidebar-link-text">Bulk Operations</span>
+        </a>
         <a href="payments.php"
             class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'payments.php' ? 'active' : ''; ?>">
             <i class="bi bi-wallet2 sidebar-link-icon"></i>
-            <span class="sidebar-link-text">Financials</span>
+            <span class="sidebar-link-text">Payments</span>
         </a>
         <?php endif; ?>
     </nav>

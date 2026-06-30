@@ -50,7 +50,9 @@ try {
         $changes = [];
         if ($isAdmin) {
             if ($ticket['type'] === 'refund' && !$isMasterAdmin && in_array($newStatus, ['APPROVED', 'REJECTED'])) {
-                die("Only Super Admins can Approve or Reject refunds.");
+                if (floatval($ticket['amount']) >= 500) {
+                    die("Only Master Admins can Approve or Reject refunds of $500 or more.");
+                }
             }
             if ($newStatus !== $ticket['status']) {
                 $updates['status'] = $newStatus;
@@ -59,6 +61,15 @@ try {
             if ($newPriority !== $ticket['priority']) {
                 $updates['priority'] = $newPriority;
                 $changes[] = "Priority changed to " . $newPriority;
+            }
+            if (isset($_POST['amount']) && floatval($_POST['amount']) !== floatval($ticket['amount'])) {
+                $updates['amount'] = floatval($_POST['amount']);
+                $changes[] = "Amount updated to $" . number_format($updates['amount'], 2);
+            }
+            if (isset($_POST['sla_due_date']) && $_POST['sla_due_date'] !== ($ticket['sla_due_date'] ?? '')) {
+                $newSla = empty($_POST['sla_due_date']) ? null : $_POST['sla_due_date'];
+                $updates['sla_due_date'] = $newSla;
+                $changes[] = "SLA Due Date updated to " . ($newSla ? date('M d, Y h:i A', strtotime($newSla)) : 'None');
             }
         }
         
@@ -237,8 +248,11 @@ html_start('Ticket #' . $ticketId);
         <?php include 'components/navbar.php'; ?>
         
         <div class="ticket-view px-4">
-            <div class="mb-4">
+            <div class="mb-4 d-flex justify-content-between align-items-center">
                 <a href="tickets.php" class="text-decoration-none text-muted"><i class="bi bi-arrow-left"></i> Back to Tickets</a>
+                <?php if ($ticket['amount'] > 0): ?>
+                    <a href="generate-invoice.php?ticket_id=<?= $ticket['id'] ?>" target="_blank" class="btn btn-outline-primary btn-sm fw-bold"><i class="bi bi-receipt"></i> View Receipt</a>
+                <?php endif; ?>
             </div>
             
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -252,9 +266,70 @@ html_start('Ticket #' . $ticketId);
                 </div>
             </div>
 
+            <!-- Flowchart Panel -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-diagram-3-fill me-2"></i>Ticket Journey Map</h6>
+                    <div class="text-center overflow-auto bg-light p-3 rounded" style="min-height: 120px; display: flex; align-items: center; justify-content: center;">
+                        <pre class="mermaid bg-transparent m-0">
+<?php
+$steps = ['SUBMITTED'];
+$history = array_reverse($comments);
+foreach ($history as $c) {
+    if (preg_match('/Status changed to ([A-Z_]+)/', $c['comment'], $matches)) {
+        $steps[] = $matches[1];
+    }
+}
+if (end($steps) !== $ticket['status']) {
+    $steps[] = $ticket['status'];
+}
+
+$cleanSteps = [];
+$last = null;
+foreach($steps as $s) {
+    if ($s !== $last) {
+        $cleanSteps[] = $s;
+        $last = $s;
+    }
+}
+
+echo "graph LR\n";
+for ($i = 0; $i < count($cleanSteps); $i++) {
+    $nodeId = "N" . $i;
+    $label = str_replace('_', ' ', $cleanSteps[$i]);
+    echo "    " . $nodeId . "(\"" . $label . "\")\n";
+    if ($i > 0) {
+        $prevId = "N" . ($i - 1);
+        echo "    " . $prevId . " --> " . $nodeId . "\n";
+    }
+}
+
+echo "    classDef current fill:#2563eb,stroke:#1d4ed8,stroke-width:3px,color:#fff,font-weight:bold,rx:8px,ry:8px;\n";
+echo "    classDef past fill:#f8fafc,stroke:#cbd5e1,stroke-width:2px,color:#475569,rx:8px,ry:8px;\n";
+
+for ($i = 0; $i < count($cleanSteps); $i++) {
+    $nid = "N" . $i;
+    if ($i === count($cleanSteps) - 1) {
+         echo "    class " . $nid . " current;\n";
+    } else {
+         echo "    class " . $nid . " past;\n";
+    }
+}
+?>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Initialize Mermaid JS -->
+            <script type="module">
+                import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+                mermaid.initialize({ startOnLoad: true, theme: 'base' });
+            </script>
+
             <div class="row g-4">
-                <!-- Main Thread -->
-                <div class="col-lg-5 mb-4">
+                <!-- Main Thread & Reply Area -->
+                <div class="col-lg-8 mb-4">
                     <div class="timeline-container">
                         <!-- Initial Request Content -->
                         <div class="timeline-item">
@@ -343,16 +418,14 @@ html_start('Ticket #' . $ticketId);
                         <?php endforeach; ?>
                     </div>
                 </div>
-                        
-                <!-- Reply Box -->
-                <div class="col-lg-4 sticky-col mb-4">
-                    <div class="reply-box">
+                    <!-- Reply Box -->
+                    <div class="reply-box mt-4">
                             <form method="POST">
                                 <input type="hidden" name="action" value="update_ticket">
                                 
                                 <?php if ($isAdmin): ?>
                                     <div class="row g-3 mb-3">
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <label class="form-label fw-bold">Update Status</label>
                                             <select name="status" class="form-select">
                                                 <?php
@@ -374,7 +447,7 @@ html_start('Ticket #' . $ticketId);
                                                 ?>
                                             </select>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <label class="form-label fw-bold">Update Priority</label>
                                             <select name="priority" class="form-select">
                                                 <?php
@@ -385,6 +458,19 @@ html_start('Ticket #' . $ticketId);
                                                 }
                                                 ?>
                                             </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold">Update Amount</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" step="0.01" name="amount" class="form-control" value="<?= htmlspecialchars($ticket['amount'] ?? '0.00') ?>">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold">SLA Due Date</label>
+                                            <input type="datetime-local" name="sla_due_date" class="form-control" value="<?= $ticket['sla_due_date'] ? date('Y-m-d\TH:i', strtotime($ticket['sla_due_date'])) : '' ?>">
                                         </div>
                                     </div>
                                 <?php endif; ?>
@@ -399,16 +485,22 @@ html_start('Ticket #' . $ticketId);
                                 </div>
                             </form>
                         </div>
-                    </div>
                 
                 <!-- Sidebar -->
-                <div class="col-lg-3 sticky-col">
+                <div class="col-lg-4 sticky-col">
                     <div class="meta-sidebar">
                         <h5 class="fw-bold mb-4 pb-2 border-bottom"><i class="bi bi-info-circle me-2 text-primary"></i>Ticket Info</h5>
                         
                         <div class="meta-group">
                             <div class="meta-label"><i class="bi bi-tag"></i>Ticket Type</div>
                             <div class="meta-value"><?= ucfirst($ticket['type']) ?></div>
+                        </div>
+                        
+                        <div class="meta-group">
+                            <div class="meta-label"><i class="bi bi-cash"></i>Amount</div>
+                            <div class="meta-value fw-bold text-success fs-5">
+                                $<?= number_format($ticket['amount'] ?? 0, 2) ?> <?= htmlspecialchars($ticket['currency'] ?? 'USD') ?>
+                            </div>
                         </div>
                         
                         <div class="meta-group">
@@ -448,11 +540,61 @@ html_start('Ticket #' . $ticketId);
                         </div>
                         
                         <div class="meta-group">
+                            <div class="meta-label"><i class="bi bi-clock-history"></i>SLA Due Date</div>
+                            <div class="meta-value">
+                                <?php if ($ticket['sla_due_date']): ?>
+                                    <?php 
+                                        $sla = strtotime($ticket['sla_due_date']);
+                                        $diff = $sla - time();
+                                        if (in_array($ticket['status'], ['CLOSED', 'RESOLVED', 'PROCESSED', 'REJECTED'])) {
+                                            $badge = '<span class="badge bg-secondary"><i class="bi bi-check-all"></i> Closed</span>';
+                                        } elseif ($diff < 0) {
+                                            $badge = '<span class="badge bg-danger"><i class="bi bi-fire"></i> Overdue</span>';
+                                        } elseif ($diff < 86400) {
+                                            $badge = '<span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle"></i> Due Soon</span>';
+                                        } else {
+                                            $badge = '<span class="badge bg-success"><i class="bi bi-shield-check"></i> On Track</span>';
+                                        }
+                                    ?>
+                                    <div class="fw-bold text-dark mb-1"><?= date('M d, Y h:i A', $sla) ?></div>
+                                    <?= $badge ?>
+                                <?php else: ?>
+                                    <span class="text-muted small fst-italic">Not set</span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        
+                        <div class="meta-group">
                             <div class="meta-label"><i class="bi bi-exclamation-triangle"></i>Delay Reason</div>
                             <div class="meta-value">
                                 <?= $ticket['delay_reason'] ? '<div class="alert alert-warning p-2 mb-0 small border-warning border-opacity-50">' . htmlspecialchars($ticket['delay_reason']) . '</div>' : '<span class="text-muted small fst-italic">None</span>' ?>
                             </div>
                         </div>
+                    </div>
+                    
+                    <!-- Journey Panel -->
+                    <div class="meta-sidebar mt-4">
+                        <h5 class="fw-bold mb-3 pb-2 border-bottom"><i class="bi bi-signpost-split text-success me-2"></i>Ticket Journey</h5>
+                        <div class="journey-timeline">
+                            <?php 
+                            $journeyComments = array_slice($comments, 0, 5);
+                            foreach ($journeyComments as $c): 
+                                $isAction = (strpos($c['comment'], 'changed to') !== false || strpos($c['comment'], 'Ticket created') !== false);
+                            ?>
+                                <div class="d-flex mb-3">
+                                    <div class="me-3 text-<?= $isAction ? 'warning' : 'primary' ?>"><i class="bi bi-<?= $isAction ? 'lightning-fill' : 'chat-dots-fill' ?>"></i></div>
+                                    <div>
+                                        <div class="small fw-bold text-dark"><?= htmlspecialchars($users[$c['user_id']]['name'] ?? 'System') ?></div>
+                                        <div class="text-muted" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i><?= date('M d, Y h:i A', strtotime($c['created_at'])) ?></div>
+                                        <div class="small text-truncate mt-1 text-secondary" style="max-width: 250px;"><?= strip_tags($c['comment']) ?></div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                            <?php if(empty($journeyComments)): ?>
+                                <div class="text-muted small fst-italic">No activity yet.</div>
+                            <?php endif; ?>
+                        </div>
+                        <a href="timeline.php?id=<?= $ticketId ?>&type=<?= $ticket['type'] ?>" class="btn btn-sm btn-outline-primary w-100 mt-2 fw-bold"><i class="bi bi-arrows-fullscreen me-1"></i> View Full Timeline</a>
                     </div>
                 </div>
             </div>

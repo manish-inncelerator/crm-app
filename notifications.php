@@ -288,69 +288,62 @@ html_start('Notifications');
                         <i class="bi bi-inbox"></i>
                     </div>
                     <h3 class="empty-state-title">No notifications</h3>
-                    <p class="empty-state-text">All caught up! No notifications match your filters. Check back later for
-                        updates.</p>
+                    <p class="empty-state-text">All caught up! No notifications match your filters. Check back later for updates.</p>
                 </div>
             <?php else: ?>
-                <?php
-                $currentDate = null;
-                foreach ($notifications as $n):
-                    $notificationDate = date('Y-m-d', strtotime($n['created_at']));
-                    if ($currentDate !== $notificationDate):
-                        $currentDate = $notificationDate;
-                        ?>
-                        <div class="notification-group-date">
-                            <?= date('F j, Y', strtotime($currentDate)) ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <div class="notification-card <?= !$n['is_read'] ? 'unread' : '' ?>">
-                        <div class="notification-icon-box notification-icon-<?= $n['type'] ?>">
-                            <?php
-                            switch ($n['type']) {
-                                case 'info':
-                                    echo '<i class="bi bi-info-circle-fill"></i>';
-                                    break;
-                                case 'success':
-                                    echo '<i class="bi bi-check-circle-fill"></i>';
-                                    break;
-                                case 'warning':
-                                    echo '<i class="bi bi-exclamation-triangle-fill"></i>';
-                                    break;
-                                case 'error':
-                                    echo '<i class="bi bi-x-circle-fill"></i>';
-                                    break;
-                                default:
-                                    echo '<i class="bi bi-bell-fill"></i>';
-                                    break;
-                            }
-                            ?>
-                        </div>
-                        <div class="notification-content">
-                            <div class="notification-header">
-                                <h3 class="notification-title"><?= htmlspecialchars($n['title']) ?></h3>
-                                <span class="notification-time"><?= date('H:i', strtotime($n['created_at'])) ?></span>
-                            </div>
-                            <p class="notification-message"><?= htmlspecialchars($n['message']) ?></p>
-                            <div class="notification-footer">
-                                <?php if (!$n['is_read']): ?>
-                                    <span class="notification-badge">
-                                        <i class="bi bi-star-fill"></i> New
-                                    </span>
-                                    <button onclick="markAsRead(<?= $n['id'] ?>)" class="notification-link">
-                                        Mark as read
-                                    </button>
-                                <?php endif; ?>
-                                <?php if ($n['ticket_id']): ?>
-                                    <a href="tickets.php?id=<?= $n['ticket_id'] ?>&type=<?= $n['ticket_type'] ?>"
-                                        class="notification-link">
-                                        <i class="bi bi-arrow-right"></i> View Ticket
-                                    </a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
+                <div class="card border-0 shadow-sm">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 5%;">Type</th>
+                                    <th style="width: 20%;">Date & Time</th>
+                                    <th style="width: 20%;">Title</th>
+                                    <th style="width: 40%;">Message</th>
+                                    <th style="width: 15%;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($notifications as $n): ?>
+                                    <tr class="<?= !$n['is_read'] ? 'table-primary fw-bold' : '' ?>">
+                                        <td class="text-center">
+                                            <?php
+                                            switch ($n['type']) {
+                                                case 'info': echo '<i class="bi bi-info-circle-fill text-primary fs-5"></i>'; break;
+                                                case 'success': echo '<i class="bi bi-check-circle-fill text-success fs-5"></i>'; break;
+                                                case 'warning': echo '<i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i>'; break;
+                                                case 'error': echo '<i class="bi bi-x-circle-fill text-danger fs-5"></i>'; break;
+                                                default: echo '<i class="bi bi-bell-fill text-secondary fs-5"></i>'; break;
+                                            }
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <div class="small"><?= date('M d, Y', strtotime($n['created_at'])) ?></div>
+                                            <div class="text-muted small"><?= date('h:i A', strtotime($n['created_at'])) ?></div>
+                                        </td>
+                                        <td><?= htmlspecialchars($n['title']) ?></td>
+                                        <td><span class="text-wrap"><?= htmlspecialchars($n['message']) ?></span></td>
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                <?php if (!$n['is_read']): ?>
+                                                    <button onclick="markAsRead(<?= $n['id'] ?>)" class="btn btn-sm btn-outline-primary" title="Mark as read">
+                                                        <i class="bi bi-check2"></i>
+                                                    </button>
+                                                <?php endif; ?>
+                                                <?php if ($n['ticket_id']): ?>
+                                                    <a href="ticket-details.php?id=<?= $n['ticket_id'] ?>" class="btn btn-sm btn-outline-secondary" title="View Ticket">
+                                                        <i class="bi bi-arrow-right"></i>
+                                                    </a>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
-                <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
 
                 <!-- Pagination -->
                 <?php if ($total_pages > 1): ?>

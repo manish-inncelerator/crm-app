@@ -30,25 +30,26 @@ $is_admin = (bool)($dbUser['is_admin'] ?? false);
 $ticketId = $_GET['id'] ?? null;
 $ticketType = $_GET['type'] ?? null;
 
+if ($ticketId && !$ticketType) {
+    $unified = $database->get('tickets_unified', ['type'], ['id' => $ticketId]);
+    if ($unified) $ticketType = $unified['type'];
+}
+
 $isGlobal = (!$ticketId || !$ticketType);
 
+// Fetch tickets for dropdown
+$allTickets = [];
+if ($is_admin) {
+    $allTickets = $database->select('tickets_unified', ['id', 'subtype', 'type'], ['ORDER' => ['id' => 'DESC']]);
+} else {
+    $allTickets = $database->select('tickets_unified', ['id', 'subtype', 'type'], ['user_id' => $dbUser['id'], 'ORDER' => ['id' => 'DESC']]);
+}
+
 if ($isGlobal) {
-    // Fetch all comments across all tickets, newest first
-    $comments = $database->select('ticket_comments', [
-        '[>]users' => ['user_id' => 'id']
-    ], [
-        'ticket_comments.comment',
-        'ticket_comments.created_at',
-        'ticket_comments.ticket_id',
-        'ticket_comments.ticket_type',
-        'users.name(user_name)',
-        'users.is_admin'
-    ], [
-        'ORDER' => ['ticket_comments.created_at' => 'DESC'],
-        'LIMIT' => 50
-    ]);
+    // We will just show an empty state if they need to select a ticket
+    $comments = [];
     $ticket = null;
-    $pageTitle = 'Recent Activity';
+    $pageTitle = 'Select a Ticket to View Timeline';
 } else {
     // Fetch all comments for this ticket, oldest first
     $comments = $database->select('ticket_comments', [
@@ -146,54 +147,65 @@ html_start($pageTitle);
         <div class="content-header">
             <h2 class="main-title mb-0" style="margin-bottom:0;"><i class="bi bi-clock-history"></i> <?php echo htmlspecialchars($pageTitle); ?></h2>
         </div>
+
+        <div class="card mb-4 border-0 shadow-sm mt-3">
+            <div class="card-body">
+                <form method="GET" action="timeline.php" class="row g-3 align-items-end">
+                    <div class="col-md-9">
+                        <label class="form-label text-muted small mb-1 fw-bold">Find Ticket Timeline</label>
+                        <select name="id" class="form-select">
+                            <option value="">-- Choose a Ticket --</option>
+                            <?php foreach($allTickets as $t): ?>
+                                <option value="<?= $t['id'] ?>" <?= $t['id'] == $ticketId ? 'selected' : '' ?>>
+                                    #<?= str_pad($t['id'], 5, '0', STR_PAD_LEFT) ?> - <?= htmlspecialchars($t['subtype']) ?> (<?= ucfirst($t['type']) ?>)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> View Timeline</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <?php if ($ticket): ?>
-            <div class="text-muted mb-4" style="text-align:center;">
-                Ticket #<?php echo htmlspecialchars($ticketId); ?> -
-                <?php echo htmlspecialchars(strip_tags($ticket['subject'] ?? $ticket['description'] ?? 'No Subject')); ?>
+            <div class="text-muted mb-4 text-center">
+                <span class="badge bg-secondary rounded-pill fs-6 px-3 py-2">
+                    Ticket #<?php echo htmlspecialchars($ticketId); ?> - <?php echo htmlspecialchars(strip_tags($ticket['subject'] ?? $ticket['description'] ?? 'No Subject')); ?>
+                </span>
             </div>
         <?php endif; ?>
-        <?php if (empty($comments)): ?>
-            <div class="alert alert-info" style="max-width:600px;margin:0 auto;">No timeline events found for this ticket.</div>
-        <?php endif; ?>
-        <div class="timeline-container">
-            <?php $count = count($comments);
-            foreach ($comments as $i => $comment):
-                list($badgeClass, $icon) = getBadgeAndIcon($comment['comment']);
-                $stepNumber = $i + 1;
-            ?>
-                <div class="timeline-card">
-                    <div class="timeline-step-circle">
-                        <span class="step-circle-text">#<?= $stepNumber ?></span>
-                    </div>
-                    <div class="timeline-item-connector-wrapper">
-                        <div class="timeline-widget">
-                            <div class="d-flex flex-wrap align-items-center mb-2 timeline-badge-row gap-2">
-                                <span class="timeline-badge <?= $badgeClass ?>">
-                                    <i class="bi <?= $icon ?>"></i> <?= htmlspecialchars($comment['user_name']) ?>
+
+        <?php if ($isGlobal): ?>
+            <div class="alert alert-info text-center shadow-sm border-0"><i class="bi bi-info-circle"></i> Please select a ticket from the dropdown above to view its history timeline.</div>
+        <?php elseif (empty($comments)): ?>
+            <div class="alert alert-warning text-center shadow-sm border-0"><i class="bi bi-exclamation-triangle"></i> No timeline events found for this ticket.</div>
+        <?php else: ?>
+            <div class="card border-0 shadow-sm">
+                <div class="list-group list-group-flush">
+                    <?php 
+                    $count = count($comments);
+                    foreach ($comments as $i => $comment):
+                        list($badgeClass, $icon) = getBadgeAndIcon($comment['comment']);
+                        $textColor = str_replace('bg-', 'text-', $badgeClass);
+                        if ($textColor === 'text-purple') $textColor = 'text-primary';
+                    ?>
+                        <div class="list-group-item py-4 px-4 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0 fw-bold <?= $textColor ?>"><i class="bi <?= $icon ?> me-2"></i> <?= htmlspecialchars($comment['user_name']) ?>
                                     <?php if ($comment['is_admin']): ?>
-                                        <span class="badge bg-dark ms-1" style="font-size:0.75rem; border-radius:12px;">Admin</span>
+                                        <span class="badge bg-dark ms-2" style="font-size:0.7rem; border-radius:12px;">Admin</span>
                                     <?php endif; ?>
-                                </span>
+                                </h6>
+                                <small class="text-muted"><i class="bi bi-clock me-1"></i> <?= date('M d, Y g:i A', strtotime($comment['created_at'])) ?></small>
                             </div>
-                            <div class="timeline-date">
-                                <?= date('F j, Y g:i A', strtotime($comment['created_at'])) ?>
-                            </div>
-                            <div class="timeline-comment"><?= nl2br(htmlspecialchars($comment['comment'])) ?></div>
-                            <?php if (isset($isGlobal) && $isGlobal): ?>
-                                <div class="mt-3 pt-2 border-top text-muted d-flex flex-wrap justify-content-between align-items-center gap-2" style="font-size:0.8rem;">
-                                    <span class="text-truncate" style="max-width: 100%;">
-                                        <i class="bi bi-ticket-detailed"></i> Ticket #<?= htmlspecialchars($comment['ticket_id']) ?> (<?= htmlspecialchars(ucfirst($comment['ticket_type'])) ?>)
-                                    </span>
-                                    <a href="timeline.php?id=<?= htmlspecialchars($comment['ticket_id']) ?>&type=<?= htmlspecialchars($comment['ticket_type']) ?>" class="btn btn-sm btn-outline-primary py-0 px-2 flex-shrink-0" style="font-size:0.75rem; border-radius:12px;">
-                                        View
-                                    </a>
-                                </div>
-                            <?php endif; ?>
+                            <p class="mb-0 text-secondary ps-4 ms-2 mt-2" style="border-left: 2px solid #e9ecef;"><?= nl2br(htmlspecialchars($comment['comment'])) ?></p>
                         </div>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
-            <?php endforeach; ?>
-        </div>
+            </div>
+        <?php endif; ?>
         <div class="d-flex justify-content-center mt-4">
             <a href="tickets.php" class="btn btn-outline-secondary btn-lg px-4 py-2 shadow-sm rounded-pill">
                 <i class="bi bi-arrow-left"></i> Back to Tickets

@@ -95,10 +95,16 @@ try {
 
 
     // Get recent activity
+    $activityPage = max(1, intval($_GET['activity_page'] ?? 1));
+    $activityPerPage = 5;
+    $activityOffset = ($activityPage - 1) * $activityPerPage;
+    $totalActivities = $database->count('notifications', ['user_id' => $dbUser['id']]);
+    $totalActivityPages = ceil($totalActivities / $activityPerPage);
+
     $recentActivity = $database->select('notifications', '*', [
         'user_id' => $dbUser['id'],
         'ORDER' => ['created_at' => 'DESC'],
-        'LIMIT' => 5
+        'LIMIT' => [$activityOffset, $activityPerPage]
     ]);
 
     // Update last_activity for current user
@@ -199,10 +205,11 @@ html_start('Dashboard - Fayyaz Travels CRM', ['assets/css/dashboard.css']);
         <div class="dashboard-actions-header">
             <h2>Overview</h2>
             <div class="action-buttons-group">
+                <?php if (!$is_admin): ?>
                 <a href="create-ticket.php" class="btn-premium">
                     <i class="fas fa-plus"></i> New Ticket
                 </a>
-
+                <?php endif; ?>
             </div>
         </div>
 
@@ -240,7 +247,7 @@ html_start('Dashboard - Fayyaz Travels CRM', ['assets/css/dashboard.css']);
         </div>
 
         <!-- Recent Activity Timeline -->
-        <div class="recent-activity-section">
+        <div class="recent-activity-section" id="recent-activity">
             <h3><i class="fas fa-history"></i> Recent Activity</h3>
             <?php if (empty($recentActivity)): ?>
                 <div class="empty-activity">
@@ -271,6 +278,19 @@ html_start('Dashboard - Fayyaz Travels CRM', ['assets/css/dashboard.css']);
                         </div>
                     <?php endforeach; ?>
                 </div>
+                
+                <!-- Pagination UI -->
+                <?php if ($totalActivityPages > 1): ?>
+                    <div class="d-flex justify-content-center mt-3 gap-2 align-items-center">
+                        <?php if ($activityPage > 1): ?>
+                            <a href="?activity_page=<?= $activityPage - 1 ?>#recent-activity" class="btn btn-sm btn-outline-primary"><i class="bi bi-chevron-left"></i> Previous</a>
+                        <?php endif; ?>
+                        <span class="text-muted small">Page <?= $activityPage ?> of <?= $totalActivityPages ?></span>
+                        <?php if ($activityPage < $totalActivityPages): ?>
+                            <a href="?activity_page=<?= $activityPage + 1 ?>#recent-activity" class="btn btn-sm btn-outline-primary">Next <i class="bi bi-chevron-right"></i></a>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
     </div>
