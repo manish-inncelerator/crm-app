@@ -29,7 +29,8 @@ if ($is_localhost) {
         'logging' => true,
         'error' => PDO::ERRMODE_EXCEPTION,
         'command' => [
-            'SET SQL_MODE=ANSI_QUOTES'
+            'SET SQL_MODE=ANSI_QUOTES',
+            "SET time_zone='+08:00'"
         ]
     ]);
 } else {
@@ -47,7 +48,8 @@ if ($is_localhost) {
         'logging' => true,
         'error' => PDO::ERRMODE_EXCEPTION,
         'command' => [
-            'SET SQL_MODE=ANSI_QUOTES'
+            'SET SQL_MODE=ANSI_QUOTES',
+            "SET time_zone='+08:00'"
         ]
     ]);
 }
